@@ -20,3 +20,15 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.dashboard-card {
+    border-radius: 1rem;
+}
+
+    .dashboard-card .card-body {
+        padding: 1.25rem 1.5rem;
+    }
+
+.card {
+    border: none;
+}

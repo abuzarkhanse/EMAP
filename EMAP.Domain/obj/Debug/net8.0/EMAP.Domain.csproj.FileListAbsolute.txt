@@ -1,0 +1,13 @@
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\bin\Debug\net8.0\EMAP.Domain.deps.json
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\bin\Debug\net8.0\EMAP.Domain.dll
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\bin\Debug\net8.0\EMAP.Domain.pdb
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.csproj.AssemblyReference.cache
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.AssemblyInfoInputs.cache
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.AssemblyInfo.cs
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.csproj.CoreCompileInputs.cache
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.sourcelink.json
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.dll
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\obj\Debug\net8.0\refint\EMAP.Domain.dll
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.pdb
+C:\Users\mrabu\Desktop\FYP\Development\EMAP\EMAP.Domain\obj\Debug\net8.0\ref\EMAP.Domain.dll
