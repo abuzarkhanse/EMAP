@@ -1,0 +1,44 @@
+﻿@model EMAP.Web.Controllers.EditChapterVm
+@using EMAP.Domain.Fyp
+
+@{
+    ViewData["Title"] = "Edit Chapter";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="mb-1">Edit Chapter</h4>
+            <p class="text-muted mb-3">@Model.ChapterType</p>
+
+            <form asp-action="EditChapter" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ChapterType" />
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" asp-for="IsOpen" />
+                    <label class="form-check-label" asp-for="IsOpen">
+                        Open this chapter (students can submit)
+                    </label>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Deadline</label>
+                    <input class="form-control" asp-for="Deadline" type="date" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Instructions for Students</label>
+                    <textarea class="form-control" asp-for="Instructions" rows="5"
+                              placeholder="Write what students must include, template rules, headings, etc..."></textarea>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary">Save</button>
+                    <a asp-action="Chapters" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

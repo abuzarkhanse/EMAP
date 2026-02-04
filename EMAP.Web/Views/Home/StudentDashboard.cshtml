@@ -3,188 +3,179 @@
 }
 
 <div class="container-fluid py-4">
-    <!-- Top heading / breadcrumb -->
+
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-0">Student Dashboard — FYP Portal</h2>
-            <small class="text-muted">Welcome back, @User.Identity?.Name</small>
+            <h2 class="mb-1">Student Dashboard</h2>
+            <p class="text-muted mb-0">
+                EMAP – Academic Project & Editorial Platform
+            </p>
         </div>
-        <div>
-            <button class="btn btn-outline-secondary btn-sm me-2">
-                <i class="bi bi-bell"></i> Notifications
-            </button>
-            <button class="btn btn-primary btn-sm">
-                <i class="bi bi-question-circle"></i> Help &amp; Support
-            </button>
+        <div class="text-end">
+            <span class="badge bg-light text-dark border px-3 py-2">
+                <i class="bi bi-person-circle me-1"></i>
+                @User.Identity?.Name
+            </span>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Left main area -->
-        <div class="col-lg-8 mb-4">
-            <!-- FYP / Thesis / Research cards -->
-            <div class="row g-3 mb-4">
-                <!-- FYP Card -->
-                <div class="col-md-6">
-                    <div class="card shadow-sm h-100 dashboard-card">
-                        <div class="card-body d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="card-title mb-0">FYP Module</h5>
-                                <span class="badge bg-primary">Active</span>
-                            </div>
-                            <p class="text-muted small mb-3">
-                                Manage your Final Year Project proposals, submissions and supervisor feedback.
-                            </p>
-                            <ul class="list-unstyled mb-3 small">
-                                <li>• Submit / update proposal</li>
-                                <li>• Track approval status</li>
-                                <li>• View supervisor comments</li>
-                                <li>• See upcoming FYP deadlines</li>
-                            </ul>
-                            <div class="mt-auto">
-                                <a href="#" class="btn btn-sm btn-primary me-2">Open FYP Portal</a>
-                                <a href="#" class="btn btn-sm btn-outline-secondary">View Guidelines</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Key Modules -->
+    <div class="row g-3 mb-4">
 
-                <!-- Thesis Card -->
-                <div class="col-md-6">
-                    <div class="card shadow-sm h-100 dashboard-card">
-                        <div class="card-body d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="card-title mb-0">Thesis Module</h5>
-                                <span class="badge bg-secondary">Upcoming</span>
-                            </div>
-                            <p class="text-muted small mb-3">
-                                Thesis timeline, chapter submissions and evaluation will appear here.
-                            </p>
-                            <ul class="list-unstyled mb-3 small">
-                                <li>• Register thesis topic</li>
-                                <li>• Submit chapters online</li>
-                                <li>• Check plagiarism &amp; reviews</li>
-                                <li>• Track final submission slot</li>
-                            </ul>
-                            <div class="mt-auto">
-                                <button class="btn btn-sm btn-outline-secondary" disabled>
-                                    Coming Soon
-                                </button>
-                            </div>
-                        </div>
+        <!-- FYP MODULE -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">
+                            <i class="bi bi-mortarboard-fill me-2"></i>Final Year Project (FYP)
+                        </h5>
+                        <span class="badge bg-success">Active</span>
                     </div>
-                </div>
 
-                <!-- Research Card -->
-                <div class="col-md-6">
-                    <div class="card shadow-sm h-100 dashboard-card">
-                        <div class="card-body d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="card-title mb-0">Research Module</h5>
-                                <span class="badge bg-secondary">Upcoming</span>
-                            </div>
-                            <p class="text-muted small mb-3">
-                                Manage research proposals, paper submissions and funding applications.
-                            </p>
-                            <ul class="list-unstyled mb-3 small">
-                                <li>• Submit research proposals</li>
-                                <li>• Track review decisions</li>
-                                <li>• Manage revisions &amp; resubmissions</li>
-                                <li>• Link to journals &amp; conferences</li>
-                            </ul>
-                            <div class="mt-auto">
-                                <button class="btn btn-sm btn-outline-secondary" disabled>
-                                    Coming Soon
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <p class="text-muted small">
+                        Manage your FYP lifecycle including group formation, supervisor selection,
+                        proposal submission and review.
+                    </p>
 
-                <!-- Quick Actions Card -->
-                <div class="col-md-6">
-                    <div class="card shadow-sm h-100 dashboard-card">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title mb-3">Quick Actions</h5>
-                            <div class="d-grid gap-2">
-                                <a href="#" class="btn btn-outline-primary btn-sm">
-                                    Submit New FYP Proposal
-                                </a>
-                                <a href="#" class="btn btn-outline-primary btn-sm">
-                                    View My Submissions
-                                </a>
-                                <a href="#" class="btn btn-outline-primary btn-sm">
-                                    Check Supervisor Feedback
-                                </a>
-                                <a href="#" class="btn btn-outline-primary btn-sm">
-                                    Download Templates &amp; Forms
-                                </a>
-                            </div>
-                        </div>
+                    <ul class="small mb-3">
+                        <li>Create / manage FYP group</li>
+                        <li>Select supervisor & track approval</li>
+                        <li>Submit proposal and revisions</li>
+                        <li>View feedback and defense status</li>
+                    </ul>
+
+                    <div class="mt-auto">
+                        <a asp-controller="Fyp" asp-action="Index"
+                           class="btn btn-primary btn-sm me-2">
+                            Open FYP Portal
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary btn-sm">
+                            View Guidelines
+                        </a>
                     </div>
                 </div>
-            </div> <!-- /row -->
+            </div>
         </div>
 
-        <!-- Right sidebar: Deadlines & Alerts -->
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow-sm mb-3">
+        <!-- THESIS MODULE -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">
+                            <i class="bi bi-book-half me-2"></i>Thesis Module
+                        </h5>
+                        <span class="badge bg-secondary">Upcoming</span>
+                    </div>
+
+                    <p class="text-muted small">
+                        Thesis registration, chapter submissions, plagiarism checks
+                        and evaluation workflow.
+                    </p>
+
+                    <ul class="small mb-3">
+                        <li>Register thesis topic</li>
+                        <li>Upload chapters</li>
+                        <li>Track evaluations</li>
+                        <li>Final submission & approval</li>
+                    </ul>
+
+                    <div class="mt-auto">
+                        <button class="btn btn-outline-secondary btn-sm" disabled>
+                            Coming Soon
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Secondary Row -->
+    <div class="row g-3">
+
+        <!-- QUICK ACTIONS -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h5 class="card-title mb-3">Upcoming Deadlines</h5>
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-lightning-charge-fill me-2"></i>Quick Actions
+                    </h5>
+
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Fyp" asp-action="Index"
+                           class="btn btn-outline-primary btn-sm">
+                            Go to FYP Portal
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            View My Submissions
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            Supervisor Feedback
+                        </a>
+                        <a href="~/templates/SRS Template.docx" class="btn btn-outline-secondary btn-sm">
+                            Download Templates (SRS)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEADLINES -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-calendar-event me-2"></i>Upcoming Deadlines
+                    </h5>
+
                     <ul class="list-unstyled small mb-0">
-                        <li class="mb-2">
+                        <li class="mb-3">
                             <strong>FYP Proposal Submission</strong><br />
                             <span class="text-muted">Due: 15 Dec 2025</span><br />
-                            <span class="badge bg-warning text-dark mt-1">5 days remaining</span>
+                            <span class="badge bg-warning text-dark">5 days remaining</span>
                         </li>
-                        <li class="mb-2">
+                        <li class="mb-3">
                             <strong>Supervisor Approval</strong><br />
                             <span class="text-muted">Due: 22 Dec 2025</span>
                         </li>
-                        <li class="mb-2">
-                            <strong>FYP Progress Presentation</strong><br />
-                            <span class="text-muted">Tentative: 10 Jan 2026</span>
+                        <li>
+                            <strong>Progress Presentation</strong><br />
+                            <span class="text-muted">Tentative: Jan 2026</span>
                         </li>
                     </ul>
                 </div>
             </div>
+        </div>
 
-            <div class="card shadow-sm mb-3">
+        <!-- ACTIVITY -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h5 class="card-title mb-3">Recent Activity</h5>
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-clock-history me-2"></i>Recent Activity
+                    </h5>
+
                     <ul class="list-unstyled small mb-0">
                         <li class="mb-2">
                             ✅ Proposal draft saved<br />
-                            <span class="text-muted">Today at 10:45 AM</span>
+                            <span class="text-muted">Today, 10:45 AM</span>
                         </li>
                         <li class="mb-2">
-                            📩 Notification from Supervisor<br />
-                            <span class="text-muted">Yesterday at 6:30 PM</span>
+                            📩 Supervisor notification received<br />
+                            <span class="text-muted">Yesterday</span>
                         </li>
-                        <li class="mb-2">
-                            📄 Template “FYP Proposal Format” downloaded<br />
+                        <li>
+                            📄 Template downloaded<br />
                             <span class="text-muted">2 days ago</span>
                         </li>
                     </ul>
                 </div>
             </div>
-
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">Need Help?</h5>
-                    <p class="small text-muted mb-2">
-                        For academic queries, contact your supervisor. For portal issues, open a ticket.
-                    </p>
-                    <div class="d-grid gap-2">
-                        <a href="#" class="btn btn-sm btn-outline-primary">
-                            Open Support Ticket
-                        </a>
-                        <a href="#" class="btn btn-sm btn-outline-secondary">
-                            View User Guide
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
-    </div> <!-- /row -->
+
+    </div>
+
 </div>

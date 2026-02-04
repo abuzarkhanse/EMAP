@@ -1,0 +1,824 @@
+﻿@using EMAP.Domain.Fyp
+@model EMAP.Web.ViewModels.Fyp.FypPortalViewModel
+
+@{
+    ViewData["Title"] = "FYP Portal";
+
+    // ===== Proposal status helpers (define ONCE, reuse everywhere) =====
+    var pStatus = Model.Proposal?.Status.ToString() ?? "";
+
+    var hasProposal = Model.HasProposal;
+    var isPending = pStatus == "PendingReview";
+    var isChanges = pStatus == "ChangesRequested";
+
+    // Proposal accepted (move forward)
+    var isAccepted =
+        pStatus == "ApprovedForDefense" ||
+        pStatus == "ProposalAccepted" ||
+        pStatus == "DefenseScheduled" ||
+        pStatus == "DefenseChangesRequired";
+
+    // Defense helpers
+    var isDefenseScheduled = pStatus == "DefenseScheduled";
+    var isDefensePendingSlot = (pStatus == "ApprovedForDefense" || pStatus == "ProposalAccepted");
+
+    // Flow status
+    var step1Done = Model.HasGroup;
+    var step2Done = Model.HasSupervisor;
+    var step3Done = (Model.Group?.Status == GroupStatus.Approved);
+    var step4Done = Model.HasProposal;
+
+    // Defense step state
+    var defenseHasResult = Model.DefenseEvaluation != null;
+    var defenseHasSlot = Model.DefenseSchedule != null;
+}
+
+<div class="container py-4">
+
+    <!-- ===== HEADER ===== -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-1">Final Year Project Portal</h3>
+                <small class="text-muted">
+                    @if (Model.ActiveCall != null)
+                    {
+                        <span>Batch @Model.ActiveCall.Batch — @Model.ActiveCall.Title</span>
+                    }
+                    else
+                    {
+                        <span>No active FYP call</span>
+                    }
+                </small>
+            </div>
+            <a asp-controller="Home" asp-action="StudentDashboard"
+               class="btn btn-outline-secondary btn-sm">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== FLASH MESSAGES ===== -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <!-- ===== CONNECTED FLOW (UI only) ===== -->
+    <div class="fyp-flow mb-4">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="step @(step1Done ? "done" : "pending")">1. Group</div>
+            <div class="line"></div>
+            <div class="step @(step2Done ? "done" : "pending")">2. Supervisor</div>
+            <div class="line"></div>
+            <div class="step @(step3Done ? "done" : "pending")">3. Approval</div>
+            <div class="line"></div>
+            <div class="step @(step4Done ? "done" : "pending")">4. Proposal</div>
+            <div class="line"></div>
+            <div class="step @((defenseHasSlot || defenseHasResult) ? "done" : "pending")">5. Defense</div>
+            <div class="line"></div>
+            <div class="step @(Model.OpenChapter != null ? "done" : "pending")">6. Chapters</div>
+        </div>
+    </div>
+
+    <!-- ===== PROGRESS ===== -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h6 class="mb-3">FYP Progress</h6>
+            <div class="d-flex justify-content-between text-center small">
+                <div class="flex-fill">
+                    <div class="fw-bold @(Model.HasGroup ? "text-success" : "text-muted")">1</div>
+                    <div>Create Group</div>
+                </div>
+                <div class="flex-fill">
+                    <div class="fw-bold @(Model.HasSupervisor ? "text-success" : "text-muted")">2</div>
+                    <div>Select Supervisor</div>
+                </div>
+                <div class="flex-fill">
+                    <div class="fw-bold @(Model.Group?.Status == GroupStatus.Approved ? "text-success" : "text-muted")">3</div>
+                    <div>Supervisor Approval</div>
+                </div>
+                <div class="flex-fill">
+                    <div class="fw-bold @(Model.HasProposal ? "text-success" : "text-muted")">4</div>
+                    <div>Proposal</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- ===== LEFT MAIN ===== -->
+        <div class="col-lg-8">
+
+            <!-- ===== CURRENT CALL ===== -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-megaphone me-2"></i>Current FYP Call
+                    </h5>
+
+                    @if (Model.ActiveCall == null)
+                    {
+                        <p class="text-muted mb-0">
+                            No active FYP call at the moment.
+                        </p>
+                    }
+                    else
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-1">
+                                    @Model.ActiveCall.Title (@Model.ActiveCall.Batch)
+                                </h6>
+                                <small class="text-muted">
+                                    Announced: @Model.ActiveCall.AnnouncementDate.ToString("dd MMM yyyy")
+                                </small>
+                            </div>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+
+                        <div class="small">
+                            <strong>Proposal Deadline:</strong>
+                            @Model.ActiveCall.ProposalDeadline.ToString("dd MMM yyyy")
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- ===== STATUS CARDS ===== -->
+            <div class="row g-4">
+
+                <!-- GROUP -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card shadow-sm status-card">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-people me-1"></i> Group
+                            </h6>
+
+                            @if (Model.HasGroup)
+                            {
+                                <p class="small mb-1">Group created</p>
+                                <span class="badge bg-info text-dark">@Model.Group!.Status</span>
+                            }
+                            else
+                            {
+                                <p class="small text-muted mb-2">No group created yet.</p>
+                                @if (Model.ActiveCall != null)
+                                {
+                                    <a asp-action="CreateGroup" class="btn btn-sm btn-outline-primary">
+                                        Create Group
+                                    </a>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUPERVISOR -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card shadow-sm status-card">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-person-badge me-1"></i> Supervisor
+                            </h6>
+
+                            @if (Model.HasSupervisor)
+                            {
+                                <p class="small mb-1"><strong>@Model.Group!.Supervisor!.Name</strong></p>
+
+                                @if (Model.Group!.Status == GroupStatus.PendingSupervisorApproval)
+                                {
+                                    <span class="badge bg-warning text-dark">Pending Approval</span>
+                                }
+                                else if (Model.Group!.Status == GroupStatus.Approved)
+                                {
+                                    <span class="badge bg-success">Approved</span>
+                                }
+                            }
+                            else
+                            {
+                                <p class="small text-muted mb-0">Supervisor not selected yet.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROPOSAL -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card shadow-sm status-card">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-file-earmark-text me-1"></i> Proposal
+                            </h6>
+
+                            @if (Model.HasProposal)
+                            {
+                                <p class="small mb-1">
+                                    <strong>@Model.Proposal!.Title</strong>
+                                </p>
+
+                                <span class="badge bg-info text-dark">@Model.Proposal.Status</span>
+
+                                @* Revision required *@
+                                @if (isChanges)
+                                {
+                                    if (!string.IsNullOrWhiteSpace(Model.Proposal.SupervisorFeedback))
+                                    {
+                                        <div class="alert alert-danger small mt-2 mb-2">
+                                            <strong>Revision Required:</strong><br />
+                                            @Model.Proposal.SupervisorFeedback
+                                        </div>
+                                    }
+
+                                    @if (Model.IsGroupLeader)
+                                    {
+                                        <a asp-action="SubmitProposal" class="btn btn-sm btn-warning">
+                                            Resubmit Proposal
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted small mt-2">
+                                            Only the group leader can resubmit.
+                                        </div>
+                                    }
+                                }
+
+                                @* Under review *@
+                                @if (isPending)
+                                {
+                                    <div class="text-muted small mt-2">
+                                        Proposal is under review by supervisor.
+                                    </div>
+                                }
+
+                                @* Accepted *@
+                                @if (isAccepted)
+                                {
+                                    <div class="text-success small mt-2">
+                                        Proposal accepted. Proceed to next phase.
+                                    </div>
+
+                                    @if (Model.DefenseSchedule != null)
+                                    {
+                                        <a asp-action="Index"
+                                           asp-route-showDefense="1"
+                                           class="btn btn-sm btn-outline-primary mt-2">
+                                            View Slot & Instructions
+                                        </a>
+                                    }
+                                }
+                            }
+                            else if (Model.CanSubmitProposal)
+                            {
+                                @if (Model.IsGroupLeader)
+                                {
+                                    <a asp-action="SubmitProposal" class="btn btn-sm btn-outline-primary">
+                                        Submit Proposal
+                                    </a>
+                                }
+                                else
+                                {
+                                    <div class="text-muted small">
+                                        Only the group leader can submit the proposal.
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p class="small text-muted mb-0">Not available yet.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEFENSE -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card shadow-sm status-card">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-shield-check me-1"></i> Defense
+                            </h6>
+
+                            @* IMPORTANT: Show ONLY ONE state at a time *@
+                            @if (!Model.HasProposal)
+                            {
+                                <p class="small text-muted mb-0">Not available yet.</p>
+                            }
+                            else if (Model.DefenseEvaluation != null)
+                            {
+                                <span class="badge bg-success">Evaluated</span>
+
+                                <div class="small mt-2">
+                                    <strong>Decision:</strong> @Model.DefenseEvaluation.Decision
+                                </div>
+
+                                <a asp-action="Index"
+                                   asp-route-showResult="1"
+                                   class="btn btn-sm btn-outline-success mt-2">
+                                    View Result
+                                </a>
+                            }
+                            else if (Model.DefenseSchedule != null)
+                            {
+                                <span class="badge bg-success">Scheduled</span>
+
+                                <div class="small text-muted mt-2">
+                                    Defense slot has been allocated.
+                                </div>
+
+                                <a asp-action="Index"
+                                   asp-route-showDefense="1"
+                                   class="btn btn-sm btn-outline-primary mt-2">
+                                    View Slot Details
+                                </a>
+                            }
+                            else if (isAccepted)
+                            {
+                                <span class="badge bg-warning text-dark">Pending Slot</span>
+                                <div class="small text-muted mt-2">
+                                    Committee will allocate date & time.
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="small text-muted mb-0">
+                                    Waiting proposal acceptance.
+                                </p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHAPTERS  01 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card shadow-sm status-card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title mb-3">
+                                <i class="bi bi-journal-text me-1 text-primary"></i>
+                                Chapters
+                            </h6>
+
+                            @* ================= NO CHAPTER YET ================= *@
+                            @if (Model.OpenChapter == null)
+                            {
+                                <div class="text-center mt-auto">
+                                    <i class="bi bi-info-circle text-muted fs-4"></i>
+                                    <p class="small text-muted mt-2 mb-0">
+                                        No chapter announced yet.<br />
+                                        Please wait for coordinator update.
+                                    </p>
+                                </div>
+                            }
+
+                            @* ================= CHAPTER OPEN – NOT SUBMITTED ================= *@
+                            else if (Model.ChapterSubmission == null)
+                            {
+                                <span class="badge bg-info text-dark mb-2 align-self-start">
+                                    @Model.OpenChapter.ChapterType
+                                </span>
+
+                                <p class="small text-muted mb-3">
+                                    Chapter is currently <strong>open for submission</strong>.
+                                </p>
+
+                                <a asp-controller="Fyp"
+                                   asp-action="SubmitChapter"
+                                   class="btn btn-primary btn-sm mt-auto">
+                                    <i class="bi bi-upload me-1"></i>
+                                    Submit Chapter
+                                </a>
+                            }
+
+                            @* ================= SUBMITTED ================= *@
+                            else if (Model.ChapterSubmission.Status == ChapterSubmissionStatus.Submitted)
+                            {
+                                <span class="badge bg-warning text-dark mb-2 align-self-start">
+                                    Submitted
+                                </span>
+
+                                <p class="small text-muted mt-2 mb-0">
+                                    Your chapter has been submitted successfully.<br />
+                                    <strong>Waiting for supervisor review.</strong>
+                                </p>
+                            }
+
+                            @* ================= CHANGES REQUESTED ================= *@
+                            else if (Model.ChapterSubmission.Status == ChapterSubmissionStatus.ChangesRequested)
+                            {
+                                <span class="badge bg-danger mb-2 align-self-start">
+                                    Changes Required
+                                </span>
+
+                                <p class="small text-muted mb-2">
+                                    Supervisor has requested revisions:
+                                </p>
+
+                                <div class="alert alert-warning py-2 px-3 small mb-3">
+                                    @Model.ChapterSubmission.Feedback
+                                </div>
+
+                                <button class="btn btn-sm btn-warning mt-auto"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#submitChapterModal">
+                                    <i class="bi bi-arrow-repeat me-1"></i>
+                                    Resubmit Chapter
+                                </button>
+                            }
+
+                            @* ================= Superisor APPROVAL ================= *@
+                            else if (Model.ChapterSubmission.Status == ChapterSubmissionStatus.SupervisorApproved)
+                            {
+                                <span class="badge bg-primary">
+                                    Supervisor Approved
+                                </span>
+
+                                <p class="small text-muted mt-2">
+                                    Your supervisor has approved this chapter.
+                                    It is now under final review by the coordinator.
+                                </p>
+
+                                <div class="alert alert-info small mt-2 mb-0">
+                                    <i class="bi bi-hourglass-split me-1"></i>
+                                    Please wait for coordinator decision.
+                                </div>
+                            }
+
+                            @* ================= FINAL APPROVAL ================= *@
+                            else if (Model.ChapterSubmission.Status == ChapterSubmissionStatus.CoordinatorApproved)
+                            {
+                                <span class="badge bg-success mb-2 align-self-start">
+                                    Accepted
+                                </span>
+
+                                <p class="small text-success mb-0">
+                                    🎉 Chapter completed successfully.<br />
+                                    You may proceed to the next phase.
+                                </p>
+                            }
+
+                            @if (Model.CompletedChapters != null && Model.CompletedChapters.Any())
+                            {
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="card shadow-sm border-success">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-success">
+                                                <i class="bi bi-check2-circle me-1"></i> Completed Chapters
+                                            </h6>
+
+                                            <ul class="list-group list-group-flush small">
+                                                @foreach (var c in Model.CompletedChapters)
+                                                {
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                        <span>
+                                                            <i class="bi bi-journal-check me-1 text-success"></i>
+                                                            @c.ChapterAnnouncement.ChapterType
+                                                        </span>
+                                                        <span class="badge bg-success">
+                                                            Approved
+                                                        </span>
+                                                    </li>
+                                                }
+                                            </ul>
+
+                                            <div class="small text-muted mt-2">
+                                                These chapters are finalized and locked.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SUPERVISOR LIST ===== -->
+            @if (Model.ShowSupervisorList)
+            {
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-person-badge me-2"></i>Available Supervisors
+                        </h5>
+
+                        @if (!Model.AvailableSupervisors.Any())
+                        {
+                            <p class="small text-muted mb-0">No supervisors available.</p>
+                        }
+                        else
+                        {
+                            <table class="table table-sm align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Field</th>
+                                        <th>Slots</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var s in Model.AvailableSupervisors)
+                                    {
+                                        <tr>
+                                            <td>@s.Name</td>
+                                            <td>@s.FieldOfExpertise</td>
+                                            <td>@s.CurrentSlots / @s.MaxSlots</td>
+                                            <td>
+                                                @if (Model.HasGroup && 
+                                                !Model.HasSupervisor &&
+                                                 Model.Group!.Status == GroupStatus.PendingSupervisorSelection)
+                                                {
+                                                    <form asp-controller="Fyp"
+                                                          asp-action="SelectSupervisor"
+                                                          method="post"
+                                                          class="d-inline">
+
+                                                        <input type="hidden" name="supervisorId" value="@s.Id" />
+
+                                                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                            Select
+                                                        </button>
+                                                    </form>
+
+                                                }
+                                                else if (
+                                                Model.ChapterSubmission != null &&
+                                                Model.Group?.Supervisor != null &&
+                                                Model.ChapterSubmission.SupervisorId == Model.Group.Supervisor.UserId
+                                                )
+                                                {
+                                                    <span class="badge bg-info text-dark">Requested</span>
+                                                }
+
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- ===== RIGHT SIDEBAR ===== -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-list-check me-2"></i>Next Steps
+                    </h5>
+                    <ol class="small mb-0">
+                        <li>Create your FYP group</li>
+                        <li>Select a supervisor</li>
+                        <li>Wait for approval</li>
+                        <li>Submit proposal</li>
+                        <li>Follow committee announcements (chapters)</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-info-circle me-2"></i>Information
+                    </h5>
+                    <p class="small text-muted mb-0">
+                        This workflow follows the approved FYP process defined in the EMAP SRS and departmental policy.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- =================== MODALS =================== -->
+@* ✅ MODAL: defense schedule *@
+@if (Model.DefenseSchedule != null)
+{
+    <div class="modal fade" id="defenseScheduleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Proposal Defense Slot & Instructions</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date</strong><br />
+                            @Model.DefenseSchedule.DefenseDate.ToString("dddd, dd MMM yyyy")
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Time</strong><br />
+                            @Model.DefenseSchedule.DefenseTime.ToString(@"hh\:mm")
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Duration</strong><br />
+                            @Model.DefenseSchedule.DurationMinutes minutes
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Venue</strong><br />
+                            @(string.IsNullOrWhiteSpace(Model.DefenseSchedule.Venue)
+                                                    ? "To be announced"
+                                                    : Model.DefenseSchedule.Venue)
+                    </div>
+                </div>
+
+                    <hr />
+
+                    <strong>Coordinator Instructions</strong>
+                    <div class="mt-2 p-3 bg-light border rounded">
+                    @if (string.IsNullOrWhiteSpace(Model.DefenseSchedule.Instructions))
+                        {
+                            <span class="text-muted">No additional instructions.</span>
+                        }
+                        else
+                        {
+                            @Html.Raw(Model.DefenseSchedule.Instructions.Replace("\n", "<br />"))
+                        }
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@* ✅ MODAL: defense result *@
+@if (Model.DefenseEvaluation != null)
+{
+    <div class="modal fade" id="defenseResultModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Defense Result & Feedback</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Present</strong><br />
+                            @(Model.DefenseEvaluation.IsPresent ? "Yes" : "No")
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Decision</strong><br />
+                            @Model.DefenseEvaluation.Decision
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <strong>Committee Feedback</strong>
+                    <div class="mt-2 p-3 bg-light border rounded">
+                        @if (string.IsNullOrWhiteSpace(Model.DefenseEvaluation.Feedback))
+                        {
+                            <span class="text-muted">No feedback provided.</span>
+                        }
+                        else
+                        {
+                            @Html.Raw(Model.DefenseEvaluation.Feedback.Replace("\n", "<br />"))
+                        }
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@* ✅ MODAL: NextChapter (ONLY ONE, uses Model.OpenChapter) *@
+<div class="modal fade" id="nextChapterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Next Phase — Chapter Instructions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                @if (Model.OpenChapter == null)
+                {
+                    <div class="alert alert-warning">
+                        Committee has not announced any chapter yet.
+                    </div>
+                }
+                else
+                {
+                    <form asp-action="SubmitChapter"
+                          asp-controller="Fyp"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        <input type="hidden" name="ChapterAnnouncementId" value="@Model.OpenChapter.Id" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Chapter</label>
+                            <input class="form-control"
+                                   value="@Model.OpenChapter.ChapterType"
+                                   readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Chapter Title</label>
+                            <input class="form-control"
+                                   name="Title"
+                                   placeholder="Enter chapter title"
+                                   required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Upload File</label>
+                            <input type="file"
+                                   name="File"
+                                   class="form-control"
+                                   accept=".pdf,.doc,.docx"
+                                   required />
+                        </div>
+
+                        @if (Model.OpenChapter.Deadline != null)
+                        {
+                            <p class="text-muted small">
+                                Deadline:
+                                @Model.OpenChapter.Deadline.Value.ToString("dd MMM yyyy")
+                            </p>
+                        }
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                Submit Chapter
+                            </button>
+                        </div>
+                    </form>
+                }
+            </div>
+
+            <div class="modal-footer">
+                <a class="btn btn-outline-secondary"
+                   href="~/templates/University_SRS_Template.docx"
+                   download>
+                    Download Template
+                </a>
+
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@* ====== INLINE SCRIPTS (FIX: no @section Scripts) ====== *@
+@if (Model.DefenseSchedule != null && Context.Request.Query["showDefense"] == "1")
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var el = document.getElementById("defenseScheduleModal");
+            if (el) {
+                var modal = new bootstrap.Modal(el);
+                modal.show();
+            }
+        });
+    </script>
+}
+
+@if (Model.DefenseEvaluation != null && Context.Request.Query["showResult"] == "1")
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var el = document.getElementById("defenseResultModal");
+            if (el) {
+                var modal = new bootstrap.Modal(el);
+                modal.show();
+            }
+        });
+    </script>
+}

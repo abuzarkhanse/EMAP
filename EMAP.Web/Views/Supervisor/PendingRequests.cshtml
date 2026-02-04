@@ -1,0 +1,124 @@
+﻿@using EMAP.Domain.Fyp
+@model IEnumerable<StudentGroup>
+
+@{
+    ViewData["Title"] = "Supervisor Requests";
+}
+
+<div class="container py-4">
+
+    <!-- ===== HEADER ===== -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Supervisor Requests</h2>
+            <p class="text-muted mb-0">
+                Student groups awaiting your supervision approval
+            </p>
+        </div>
+        <a asp-action="Dashboard" class="btn btn-outline-secondary btn-sm">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- ===== ALERTS ===== -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (ViewBag.Warning != null)
+    {
+        <div class="alert alert-warning small">
+            @ViewBag.Warning
+        </div>
+    }
+
+    <!-- ===== REQUESTS TABLE ===== -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            @if (!Model.Any())
+            {
+                <p class="text-muted mb-0">
+                    There are currently no pending supervision requests.
+                </p>
+            }
+            else
+            {
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Batch</th>
+                            <th>Group Members</th>
+                            <th>Status</th>
+                            <th class="text-end" style="width: 200px;">Decision</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var g in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@g.FypCall.Batch</strong>
+                                </td>
+
+                                <td class="small">
+                                    <div>
+                                        <strong>Leader:</strong> @g.LeaderId
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(g.Member2Id))
+                                    {
+                                        <div>
+                                            <strong>Member:</strong> @g.Member2Id
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(g.Member3Id))
+                                    {
+                                        <div>
+                                            <strong>Member:</strong> @g.Member3Id
+                                        </div>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-warning text-dark">
+                                        Pending Approval
+                                    </span>
+                                </td>
+
+                                <td class="text-end">
+                                    <form asp-action="Approve" method="post" class="d-inline">
+                                        <input type="hidden" name="groupId" value="@g.Id" />
+                                        <button class="btn btn-sm btn-success">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            Approve
+                                        </button>
+                                    </form>
+
+                                    <form asp-action="Reject" method="post" class="d-inline ms-1">
+                                        <input type="hidden" name="groupId" value="@g.Id" />
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-x-circle me-1"></i>
+                                            Reject
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info small mt-3 mb-0">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Approving a group assigns supervision responsibility to you.
+                    Rejecting allows students to select another supervisor.
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+﻿@model EMAP.Web.ViewModels.Fyp.CreateGroupViewModel
+
+@{
+    ViewData["Title"] = "Create FYP Group";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0">Create FYP Group</h2>
+            <small class="text-muted">
+                Batch @Model.Batch – @Model.ActiveCallTitle
+            </small>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to FYP Portal</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p class="small text-muted">
+                You are automatically set as the <strong>Group Leader</strong>. You may work
+                <strong>solo</strong> or add up to <strong>two more members</strong>.
+            </p>
+
+            <form asp-action="CreateGroup" method="post">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Member 2 Email (optional)</label>
+                    <input asp-for="Member2Email" class="form-control" />
+                    <span asp-validation-for="Member2Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3" id="member3-row" style="display:@(string.IsNullOrEmpty(Model.Member3Email) ? "none" : "block")">
+                    <label class="form-label fw-bold">Member 3 Email (optional)</label>
+                    <input asp-for="Member3Email" class="form-control" />
+                    <span asp-validation-for="Member3Email" class="text-danger small"></span>
+                </div>
+
+                <button type="button" id="add-member-btn" class="btn btn-sm btn-outline-secondary mb-3"
+                        style="display:@(string.IsNullOrEmpty(Model.Member3Email) ? "inline-block" : "none")">
+                    + Add another member
+                </button>
+
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        Create Group
+                    </button>
+                    <a asp-action="Index" class="btn btn-link">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var btn = document.getElementById("add-member-btn");
+            var row = document.getElementById("member3-row");
+            if (btn && row) {
+                btn.addEventListener("click", function () {
+                    row.style.display = "block";
+                    btn.style.display = "none";
+                });
+            }
+        })();
+    </script>
+}

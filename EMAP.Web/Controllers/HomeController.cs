@@ -1,6 +1,4 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using EMAP.Web.Models;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMAP.Web.Controllers
@@ -9,13 +7,15 @@ namespace EMAP.Web.Controllers
     {
         public IActionResult Index()
         {
+            // Keep it simple (not used as landing anymore)
             return View();
         }
 
+        // ✅ This matches Views/Home/StudentDashboard.cshtml
+        [Authorize(Roles = "Student")]
         public IActionResult StudentDashboard()
         {
-            return View();   // this will look for Views/Home/StudentDashboard.cshtml
+            return View();
         }
     }
 }
-

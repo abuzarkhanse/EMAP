@@ -1,0 +1,78 @@
+﻿@model EMAP.Web.ViewModels.Fyp.AssignSlotViewModel
+
+@{
+    ViewData["Title"] = "Assign Defense Slot";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0">Assign Defense Slot</h2>
+            <small class="text-muted">Each slot is typically 10 minutes (can adjust if needed)</small>
+        </div>
+        <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index", "FypCoordinator")">Back</a>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body small">
+            <div><strong>Batch:</strong> @Model.Batch</div>
+            <div><strong>Title:</strong> @Model.Title</div>
+            <div><strong>Group Leader:</strong> @Model.GroupLeader</div>
+            <div><strong>Supervisor:</strong> @Model.SupervisorName</div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            @using (Html.BeginForm("AssignSlot", "FypCoordinator", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.ProposalId)
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Defense Date</label>
+                        <input type="date" name="DefenseDate"
+                               value="@Model.DefenseDate.ToString("yyyy-MM-dd")"
+                               class="form-control" />
+                        <div class="form-text">
+                            Change date by editing and re-opening page if needed.
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Slot Time</label>
+                        @Html.DropDownListFor(m => m.SelectedSlot, Model.AvailableSlots, "-- Select Slot --",
+                        new { @class = "form-select" })
+                    @Html.ValidationMessageFor(m => m.SelectedSlot, "", new { @class = "text-danger small" })
+                    <div class="form-text">
+                        Disabled slots are already taken.
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Duration (minutes)</label>
+                    @Html.TextBoxFor(m => m.DurationMinutes, new { @class = "form-control" })
+                    <div class="form-text">Default is 10 minutes.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Venue (optional)</label>
+                    @Html.TextBoxFor(m => m.Venue, new { @class = "form-control", placeholder = "e.g., Lab 2 / Seminar Hall" })
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">Instructions / Committee Comments</label>
+                    @Html.TextAreaFor(m => m.Instructions, 5, 60,
+                                        new { @class = "form-control", placeholder = "e.g., Presentation must be 10 minutes. Include problem statement, methodology, and demo plan..." })
+                </div>
+            </div>
+
+            <hr />
+            <button type="submit" class="btn btn-success">
+                Save Schedule
+            </button>
+                        }
+        </div>
+    </div>
+</div>

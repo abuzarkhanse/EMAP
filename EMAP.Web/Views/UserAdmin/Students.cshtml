@@ -1,0 +1,69 @@
+﻿@using EMAP.Domain.Users
+@model EMAP.Web.Controllers.Admin.StudentListViewModel
+
+@{
+    ViewData["Title"] = "Manage Students";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0">Registered Students</h2>
+            <small class="text-muted">
+                Total registered students: @Model.TotalStudents
+            </small>
+        </div>
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm">
+            Back to Admin Dashboard
+        </a>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            @if (!Model.Students.Any())
+            {
+                <p class="text-muted mb-0">No student accounts found.</p>
+            }
+            else
+            {
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Registration #</th>
+                            <th>Department</th>
+                            <th style="width: 120px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model.Students)
+                        {
+                            <tr>
+                                <td>@s.FullName</td>
+                                <td>@s.Email</td>
+                                <td>@s.RegistrationNumber</td>
+                                <td>@s.Department</td>
+                                <td>
+                                    <a asp-action="Delete" asp-route-id="@s.Id"
+                                       class="btn btn-sm btn-outline-danger">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>

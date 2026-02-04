@@ -1,0 +1,33 @@
+﻿@model EMAP.Web.Controllers.Admin.ConfirmDeleteUserViewModel
+
+@{
+    ViewData["Title"] = "Confirm Delete Student";
+}
+
+<div class="container py-4">
+    <h2 class="mb-3">Delete Student Account</h2>
+
+    <div class="alert alert-warning">
+        <strong>Are you sure?</strong> This will permanently delete the student account:
+        <ul class="mb-0">
+            <li><strong>Name:</strong> @Model.FullName</li>
+            <li><strong>Email:</strong> @Model.Email</li>
+        </ul>
+        <p class="mb-0 mt-2">
+            This action cannot be undone. Only delete test accounts or accounts created by mistake.
+        </p>
+    </div>
+
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Email" />
+        <input type="hidden" asp-for="FullName" />
+
+        <button type="submit" class="btn btn-danger">
+            Yes, delete this student
+        </button>
+        <a asp-action="Students" class="btn btn-secondary ms-2">
+            Cancel
+        </a>
+    </form>
+</div>

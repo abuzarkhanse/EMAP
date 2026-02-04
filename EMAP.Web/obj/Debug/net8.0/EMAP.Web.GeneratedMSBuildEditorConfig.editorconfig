@@ -1,11 +1,19 @@
 is_global = true
 build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
 build_property.TargetPlatformMinVersion = 
 build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
 build_property.ProjectTypeGuids = 
 build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = EMAP.Web
 build_property.RootNamespace = EMAP.Web
@@ -20,6 +28,94 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Areas/Identity/Pages/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Areas/Identity/Pages/Account/Logout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxMb2dvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Areas/Identity/Pages/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Areas/Identity/Pages/Account/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxfVmlld0ltcG9ydHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Areas/Identity/Pages/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZhbGlkYXRpb25TY3JpcHRzUGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Areas/Identity/Pages/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Areas/Identity/Pages/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Admin/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/DefenseCommittee/Evaluate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVmZW5zZUNvbW1pdHRlZVxFdmFsdWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/DefenseCommittee/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVmZW5zZUNvbW1pdHRlZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/FypCall/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ2FsbFxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/FypCall/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ2FsbFxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/FypCoordinator/AssignSlot.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ29vcmRpbmF0b3JcQXNzaWduU2xvdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/FypCoordinator/ChapterApprovals.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ29vcmRpbmF0b3JcQ2hhcHRlckFwcHJvdmFscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/FypCoordinator/Chapters.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ29vcmRpbmF0b3JcQ2hhcHRlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/FypCoordinator/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ29vcmRpbmF0b3JcRGFzaGJvYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/FypCoordinator/EditChapter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ29vcmRpbmF0b3JcRWRpdENoYXB0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/FypCoordinator/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ29vcmRpbmF0b3JcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Fyp/CreateGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwXENyZWF0ZUdyb3VwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Fyp/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Fyp/SubmitChapter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwXFN1Ym1pdENoYXB0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Fyp/SubmitProposal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwXFN1Ym1pdFByb3Bvc2FsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -32,12 +128,64 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTdHVkZW50RGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Home/TestLogin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxUZXN0TG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Shared/_Alerts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BbGVydHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Shared/_LoginPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dpblBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Supervisor/ChapterReviews.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwZXJ2aXNvclxDaGFwdGVyUmV2aWV3cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Supervisor/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwZXJ2aXNvclxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Supervisor/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwZXJ2aXNvclxEYXNoYm9hcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Supervisor/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwZXJ2aXNvclxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Supervisor/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwZXJ2aXNvclxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Supervisor/PendingRequests.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwZXJ2aXNvclxQZW5kaW5nUmVxdWVzdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Supervisor/Proposals.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwZXJ2aXNvclxQcm9wb3NhbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/Supervisor/Review.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwZXJ2aXNvclxSZXZpZXcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/UserAdmin/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlckFkbWluXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/UserAdmin/Students.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlckFkbWluXFN0dWRlbnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/mrabu/Desktop/FYP/Development/EMAP/EMAP.Web/Views/_ViewImports.cshtml]

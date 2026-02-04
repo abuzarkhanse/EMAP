@@ -1,0 +1,125 @@
+﻿@using EMAP.Domain.Fyp
+@model IEnumerable<ProposalSubmission>
+
+@{
+    ViewData["Title"] = "Proposals";
+}
+
+<div class="container py-4">
+
+    <!-- ===== HEADER ===== -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">FYP Proposals</h2>
+            <p class="text-muted mb-0">
+                Review and manage submitted Final Year Project proposals
+            </p>
+        </div>
+        <a asp-controller="Supervisor"
+           asp-action="Dashboard"
+           class="btn btn-outline-secondary btn-sm">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- ===== ALERTS ===== -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (ViewBag.Warning != null)
+    {
+        <div class="alert alert-warning small">
+            @ViewBag.Warning
+        </div>
+    }
+
+    <!-- ===== PROPOSALS TABLE ===== -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            @if (!Model.Any())
+            {
+                <p class="text-muted mb-0">
+                    No proposals have been submitted by your groups yet.
+                </p>
+            }
+            else
+            {
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Batch</th>
+                            <th>Group Leader</th>
+                            <th>Submitted</th>
+                            <th>Status</th>
+                            <th class="text-end" style="width: 140px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@p.Group.FypCall.Batch</strong>
+                                </td>
+
+                                <td>
+                                    @p.Group.LeaderId
+                                </td>
+
+                                <td class="small">
+                                    @p.SubmittedAt.ToString("dd MMM yyyy HH:mm")
+                                    <div class="text-muted">
+                                        Revision @p.RevisionNumber
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @if (p.Status == ProposalStatus.PendingReview)
+                                    {
+                                        <span class="badge bg-info text-dark">
+                                            Pending Review
+                                        </span>
+                                    }
+                                    else if (p.Status == ProposalStatus.ChangesRequested)
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Changes Requested
+                                        </span>
+                                    }
+                                    else if (p.Status == ProposalStatus.ApprovedForDefense)
+                                    {
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            @p.Status
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="text-end">
+                                    <a asp-action="Review"
+                                       asp-route-id="@p.Id"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Review
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info small mt-3 mb-0">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Select <strong>Review</strong> to approve the proposal for defense
+                    or request revisions with feedback.
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,62 @@
+﻿@using EMAP.Domain.Fyp
+@model List<FypChapterSubmission>
+
+<h3 class="mb-3">Student Chapter Submissions</h3>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-success">
+        🎉 No chapters pending review.
+    </div>
+}
+
+<table class="table table-bordered align-middle">
+
+    <thead class="table-light">
+        <tr>
+            <th>Group</th>
+            <th>Chapter</th>
+            <th>Title</th>
+            <th>Submitted At</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>Group #@s.GroupId</td>
+                <td>@s.ChapterAnnouncement.ChapterType</td>
+                <td>@s.Title</td>
+                <td>@s.SubmittedAt.ToString("dd MMM yyyy")</td>
+                <td>
+                    <span class="badge bg-info">@s.Status</span>
+                </td>
+                <td>
+                    <a href="@s.FilePath" target="_blank"
+                       class="btn btn-sm btn-outline-primary">
+                        View
+                    </a>
+
+                    <!-- ✅ ACCEPT -->
+                    <form asp-action="ReviewChapter" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="submissionId" value="@s.Id" />
+                        <input type="hidden" name="approve" value="true" />
+                        <button class="btn btn-sm btn-success">Accept</button>
+                    </form>
+
+                    <form asp-action="ReviewChapter" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="submissionId" value="@s.Id" />
+                        <input type="hidden" name="approve" value="false" />
+                        <input type="hidden" name="feedback" value="Need changes" />
+                        <button class="btn btn-sm btn-warning">Changes</button>
+                    </form>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

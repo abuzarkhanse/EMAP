@@ -1,0 +1,191 @@
+﻿@using EMAP.Domain.Fyp
+@model ProposalSubmission
+
+@{
+    ViewData["Title"] = "Review Proposal";
+}
+
+<div class="container py-4">
+
+    <!-- ===== ALERTS ===== -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <!-- ===== HEADER ===== -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Proposal Review</h2>
+            <p class="text-muted mb-0">
+                Evaluate the submitted FYP proposal and take appropriate action
+            </p>
+        </div>
+        <a asp-action="Proposals" class="btn btn-outline-secondary btn-sm">
+            Back to Proposals
+        </a>
+    </div>
+
+    <!-- ===== PROPOSAL INFO ===== -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row small">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Batch:</strong> @Model.Group.FypCall.Batch</p>
+                    <p class="mb-1"><strong>Group Leader:</strong> @Model.Group.LeaderId</p>
+                    <p class="mb-1"><strong>Supervisor:</strong> @Model.Group.Supervisor?.Name</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1">
+                        <strong>Submitted:</strong>
+                        @Model.SubmittedAt.ToString("dd MMM yyyy HH:mm")
+                        (Revision @Model.RevisionNumber)
+                    </p>
+                    <p class="mb-1">
+                        <strong>Proposal File:</strong>
+                        <a href="@Model.FilePath" target="_blank">Download</a>
+                    </p>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.SupervisorFeedback))
+            {
+                <hr />
+                <p class="small text-muted mb-0">
+                    <strong>Previous Feedback:</strong>
+                    @Model.SupervisorFeedback
+                </p>
+            }
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- ===== DECISION / STATUS AREA (MERGED LOGIC) ========= -->
+    <!-- ===================================================== -->
+    @if (Model.Status == ProposalStatus.PendingReview ||
+        Model.Status == ProposalStatus.ChangesRequested)
+    {
+        <!-- ===== ACTION BUTTONS (ONLY WHEN ALLOWED) ===== -->
+        <div class="row g-4">
+
+            <!-- APPROVE -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-success h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-success mb-2">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Approve for Defense
+                        </h5>
+
+                        <p class="small text-muted">
+                            Select this option if the proposal meets academic requirements
+                            and is ready to proceed to defense scheduling.
+                        </p>
+
+                        <form asp-action="ApproveForDefense" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-success">
+                                Approve Proposal
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REQUEST CHANGES -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-warning h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-warning mb-2">
+                            <i class="bi bi-pencil-square me-2"></i>
+                            Request Changes
+                        </h5>
+
+                        <p class="small text-muted">
+                            Provide academic feedback and require the student to revise
+                            and resubmit the proposal.
+                        </p>
+
+                        <form asp-action="RequestChanges" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">
+                                    Supervisor Feedback
+                                </label>
+                                <textarea name="feedback"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Provide clear guidance for revision...">@Model.SupervisorFeedback</textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-outline-warning">
+                                Send Feedback & Request Revision
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+    else if (Model.Status == ProposalStatus.ApprovedForDefense)
+    {
+        <!-- ===== LOCKED AFTER APPROVAL ===== -->
+        <div class="alert alert-info mt-4">
+            <i class="bi bi-lock-fill me-1"></i>
+            Proposal is <strong>approved</strong>. Waiting for
+            <strong>FYP Coordinator</strong> to assign defense slot/time.
+            Supervisor actions are locked.
+        </div>
+    }
+    else if (Model.Status == ProposalStatus.DefenseScheduled)
+    {
+        <!-- ===== DEFENSE SCHEDULED ===== -->
+        <div class="alert alert-success mt-4">
+            <i class="bi bi-calendar-check me-1"></i>
+            Defense is <strong>scheduled</strong>. Supervisor actions are locked.
+        </div>
+
+        @if (Model.DefenseSchedule != null)
+        {
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="mb-3">Defense Schedule</h6>
+
+                    <div><strong>Date:</strong> @Model.DefenseSchedule.DefenseDate.ToString("dd MMM yyyy")</div>
+                    <div><strong>Time:</strong> @Model.DefenseSchedule.DefenseTime.ToString(@"hh\:mm")</div>
+                    <div><strong>Duration:</strong> @Model.DefenseSchedule.DurationMinutes minutes</div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.DefenseSchedule.Venue))
+                    {
+                        <div><strong>Venue:</strong> @Model.DefenseSchedule.Venue</div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.DefenseSchedule.Instructions))
+                    {
+                        <hr />
+                        <div class="small text-muted">
+                            <strong>Instructions:</strong>
+                            @Model.DefenseSchedule.Instructions
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+
+    <!-- ===== FOOTNOTE ===== -->
+    <div class="alert alert-light small mt-4">
+        <i class="bi bi-info-circle me-1"></i>
+        Approved proposals move to defense scheduling by the FYP Coordinator.
+        Proposals with requested changes must be revised and resubmitted by the student.
+    </div>
+
+</div>

@@ -1,0 +1,113 @@
+﻿@model EMAP.Web.Controllers.Admin.DefenseIndexVm
+
+@{
+    ViewData["Title"] = "Defense Reviews";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-0">Proposal Defense Reviews</h4>
+                <small class="text-muted">Search by project title, student username/email, group id, proposal id</small>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Defense Date</label>
+                    <input type="date" class="form-control" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Search</label>
+                    <input class="form-control" name="q" value="@Model.Query" placeholder="project title / student username / group id / proposal id" />
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            @if (Model.Items.Count == 0)
+            {
+                <p class="text-muted mb-0">No scheduled defenses found for this date.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Time</th>
+                                <th>Project</th>
+                                <th>Members</th>
+                                <th>Batch</th>
+                                <th>Status</th>
+                                <th>Evaluation</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var x in Model.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">@x.Time</div>
+                                        <div class="small text-muted">@x.DurationMinutes min</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">@x.Title</div>
+                                        <div class="small text-muted">Group #@x.GroupId | Proposal #@x.ProposalId</div>
+                                    </td>
+                                    <td class="small">@x.Members</td>
+                                    <td>@x.Batch</td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">@x.Status</span>
+                                    </td>
+                                    <td>
+                                        @if (!x.HasEvaluation)
+                                        {
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">Done</span>
+                                            <div class="small text-muted">
+                                                @(x.IsPresent == true ? "Present" : "Absent")
+                                                @if (!string.IsNullOrWhiteSpace(x.Decision))
+                                                {
+                                                    <span> | @x.Decision</span>
+                                                }
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-action="Evaluate" asp-route-id="@x.ProposalId"
+                                           class="btn btn-sm btn-primary">
+                                            @(x.HasEvaluation ? "Edit" : "Evaluate")
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

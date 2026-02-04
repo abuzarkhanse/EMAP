@@ -1,0 +1,196 @@
+﻿@model EMAP.Web.Controllers.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "FYP Admin Dashboard";
+}
+
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col-lg-8">
+            <h2 class="mb-1">EMAP – FYP Administration</h2>
+            <p class="text-muted mb-0">
+                Monitor the full FYP lifecycle: calls, supervisors, student groups and proposals.
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+            <span class="badge bg-primary-subtle border border-primary text-primary px-3 py-2">
+                <i class="bi bi-mortarboard me-1"></i>
+                Academic Session @DateTime.Now.Year / @(DateTime.Now.Year + 1)
+            </span>
+        </div>
+    </div>
+
+    <!-- Top metrics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <span class="badge bg-primary rounded-circle p-3">
+                                <i class="bi bi-megaphone-fill text-white"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-muted small">FYP Calls (Active / Total)</div>
+                            <div class="fs-4 fw-semibold">
+                                @Model.ActiveCalls<span class="text-muted"> / @Model.TotalCalls</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <span class="badge bg-success rounded-circle p-3">
+                                <i class="bi bi-person-badge-fill text-white"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Supervisors (Active / Total)</div>
+                            <div class="fs-4 fw-semibold">
+                                @Model.ActiveSupervisors<span class="text-muted"> / @Model.TotalSupervisors</span>
+                            </div>
+                            <div class="small text-muted">
+                                Slots used: @Model.UsedSupervisorSlots / @Model.TotalSupervisorSlots
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <span class="badge bg-info rounded-circle p-3">
+                                <i class="bi bi-people-fill text-white"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Student Groups</div>
+                            <div class="fs-4 fw-semibold">@Model.TotalGroups</div>
+                            <div class="small text-muted">
+                                Pending supervisor decision: @Model.PendingSupervisorRequests
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <span class="badge bg-warning rounded-circle p-3">
+                                <i class="bi bi-journal-text text-white"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Proposals</div>
+                            <div class="fs-6 fw-semibold mb-1">
+                                Pending: @Model.PendingProposals
+                            </div>
+                            <div class="small text-muted">
+                                Changes requested: @Model.ChangesRequestedProposals<br />
+                                Approved for defense: @Model.ApprovedProposals
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning / navigation section -->
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-diagram-3 me-2"></i>FYP Lifecycle Management
+                    </h5>
+                    <p class="small text-muted">
+                        Use these modules to drive the FYP process from call announcement
+                        to proposal defense scheduling.
+                    </p>
+
+                    <div class="list-group list-group-flush">
+                        <a asp-controller="FypCall" asp-action="Index"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span>
+                                <strong>FYP Calls</strong><br />
+                                <span class="small text-muted">
+                                    Define batches, timelines and proposal deadlines.
+                                </span>
+                            </span>
+                            <i class="bi bi-arrow-right-short fs-4 text-muted"></i>
+                        </a>
+
+                        <a asp-controller="Supervisor" asp-action="Index"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span>
+                                <strong>Supervisor Directory</strong><br />
+                                <span class="small text-muted">
+                                    Maintain list of supervisors, fields, and capacity.
+                                </span>
+                            </span>
+                            <i class="bi bi-arrow-right-short fs-4 text-muted"></i>
+                        </a>
+
+                        <a asp-controller="Supervisor" asp-action="Proposals"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span>
+                                <strong>Proposals Overview</strong><br />
+                                <span class="small text-muted">
+                                    Monitor which proposals are pending, revised or approved for defense.
+                                </span>
+                            </span>
+                            <i class="bi bi-arrow-right-short fs-4 text-muted"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-lightbulb me-2"></i>Admin guidance
+                    </h5>
+                    <ol class="small mb-0">
+                        <li>Publish or update <strong>FYP Calls</strong> for each session.</li>
+                        <li>Review and maintain the <strong>Supervisor Directory</strong>.</li>
+                        <li>Monitor <strong>supervisor requests</strong> so no student is stuck.</li>
+                        <li>Ensure <strong>proposals</strong> move from pending → approved for defense.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="card-title mb-2">
+                        <i class="bi bi-info-circle me-2"></i>Quick academic snapshot
+                    </h6>
+                    <p class="small text-muted mb-0">
+                        This dashboard is designed to support accreditation and quality-assurance
+                        reporting: you can instantly see participation, supervision load and proposal
+                        progress for the current cycle.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

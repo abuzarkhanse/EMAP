@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Quick Login Tester";
+}
+
+<div class="container py-5">
+    <h2 class="mb-3">Quick Login Tester (Development Only)</h2>
+    <p class="text-muted">
+        Click any role to auto-fill credentials into the login page.
+        This feature is ONLY for local development and will be removed in production.
+    </p>
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Admin</h5>
+                    <p class="text-muted small">admin@emap.local</p>
+                    <a href="/Identity/Account/Login?email=admin@emap.local&pass=Admin@123"
+                       class="btn btn-primary btn-sm">Login as Admin</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Supervisor 1</h5>
+                    <p class="text-muted small">sup1@emap.local</p>
+                    <a href="/Identity/Account/Login?email=sup1@emap.local&pass=Supervisor@123"
+                       class="btn btn-success btn-sm">Login as SUP1</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Supervisor 2</h5>
+                    <p class="text-muted small">sup2@emap.local</p>
+                    <a href="/Identity/Account/Login?email=sup2@emap.local&pass=Supervisor@123"
+                       class="btn btn-success btn-sm">Login as SUP2</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students -->
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Student 0</h5>
+                    <p class="text-muted small">student0@emap.local</p>
+                    <a href="/Identity/Account/Login?email=student0@emap.local&pass=Student@123"
+                       class="btn btn-info btn-sm">Login as Student0</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Student 2</h5>
+                    <p class="text-muted small">student2@emap.local</p>
+                    <a href="/Identity/Account/Login?email=student2@emap.local&pass=Student@123"
+                       class="btn btn-info btn-sm">Login as Student2</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Student 3</h5>
+                    <p class="text-muted small">student3@emap.local</p>
+                    <a href="/Identity/Account/Login?email=student3@emap.local&pass=Student@123"
+                       class="btn btn-info btn-sm">Login as Student3</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

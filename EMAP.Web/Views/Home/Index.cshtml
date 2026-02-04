@@ -1,8 +1,88 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-4">
+
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="mb-1">Welcome to EMAP</h2>
+            <p class="text-muted">
+                Editorial Management and Automation Platform
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="text-muted small">Active FYP Calls</div>
+                    <div class="fs-3 fw-semibold">Live</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="text-muted small">Registered Students</div>
+                    <div class="fs-3 fw-semibold">—</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="text-muted small">Supervisors</div>
+                    <div class="fs-3 fw-semibold">—</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="text-muted small">Proposals Submitted</div>
+                    <div class="fs-3 fw-semibold">—</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modules -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">FYP Module</h5>
+                    <p class="small text-muted">
+                        Manage Final Year Project lifecycle: group formation, supervisor selection,
+                        proposal submission and defense workflow.
+                    </p>
+                    <a asp-controller="Fyp" asp-action="Index"
+                       class="btn btn-outline-primary btn-sm">
+                        Open FYP Portal
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Editorial Module</h5>
+                    <p class="small text-muted">
+                        Handle journal submissions, reviews, decisions and publication workflows
+                        under EMAP.
+                    </p>
+                    <span class="badge bg-secondary">Coming soon</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

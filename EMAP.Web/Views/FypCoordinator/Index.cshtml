@@ -1,0 +1,66 @@
+﻿@using EMAP.Domain.Fyp
+@model IEnumerable<ProposalSubmission>
+
+@{
+    ViewData["Title"] = "Proposal Defense Scheduling";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0">Proposal Defense Scheduling</h2>
+            <small class="text-muted">Only proposals approved by supervisor appear here</small>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            @if (!Model.Any())
+            {
+                <p class="text-muted mb-0">No approved proposals waiting for scheduling.</p>
+            }
+            else
+            {
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Batch</th>
+                            <th>Title</th>
+                            <th>Group Leader</th>
+                            <th>Supervisor</th>
+                            <th>Submitted</th>
+                            <th class="text-end" style="width:160px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model)
+                        {
+                            <tr>
+                                <td><strong>@p.Group.FypCall.Batch</strong></td>
+                                <td>@p.Title</td>
+                                <td>@p.Group.LeaderId</td>
+                                <td>@(p.Group.Supervisor?.Name ?? "-")</td>
+                                <td class="small">@p.SubmittedAt.ToString("dd MMM yyyy HH:mm")</td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-primary"
+                                       href="@Url.Action("AssignSlot", "FypCoordinator", new { id = p.Id })">
+                                        Assign Slot
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Database / cache
+*.db
+*.db-shm
+*.db-wal
+*.cache
+
+# Copilot / IntelliSense
+CopilotIndices/
+*.vsidx

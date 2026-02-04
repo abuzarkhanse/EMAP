@@ -1,0 +1,29 @@
+﻿@using EMAP.Domain.Fyp
+@model List<FypChapterSubmission>
+
+@foreach (var s in Model)
+{
+    <div class="card mb-3">
+        <div class="alert alert-info">
+            Chapters approved by supervisors and awaiting final decision.
+        </div>
+
+        <div class="card-body">
+            <h6>@s.Title</h6>
+            <a href="@s.FilePath" target="_blank">Download</a>
+
+            <form asp-action="FinalizeChapter" method="post">
+                <input type="hidden" name="submissionId" value="@s.Id" />
+
+                <textarea name="feedback" class="form-control mt-2"
+                          placeholder="Feedback (if rejecting)"></textarea>
+
+                <button name="accept" value="true"
+                        class="btn btn-success mt-2">Accept</button>
+
+                <button name="accept" value="false"
+                        class="btn btn-danger mt-2">Request Changes</button>
+            </form>
+        </div>
+    </div>
+}
