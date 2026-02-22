@@ -40,5 +40,7 @@ namespace EMAP.Web.ViewModels.Fyp
 
         public IList<FypChapterSubmission> CompletedChapters { get; set; }
             = new List<FypChapterSubmission>();
+
+        public List<ChapterBoxViewModel> ChapterBoxes { get; set; } = new();
     }
 }

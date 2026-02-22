@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "CWgTrlPqAoc=",
+  "dgSpecHash": "xs2A7sr7ta0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\mrabu\\Desktop\\FYP\\Development\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
+  "projectFilePath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mrabu\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\mrabu\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
@@ -84,35 +84,17 @@
     "C:\\Users\\mrabu\\.nuget\\packages\\system.text.json\\8.0.0\\system.text.json.8.0.0.nupkg.sha512",
     "C:\\Users\\mrabu\\.nuget\\packages\\system.threading.channels\\6.0.0\\system.threading.channels.6.0.0.nupkg.sha512",
     "C:\\Users\\mrabu\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
-    "C:\\Users\\mrabu\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512",
-    "C:\\Users\\mrabu\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.23\\microsoft.windowsdesktop.app.ref.8.0.23.nupkg.sha512",
-    "C:\\Users\\mrabu\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.23\\microsoft.netcore.app.ref.8.0.23.nupkg.sha512",
-    "C:\\Users\\mrabu\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.23\\microsoft.aspnetcore.app.ref.8.0.23.nupkg.sha512"
+    "C:\\Users\\mrabu\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
   ],
   "logs": [
     {
-      "code": "NU1903",
+      "code": "NU1900",
       "level": "Warning",
-      "message": "Package 'System.Text.Json' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-8g4q-xg66-9fp4",
-      "projectPath": "C:\\Users\\mrabu\\Desktop\\FYP\\Development\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json.",
+      "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\mrabu\\Desktop\\FYP\\Development\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
-      "libraryId": "System.Text.Json",
-      "targetGraphs": [
-        "net8.0"
-      ]
-    },
-    {
-      "code": "NU1903",
-      "level": "Warning",
-      "message": "Package 'System.Text.Json' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-hh2w-p6rv-4g7w",
-      "projectPath": "C:\\Users\\mrabu\\Desktop\\FYP\\Development\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\Users\\mrabu\\Desktop\\FYP\\Development\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
-      "libraryId": "System.Text.Json",
-      "targetGraphs": [
-        "net8.0"
-      ]
+      "filePath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
+      "targetGraphs": []
     }
   ]
 }

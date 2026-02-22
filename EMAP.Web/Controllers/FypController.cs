@@ -51,10 +51,11 @@ namespace EMAP.Web.Controllers
             ProposalDefenseSchedule? defenseSchedule = null;
             ProposalDefenseEvaluation? defenseEvaluation = null;
 
-            FypChapterSubmission? chapterSubmission = null;
-
             IList<FypChapterAnnouncement> chapters = new List<FypChapterAnnouncement>();
             FypChapterAnnouncement? openChapter = null;
+
+            // NEW: list of boxes/cards (one per chapter)
+            var chapterBoxes = new List<EMAP.Web.ViewModels.Fyp.ChapterBoxViewModel>();
 
             if (activeCall != null)
             {
@@ -86,21 +87,70 @@ namespace EMAP.Web.Controllers
                     }
                 }
 
+                // All chapter announcements for active call
                 chapters = await _db.FypChapterAnnouncements
                     .Where(x => x.FypCallId == activeCall.Id)
                     .OrderBy(x => x.ChapterType)
                     .ToListAsync();
 
+                // for old UI / other code if still used
                 openChapter = chapters.FirstOrDefault(x => x.IsOpen);
 
-                if (group != null && openChapter != null)
+                // NEW: Build boxes if group exists
+                if (group != null && chapters.Any())
                 {
-                    chapterSubmission = await _db.FypChapterSubmissions
-                        .Where(x =>
-                            x.GroupId == group.Id &&
-                            x.ChapterAnnouncementId == openChapter.Id)
+                    // Load all submissions for this group (for all chapters)
+                    var submissions = await _db.FypChapterSubmissions
+                        .Where(x => x.GroupId == group.Id)
                         .OrderByDescending(x => x.SubmittedAt)
-                        .FirstOrDefaultAsync();
+                        .ToListAsync();
+
+                    bool unlocked = true; // first chapter unlocked by default
+
+                    foreach (var ch in chapters)
+                    {
+                        // latest submission for this chapter announcement
+                        var latest = submissions
+                            .Where(s => s.ChapterAnnouncementId == ch.Id)
+                            .OrderByDescending(s => s.SubmittedAt)
+                            .FirstOrDefault();
+
+                        var isLeader = group.LeaderId == userId;
+
+                        var status = latest?.Status;
+
+                        // allow submit if: unlocked + open + (no submission OR changes requested)
+                        bool isChangesRequested = status == ChapterSubmissionStatus.ChangesRequested;
+
+                        // block new submit if already submitted/in review/approved and not changes requested
+                        bool alreadySubmittedAndLocked =
+                            latest != null &&
+                            status != ChapterSubmissionStatus.ChangesRequested &&
+                            status != ChapterSubmissionStatus.CoordinatorApproved;
+
+                        var box = new EMAP.Web.ViewModels.Fyp.ChapterBoxViewModel
+                        {
+                            ChapterAnnouncementId = ch.Id,
+                            ChapterType = ch.ChapterType,
+                            IsOpen = ch.IsOpen,
+                            Deadline = ch.Deadline,
+
+                            SubmissionId = latest?.Id,
+                            Status = status,
+                            Feedback = latest?.Feedback,
+                            SubmittedAt = latest?.SubmittedAt,
+
+                            IsUnlocked = unlocked,
+
+                            CanSubmitNow = unlocked && ch.IsOpen && !alreadySubmittedAndLocked && (latest == null) && isLeader,
+                            CanResubmit = unlocked && ch.IsOpen && isChangesRequested && isLeader
+                        };
+
+                        chapterBoxes.Add(box);
+
+                        // Unlock next chapter ONLY if current is fully completed (CoordinatorApproved)
+                        unlocked = (status == ChapterSubmissionStatus.CoordinatorApproved);
+                    }
                 }
             }
 
@@ -120,8 +170,16 @@ namespace EMAP.Web.Controllers
                 DefenseEvaluation = defenseEvaluation,
                 AvailableSupervisors = supervisors,
                 IsGroupLeader = group != null && group.LeaderId == userId,
+
+                // keep existing for backward compatibility
                 OpenChapter = openChapter,
-                ChapterSubmission = chapterSubmission
+
+                // OLD single-submission property no longer used by new UI,
+                // you can keep it null or leave as-is:
+                ChapterSubmission = null,
+
+                // NEW list for UI
+                ChapterBoxes = chapterBoxes
             };
 
             return View(model);

@@ -356,18 +356,18 @@
                     </div>
                 </div>
 
-                <!-- CHAPTERS  01 -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="card shadow-sm status-card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h6 class="card-title mb-3">
-                                <i class="bi bi-journal-text me-1 text-primary"></i>
-                                Chapters
-                            </h6>
+                @* ========================= CHAPTER BOXES (MULTI) ========================= *@
 
-                            @* ================= NO CHAPTER YET ================= *@
-                            @if (Model.OpenChapter == null)
-                            {
+                @if (Model.ChapterBoxes == null || !Model.ChapterBoxes.Any())
+                {
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card shadow-sm status-card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title mb-3">
+                                    <i class="bi bi-journal-text me-1 text-primary"></i>
+                                    Chapters
+                                </h6>
+
                                 <div class="text-center mt-auto">
                                     <i class="bi bi-info-circle text-muted fs-4"></i>
                                     <p class="small text-muted mt-2 mb-0">
@@ -375,130 +375,200 @@
                                         Please wait for coordinator update.
                                     </p>
                                 </div>
-                            }
-
-                            @* ================= CHAPTER OPEN – NOT SUBMITTED ================= *@
-                            else if (Model.ChapterSubmission == null)
-                            {
-                                <span class="badge bg-info text-dark mb-2 align-self-start">
-                                    @Model.OpenChapter.ChapterType
-                                </span>
-
-                                <p class="small text-muted mb-3">
-                                    Chapter is currently <strong>open for submission</strong>.
-                                </p>
-
-                                <a asp-controller="Fyp"
-                                   asp-action="SubmitChapter"
-                                   class="btn btn-primary btn-sm mt-auto">
-                                    <i class="bi bi-upload me-1"></i>
-                                    Submit Chapter
-                                </a>
-                            }
-
-                            @* ================= SUBMITTED ================= *@
-                            else if (Model.ChapterSubmission.Status == ChapterSubmissionStatus.Submitted)
-                            {
-                                <span class="badge bg-warning text-dark mb-2 align-self-start">
-                                    Submitted
-                                </span>
-
-                                <p class="small text-muted mt-2 mb-0">
-                                    Your chapter has been submitted successfully.<br />
-                                    <strong>Waiting for supervisor review.</strong>
-                                </p>
-                            }
-
-                            @* ================= CHANGES REQUESTED ================= *@
-                            else if (Model.ChapterSubmission.Status == ChapterSubmissionStatus.ChangesRequested)
-                            {
-                                <span class="badge bg-danger mb-2 align-self-start">
-                                    Changes Required
-                                </span>
-
-                                <p class="small text-muted mb-2">
-                                    Supervisor has requested revisions:
-                                </p>
-
-                                <div class="alert alert-warning py-2 px-3 small mb-3">
-                                    @Model.ChapterSubmission.Feedback
-                                </div>
-
-                                <button class="btn btn-sm btn-warning mt-auto"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#submitChapterModal">
-                                    <i class="bi bi-arrow-repeat me-1"></i>
-                                    Resubmit Chapter
-                                </button>
-                            }
-
-                            @* ================= Superisor APPROVAL ================= *@
-                            else if (Model.ChapterSubmission.Status == ChapterSubmissionStatus.SupervisorApproved)
-                            {
-                                <span class="badge bg-primary">
-                                    Supervisor Approved
-                                </span>
-
-                                <p class="small text-muted mt-2">
-                                    Your supervisor has approved this chapter.
-                                    It is now under final review by the coordinator.
-                                </p>
-
-                                <div class="alert alert-info small mt-2 mb-0">
-                                    <i class="bi bi-hourglass-split me-1"></i>
-                                    Please wait for coordinator decision.
-                                </div>
-                            }
-
-                            @* ================= FINAL APPROVAL ================= *@
-                            else if (Model.ChapterSubmission.Status == ChapterSubmissionStatus.CoordinatorApproved)
-                            {
-                                <span class="badge bg-success mb-2 align-self-start">
-                                    Accepted
-                                </span>
-
-                                <p class="small text-success mb-0">
-                                    🎉 Chapter completed successfully.<br />
-                                    You may proceed to the next phase.
-                                </p>
-                            }
-
-                            @if (Model.CompletedChapters != null && Model.CompletedChapters.Any())
-                            {
-                                <div class="col-md-6 col-lg-3">
-                                    <div class="card shadow-sm border-success">
-                                        <div class="card-body">
-                                            <h6 class="card-title text-success">
-                                                <i class="bi bi-check2-circle me-1"></i> Completed Chapters
-                                            </h6>
-
-                                            <ul class="list-group list-group-flush small">
-                                                @foreach (var c in Model.CompletedChapters)
-                                                {
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                                        <span>
-                                                            <i class="bi bi-journal-check me-1 text-success"></i>
-                                                            @c.ChapterAnnouncement.ChapterType
-                                                        </span>
-                                                        <span class="badge bg-success">
-                                                            Approved
-                                                        </span>
-                                                    </li>
-                                                }
-                                            </ul>
-
-                                            <div class="small text-muted mt-2">
-                                                These chapters are finalized and locked.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
+                            </div>
                         </div>
-
-
                     </div>
-                </div>
+                }
+                else
+                {
+                    @* Title Card (optional) *@
+                    <div class="col-12">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-journal-text me-2 text-primary"></i>
+                            <h6 class="mb-0">Chapters</h6>
+                        </div>
+                    </div>
+
+                    @foreach (var ch in Model.ChapterBoxes)
+                    {
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card shadow-sm status-card h-100">
+                                <div class="card-body d-flex flex-column">
+
+                                    <h6 class="card-title mb-3">
+                                        <i class="bi bi-journal-text me-1 text-primary"></i>
+                                        @ch.ChapterType
+                                    </h6>
+
+                                    @* ================= LOCKED ================= *@
+                                    @if (!ch.IsUnlocked)
+                                    {
+                                        <span class="badge bg-secondary mb-2 align-self-start">
+                                            Locked
+                                        </span>
+
+                                        <p class="small text-muted mt-2 mb-0">
+                                            Complete the previous chapter first.
+                                        </p>
+                                    }
+
+                                    @* ================= NOT OPEN ================= *@
+                                    else if (!ch.IsOpen)
+                                    {
+                                        <span class="badge bg-warning text-dark mb-2 align-self-start">
+                                            Not Open
+                                        </span>
+
+                                        <p class="small text-muted mt-2 mb-0">
+                                            Waiting for coordinator to open this chapter.
+                                        </p>
+                                    }
+
+                                    @* ================= OPEN – NOT SUBMITTED ================= *@
+                                    else if (ch.Status == null)
+                                    {
+                                        <span class="badge bg-info text-dark mb-2 align-self-start">
+                                            Open
+                                        </span>
+
+                                        <p class="small text-muted mb-3">
+                                            Chapter is currently <strong>open for submission</strong>.
+                                        </p>
+
+                                        @if (ch.Deadline != null)
+                                        {
+                                            <div class="small text-muted mb-2">
+                                                <i class="bi bi-calendar-event me-1"></i>
+                                                Deadline: <strong>@ch.Deadline.Value.ToString("dd MMM yyyy")</strong>
+                                            </div>
+                                        }
+
+                                        @if (ch.CanSubmitNow)
+                                        {
+                                            <a asp-controller="Fyp"
+                                               asp-action="SubmitChapter"
+                                               asp-route-chapterAnnouncementId="@ch.ChapterAnnouncementId"
+                                               class="btn btn-primary btn-sm mt-auto">
+                                                <i class="bi bi-upload me-1"></i>
+                                                Submit
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-center mt-auto">
+                                                <i class="bi bi-shield-lock text-muted fs-4"></i>
+                                                <p class="small text-muted mt-2 mb-0">
+                                                    Only group leader can submit.
+                                                </p>
+                                            </div>
+                                        }
+                                    }
+
+                                    @* ================= SUBMITTED ================= *@
+                                    else if (ch.Status == ChapterSubmissionStatus.Submitted)
+                                    {
+                                        <span class="badge bg-warning text-dark mb-2 align-self-start">
+                                            Submitted
+                                        </span>
+
+                                        <p class="small text-muted mt-2 mb-0">
+                                            Your chapter has been submitted successfully.<br />
+                                            <strong>Waiting for supervisor review.</strong>
+                                        </p>
+
+                                        @if (ch.SubmittedAt != null)
+                                        {
+                                            <div class="small text-muted mt-2">
+                                                <i class="bi bi-clock me-1"></i>
+                                                Submitted: @ch.SubmittedAt.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                            </div>
+                                        }
+                                    }
+
+                                    @* ================= CHANGES REQUESTED ================= *@
+                                    else if (ch.Status == ChapterSubmissionStatus.ChangesRequested)
+                                    {
+                                        <span class="badge bg-danger mb-2 align-self-start">
+                                            Changes Required
+                                        </span>
+
+                                        <p class="small text-muted mb-2">
+                                            Supervisor has requested revisions:
+                                        </p>
+
+                                        @if (!string.IsNullOrWhiteSpace(ch.Feedback))
+                                        {
+                                            <div class="alert alert-warning py-2 px-3 small mb-3">
+                                                @ch.Feedback
+                                            </div>
+                                        }
+
+                                        @if (ch.CanResubmit)
+                                        {
+                                            <a asp-controller="Fyp"
+                                               asp-action="SubmitChapter"
+                                               asp-route-chapterAnnouncementId="@ch.ChapterAnnouncementId"
+                                               class="btn btn-sm btn-warning mt-auto">
+                                                <i class="bi bi-arrow-repeat me-1"></i>
+                                                Resubmit
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-center mt-auto">
+                                                <i class="bi bi-shield-lock text-muted fs-4"></i>
+                                                <p class="small text-muted mt-2 mb-0">
+                                                    Only group leader can resubmit.
+                                                </p>
+                                            </div>
+                                        }
+                                    }
+
+                                    @* ================= SUPERVISOR APPROVAL ================= *@
+                                    else if (ch.Status == ChapterSubmissionStatus.SupervisorApproved)
+                                    {
+                                        <span class="badge bg-primary mb-2 align-self-start">
+                                            Supervisor Approved
+                                        </span>
+
+                                        <p class="small text-muted mt-2">
+                                            Your supervisor has approved this chapter.
+                                            It is now under final review by the coordinator.
+                                        </p>
+
+                                        <div class="alert alert-info small mt-2 mb-0">
+                                            <i class="bi bi-hourglass-split me-1"></i>
+                                            Please wait for coordinator decision.
+                                        </div>
+                                    }
+
+                                    @* ================= FINAL APPROVAL ================= *@
+                                    else if (ch.Status == ChapterSubmissionStatus.CoordinatorApproved)
+                                    {
+                                        <span class="badge bg-success mb-2 align-self-start">
+                                            Accepted
+                                        </span>
+
+                                        <p class="small text-success mb-0">
+                                            🎉 Chapter completed successfully.<br />
+                                            You may proceed to the next phase.
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary mb-2 align-self-start">
+                                            @ch.Status
+                                        </span>
+
+                                        <p class="small text-muted mb-0">
+                                            Status updated.
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
             </div>
 
             <!-- ===== SUPERVISOR LIST ===== -->
