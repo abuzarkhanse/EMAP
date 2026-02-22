@@ -54,7 +54,6 @@ namespace EMAP.Web.Controllers
             IList<FypChapterAnnouncement> chapters = new List<FypChapterAnnouncement>();
             FypChapterAnnouncement? openChapter = null;
 
-            // NEW: list of boxes/cards (one per chapter)
             var chapterBoxes = new List<EMAP.Web.ViewModels.Fyp.ChapterBoxViewModel>();
 
             if (activeCall != null)
@@ -87,42 +86,37 @@ namespace EMAP.Web.Controllers
                     }
                 }
 
-                // All chapter announcements for active call
+                // Load all chapter announcements
                 chapters = await _db.FypChapterAnnouncements
                     .Where(x => x.FypCallId == activeCall.Id)
                     .OrderBy(x => x.ChapterType)
                     .ToListAsync();
 
-                // for old UI / other code if still used
                 openChapter = chapters.FirstOrDefault(x => x.IsOpen);
 
-                // NEW: Build boxes if group exists
                 if (group != null && chapters.Any())
                 {
-                    // Load all submissions for this group (for all chapters)
+                    // Load all submissions of this group
                     var submissions = await _db.FypChapterSubmissions
                         .Where(x => x.GroupId == group.Id)
                         .OrderByDescending(x => x.SubmittedAt)
                         .ToListAsync();
 
-                    bool unlocked = true; // first chapter unlocked by default
+                    bool previousChapterCompleted = true;   // first chapter unlocked by default
 
                     foreach (var ch in chapters)
                     {
-                        // latest submission for this chapter announcement
                         var latest = submissions
                             .Where(s => s.ChapterAnnouncementId == ch.Id)
                             .OrderByDescending(s => s.SubmittedAt)
                             .FirstOrDefault();
 
+                        var status = latest?.Status;
                         var isLeader = group.LeaderId == userId;
 
-                        var status = latest?.Status;
-
-                        // allow submit if: unlocked + open + (no submission OR changes requested)
+                        bool isCompleted = status == ChapterSubmissionStatus.CoordinatorApproved;
                         bool isChangesRequested = status == ChapterSubmissionStatus.ChangesRequested;
 
-                        // block new submit if already submitted/in review/approved and not changes requested
                         bool alreadySubmittedAndLocked =
                             latest != null &&
                             status != ChapterSubmissionStatus.ChangesRequested &&
@@ -140,16 +134,30 @@ namespace EMAP.Web.Controllers
                             Feedback = latest?.Feedback,
                             SubmittedAt = latest?.SubmittedAt,
 
-                            IsUnlocked = unlocked,
+                            // 🔒 Unlock based ONLY on previous chapter completion
+                            IsUnlocked = previousChapterCompleted,
 
-                            CanSubmitNow = unlocked && ch.IsOpen && !alreadySubmittedAndLocked && (latest == null) && isLeader,
-                            CanResubmit = unlocked && ch.IsOpen && isChangesRequested && isLeader
+                            // Allow first-time submission
+                            CanSubmitNow = previousChapterCompleted &&
+                                           ch.IsOpen &&
+                                           !isCompleted &&
+                                           !alreadySubmittedAndLocked &&
+                                           latest == null &&
+                                           isLeader,
+
+                            // Allow resubmission only if changes requested
+                            CanResubmit = previousChapterCompleted &&
+                                          ch.IsOpen &&
+                                          isChangesRequested &&
+                                          isLeader
                         };
 
                         chapterBoxes.Add(box);
 
-                        // Unlock next chapter ONLY if current is fully completed (CoordinatorApproved)
-                        unlocked = (status == ChapterSubmissionStatus.CoordinatorApproved);
+                        // 🔥 CRITICAL FIX:
+                        // Next chapter unlock depends ONLY on completion,
+                        // not on IsOpen and not on coordinator actions.
+                        previousChapterCompleted = isCompleted;
                     }
                 }
             }
@@ -171,14 +179,10 @@ namespace EMAP.Web.Controllers
                 AvailableSupervisors = supervisors,
                 IsGroupLeader = group != null && group.LeaderId == userId,
 
-                // keep existing for backward compatibility
                 OpenChapter = openChapter,
 
-                // OLD single-submission property no longer used by new UI,
-                // you can keep it null or leave as-is:
-                ChapterSubmission = null,
+                ChapterSubmission = null, // no longer used
 
-                // NEW list for UI
                 ChapterBoxes = chapterBoxes
             };
 
