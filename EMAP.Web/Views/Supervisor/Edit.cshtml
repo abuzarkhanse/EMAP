@@ -12,12 +12,148 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <form asp-action="Edit" asp-controller="Supervisor" method="post" id="supervisorEditForm">
+                @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Id" />
-                <!-- same fields as Create -->
-                <!-- (you can literally paste the inner HTML from Create form) -->
-                ...
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Name" class="form-label">Name</label>
+                        <input asp-for="Name" class="form-control" maxlength="100" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" type="email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                        <small class="text-muted">Email must already exist as an ASP.NET user account.</small>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Department" class="form-label">Department</label>
+                        <input asp-for="Department" class="form-control" maxlength="100" />
+                        <span asp-validation-for="Department" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="FieldOfExpertise" class="form-label">Field of Expertise</label>
+                        <input asp-for="FieldOfExpertise" class="form-control" maxlength="150" />
+                        <span asp-validation-for="FieldOfExpertise" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="MaxSlots" class="form-label">Max FYP Slots</label>
+                        <input asp-for="MaxSlots" class="form-control" type="number" min="1" max="50" />
+                        <span asp-validation-for="MaxSlots" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="CurrentSlots" class="form-label">Current Slots</label>
+                        <input asp-for="CurrentSlots" class="form-control" type="number" min="0" max="50" />
+                        <span asp-validation-for="CurrentSlots" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3 d-flex align-items-center">
+                        <div class="form-check form-switch mt-4">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label">Available for FYP</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Supervisor</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
             </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            const form = $("#supervisorEditForm");
+            const emailInput = $("#Email");
+            const maxSlotsInput = $("#MaxSlots");
+            const currentSlotsInput = $("#CurrentSlots");
+            const supervisorId = $("#Id").val();
+
+            $("input, select, textarea").on("blur change", function () {
+                $(this).valid();
+            });
+
+            emailInput.on("blur", function () {
+                const email = $(this).val();
+
+                if (!email) return;
+
+                $.ajax({
+                    url: '@Url.Action("VerifyEmail", "Supervisor")',
+                    type: 'GET',
+                    data: {
+                        email: email,
+                        id: supervisorId
+                    },
+                    success: function (response) {
+                        const emailValidationSpan = $('span[data-valmsg-for="Email"]');
+
+                        if (response === true) {
+                            emailValidationSpan.text("");
+                            emailValidationSpan.removeClass("field-validation-error").addClass("field-validation-valid");
+                        } else {
+                            emailValidationSpan.text(response);
+                            emailValidationSpan.removeClass("field-validation-valid").addClass("field-validation-error");
+                        }
+                    }
+                });
+            });
+
+            maxSlotsInput.on("blur change", function () {
+                let maxSlots = parseInt(maxSlotsInput.val()) || 0;
+                let currentSlots = parseInt(currentSlotsInput.val()) || 0;
+
+                if (maxSlots < 1) {
+                    maxSlotsInput.val(1);
+                    maxSlots = 1;
+                }
+
+                if (maxSlots > 50) {
+                    maxSlotsInput.val(50);
+                    maxSlots = 50;
+                }
+
+                if (currentSlots > maxSlots) {
+                    const currentSlotsValidationSpan = $('span[data-valmsg-for="CurrentSlots"]');
+                    currentSlotsValidationSpan.text("Current slots cannot be greater than max slots.");
+                    currentSlotsValidationSpan.removeClass("field-validation-valid").addClass("field-validation-error");
+                } else {
+                    const currentSlotsValidationSpan = $('span[data-valmsg-for="CurrentSlots"]');
+                    currentSlotsValidationSpan.text("");
+                    currentSlotsValidationSpan.removeClass("field-validation-error").addClass("field-validation-valid");
+                }
+            });
+
+            form.on("submit", function (e) {
+                let maxSlots = parseInt(maxSlotsInput.val()) || 0;
+                let currentSlots = parseInt(currentSlotsInput.val()) || 0;
+
+                if (currentSlots > maxSlots) {
+                    e.preventDefault();
+                    const currentSlotsValidationSpan = $('span[data-valmsg-for="CurrentSlots"]');
+                    currentSlotsValidationSpan.text("Current slots cannot be greater than max slots.");
+                    currentSlotsValidationSpan.removeClass("field-validation-valid").addClass("field-validation-error");
+                    return false;
+                }
+
+                if (!form.valid()) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+}

@@ -266,6 +266,14 @@ namespace EMAP.Web.Controllers.Admin
             var supervisor = await _db.FypSupervisors.FindAsync(id);
             if (supervisor == null) return NotFound();
 
+            bool isAssigned = await _db.StudentGroups.AnyAsync(g => g.SupervisorId == id);
+
+            if (isAssigned)
+            {
+                TempData["Error"] = "This supervisor cannot be deleted because they are assigned to one or more student groups. Please reassign or remove those groups first.";
+                return RedirectToAction(nameof(Index));
+            }
+
             _db.FypSupervisors.Remove(supervisor);
             await _db.SaveChangesAsync();
 

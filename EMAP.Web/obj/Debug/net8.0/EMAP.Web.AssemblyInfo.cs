@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EMAP.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+41e84bf10e60f9fd85c2fbdcf2f73ce4931cd3fe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1584d70318c1cfa70b5c0db30e271a5b391d92c8")]
 [assembly: System.Reflection.AssemblyProductAttribute("EMAP.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EMAP.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
