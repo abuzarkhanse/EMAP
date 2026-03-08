@@ -1,11 +1,14 @@
-﻿using EMAP.Domain.Fyp;
+﻿using ClosedXML.Excel;
+using EMAP.Domain.Fyp;
 using EMAP.Domain.Users;
 using EMAP.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using EMAP.Web.ViewModels;
+using EMAP.Web.ViewModels.Fyp;
 
 namespace EMAP.Web.Controllers.Admin
 {
@@ -58,6 +61,71 @@ namespace EMAP.Web.Controllers.Admin
             ViewBag.Warning = message;
         }
 
+        private void ValidateSupervisorModel(FypSupervisor model, bool isEdit = false, int currentId = 0)
+        {
+            if (string.IsNullOrWhiteSpace(model.Name))
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.Name), "Name is required.");
+            }
+            else if (model.Name.Trim().Length < 3)
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.Name), "Name must be at least 3 characters.");
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Email))
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.Email), "Email is required.");
+            }
+            else if (!new EmailAddressAttribute().IsValid(model.Email))
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.Email), "Please enter a valid email address.");
+            }
+            else
+            {
+                bool emailExists = _db.FypSupervisors.Any(s =>
+                    s.Email == model.Email &&
+                    (!isEdit || s.Id != currentId));
+
+                if (emailExists)
+                {
+                    ModelState.AddModelError(nameof(FypSupervisor.Email), "This email is already used by another supervisor.");
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Department))
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.Department), "Department is required.");
+            }
+            else if (model.Department.Trim().Length < 2)
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.Department), "Department must be at least 2 characters.");
+            }
+
+            if (string.IsNullOrWhiteSpace(model.FieldOfExpertise))
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.FieldOfExpertise), "Field of expertise is required.");
+            }
+            else if (model.FieldOfExpertise.Trim().Length < 2)
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.FieldOfExpertise), "Field of expertise must be at least 2 characters.");
+            }
+
+            if (model.MaxSlots < 1 || model.MaxSlots > 50)
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.MaxSlots), "Max FYP slots must be between 1 and 50.");
+            }
+
+            if (model.CurrentSlots < 0 || model.CurrentSlots > 50)
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.CurrentSlots), "Current slots must be between 0 and 50.");
+            }
+
+            if (model.CurrentSlots > model.MaxSlots)
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.CurrentSlots), "Current slots cannot be greater than max slots.");
+            }
+        }
+
         // ===================== ADMIN: SUPERVISOR MASTER LIST =====================
 
         [Authorize(Roles = "Admin")]
@@ -102,6 +170,7 @@ namespace EMAP.Web.Controllers.Admin
             ModelState.Remove(nameof(FypSupervisor.User));
             ModelState.Remove(nameof(FypSupervisor.UserId));
 
+            ValidateSupervisorModel(model);
 
             if (!ModelState.IsValid)
                 return View(model);
@@ -114,11 +183,12 @@ namespace EMAP.Web.Controllers.Admin
 
             if (string.IsNullOrEmpty(model.UserId))
             {
-                ModelState.AddModelError("", "No ASP.NET user exists with this email.");
+                ModelState.AddModelError(nameof(FypSupervisor.Email), "No ASP.NET user exists with this email.");
                 return View(model);
             }
 
-            model.CurrentSlots = 0;
+            if (model.CurrentSlots < 0)
+                model.CurrentSlots = 0;
 
             _db.FypSupervisors.Add(model);
             _db.SaveChanges();
@@ -126,7 +196,6 @@ namespace EMAP.Web.Controllers.Admin
             TempData["Success"] = "Supervisor created successfully.";
             return RedirectToAction(nameof(Index));
         }
-
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
@@ -143,7 +212,10 @@ namespace EMAP.Web.Controllers.Admin
         public async Task<IActionResult> Edit(FypSupervisor model)
         {
             // If you have navigation props in model, ignore them
+            ModelState.Remove(nameof(FypSupervisor.User));
             ModelState.Remove(nameof(FypSupervisor.UserId));
+
+            ValidateSupervisorModel(model, true, model.Id);
 
             if (!ModelState.IsValid)
                 return View(model);
@@ -156,6 +228,7 @@ namespace EMAP.Web.Controllers.Admin
             supervisor.Department = model.Department;
             supervisor.FieldOfExpertise = model.FieldOfExpertise;
             supervisor.MaxSlots = model.MaxSlots;
+            supervisor.CurrentSlots = model.CurrentSlots;
             supervisor.IsActive = model.IsActive;
 
             // Re-link UserId if email changed (important after DB reset)
@@ -166,7 +239,7 @@ namespace EMAP.Web.Controllers.Admin
 
             if (string.IsNullOrEmpty(supervisor.UserId))
             {
-                ModelState.AddModelError("", "No ASP.NET user exists with this email.");
+                ModelState.AddModelError(nameof(FypSupervisor.Email), "No ASP.NET user exists with this email.");
                 return View(model);
             }
 
@@ -174,6 +247,244 @@ namespace EMAP.Web.Controllers.Admin
 
             TempData["Success"] = "Supervisor updated successfully.";
             return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var supervisor = await _db.FypSupervisors.FindAsync(id);
+            if (supervisor == null) return NotFound();
+
+            return View(supervisor);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var supervisor = await _db.FypSupervisors.FindAsync(id);
+            if (supervisor == null) return NotFound();
+
+            _db.FypSupervisors.Remove(supervisor);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Supervisor deleted successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // ===================== REAL-TIME VALIDATION =====================
+
+        [AcceptVerbs("GET", "POST")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult VerifyEmail(string email, int? id)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return Json("Email is required.");
+
+            if (!new EmailAddressAttribute().IsValid(email))
+                return Json("Please enter a valid email address.");
+
+            bool exists = _db.FypSupervisors.Any(x =>
+                x.Email == email &&
+                (!id.HasValue || x.Id != id.Value));
+
+            if (exists)
+                return Json("This email is already used by another supervisor.");
+
+            bool userExists = _db.Users.Any(u => u.Email == email);
+            if (!userExists)
+                return Json("No ASP.NET user exists with this email.");
+
+            return Json(true);
+        }
+
+        // ===================== BULK UPLOAD =====================
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult BulkUpload()
+        {
+            return View(new BulkSupervisorUploadViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> BulkUpload(BulkSupervisorUploadViewModel model)
+        {
+            if (model.File == null || model.File.Length == 0)
+            {
+                ModelState.AddModelError(nameof(model.File), "Please select an Excel file.");
+                return View(model);
+            }
+
+            var extension = Path.GetExtension(model.File.FileName).ToLowerInvariant();
+            if (extension != ".xlsx")
+            {
+                ModelState.AddModelError(nameof(model.File), "Only .xlsx files are allowed.");
+                return View(model);
+            }
+
+            var supervisorsToAdd = new List<FypSupervisor>();
+            var errors = new List<string>();
+
+            using (var stream = new MemoryStream())
+            {
+                await model.File.CopyToAsync(stream);
+                stream.Position = 0;
+
+                using (var workbook = new XLWorkbook(stream))
+                {
+                    var worksheet = workbook.Worksheet(1);
+                    var usedRange = worksheet.RangeUsed();
+
+                    if (usedRange == null)
+                    {
+                        ModelState.AddModelError(nameof(model.File), "The uploaded Excel file is empty.");
+                        return View(model);
+                    }
+
+                    var rows = usedRange.RowsUsed().Skip(1);
+                    int rowNumber = 2;
+
+                    foreach (var row in rows)
+                    {
+                        string name = row.Cell(1).GetString().Trim();
+                        string email = row.Cell(2).GetString().Trim();
+                        string department = row.Cell(3).GetString().Trim();
+                        string fieldOfExpertise = row.Cell(4).GetString().Trim();
+                        string maxSlotsText = row.Cell(5).GetString().Trim();
+                        string currentSlotsText = row.Cell(6).GetString().Trim();
+                        string isActiveText = row.Cell(7).GetString().Trim();
+
+                        if (string.IsNullOrWhiteSpace(name))
+                        {
+                            errors.Add($"Row {rowNumber}: Name is required.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        if (name.Length < 3)
+                        {
+                            errors.Add($"Row {rowNumber}: Name must be at least 3 characters.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        if (string.IsNullOrWhiteSpace(email) || !new EmailAddressAttribute().IsValid(email))
+                        {
+                            errors.Add($"Row {rowNumber}: A valid email is required.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        bool supervisorEmailExists = _db.FypSupervisors.Any(x => x.Email == email) ||
+                                                     supervisorsToAdd.Any(x => x.Email == email);
+                        if (supervisorEmailExists)
+                        {
+                            errors.Add($"Row {rowNumber}: Supervisor email '{email}' already exists.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        var userId = await _db.Users
+                            .Where(u => u.Email == email)
+                            .Select(u => u.Id)
+                            .FirstOrDefaultAsync();
+
+                        if (string.IsNullOrWhiteSpace(userId))
+                        {
+                            errors.Add($"Row {rowNumber}: No ASP.NET user exists with email '{email}'.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        if (string.IsNullOrWhiteSpace(department))
+                        {
+                            errors.Add($"Row {rowNumber}: Department is required.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        if (department.Length < 2)
+                        {
+                            errors.Add($"Row {rowNumber}: Department must be at least 2 characters.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        if (string.IsNullOrWhiteSpace(fieldOfExpertise))
+                        {
+                            errors.Add($"Row {rowNumber}: Field of expertise is required.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        if (fieldOfExpertise.Length < 2)
+                        {
+                            errors.Add($"Row {rowNumber}: Field of expertise must be at least 2 characters.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        if (!int.TryParse(maxSlotsText, out int maxSlots) || maxSlots < 1 || maxSlots > 50)
+                        {
+                            errors.Add($"Row {rowNumber}: Max slots must be a number between 1 and 50.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        if (!int.TryParse(currentSlotsText, out int currentSlots) || currentSlots < 0 || currentSlots > 50)
+                        {
+                            errors.Add($"Row {rowNumber}: Current slots must be a number between 0 and 50.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        if (currentSlots > maxSlots)
+                        {
+                            errors.Add($"Row {rowNumber}: Current slots cannot be greater than max slots.");
+                            rowNumber++;
+                            continue;
+                        }
+
+                        bool isActive = true;
+                        if (!string.IsNullOrWhiteSpace(isActiveText))
+                        {
+                            var normalized = isActiveText.Trim().ToLower();
+                            isActive = normalized == "true" || normalized == "yes" || normalized == "1" || normalized == "active";
+                        }
+
+                        supervisorsToAdd.Add(new FypSupervisor
+                        {
+                            Name = name,
+                            Email = email,
+                            Department = department,
+                            FieldOfExpertise = fieldOfExpertise,
+                            MaxSlots = maxSlots,
+                            CurrentSlots = currentSlots,
+                            IsActive = isActive,
+                            UserId = userId
+                        });
+
+                        rowNumber++;
+                    }
+                }
+            }
+
+            if (supervisorsToAdd.Any())
+            {
+                _db.FypSupervisors.AddRange(supervisorsToAdd);
+                await _db.SaveChangesAsync();
+                TempData["Success"] = $"{supervisorsToAdd.Count} supervisor(s) uploaded successfully.";
+            }
+
+            if (errors.Any())
+            {
+                ViewBag.Errors = errors;
+            }
+
+            return View(new BulkSupervisorUploadViewModel());
         }
 
         // ===================== SUPERVISOR PORTAL =====================
@@ -546,6 +857,5 @@ namespace EMAP.Web.Controllers.Admin
 
             return RedirectToAction(nameof(ChapterReviews));
         }
-
     }
 }

@@ -1,20 +1,21 @@
 ﻿@model EMAP.Domain.Fyp.FypCall
 
 @{
-    ViewData["Title"] = "Create FYP Call";
+    ViewData["Title"] = "Edit FYP Call";
     var today = DateTime.Today.ToString("yyyy-MM-dd");
 }
 
-<h1>Create FYP Call</h1>
+<h1>Edit FYP Call</h1>
 
 <div class="row">
     <div class="col-md-10">
-        <form asp-action="Create" method="post" id="fypCallForm">
+        <form asp-action="Edit" method="post" id="fypCallEditForm">
+            <input type="hidden" asp-for="Id" />
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
                 <label asp-for="Batch" class="form-label"></label>
-                <input asp-for="Batch" class="form-control" placeholder="e.g. F22" />
+                <input asp-for="Batch" class="form-control" />
                 <span asp-validation-for="Batch" class="text-danger"></span>
             </div>
 
@@ -31,8 +32,7 @@
 
             <div class="mb-3">
                 <label asp-for="Title" class="form-label"></label>
-                <input asp-for="Title" class="form-control" value="FYP Call" readonly />
-                <input type="hidden" asp-for="Title" value="FYP Call" />
+                <input asp-for="Title" class="form-control" readonly />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
 
@@ -55,9 +55,7 @@
                 <label asp-for="IsActive" class="form-check-label">Active FYP Call</label>
             </div>
 
-            <button type="submit" class="btn btn-primary">
-                Save FYP Call
-            </button>
+            <button type="submit" class="btn btn-primary">Update FYP Call</button>
             <a asp-action="Index" class="btn btn-secondary">Back to List</a>
         </form>
     </div>
@@ -70,44 +68,14 @@
         document.addEventListener("DOMContentLoaded", function () {
             const announcementDate = document.getElementById("announcementDate");
             const proposalDeadline = document.getElementById("proposalDeadline");
-            const form = document.getElementById("fypCallForm");
 
             function syncDeadlineMin() {
                 if (announcementDate.value) {
                     proposalDeadline.min = announcementDate.value;
-
-                    if (proposalDeadline.value && proposalDeadline.value <= announcementDate.value) {
-                        proposalDeadline.value = "";
-                    }
                 }
             }
 
             announcementDate.addEventListener("change", syncDeadlineMin);
-
-            form.addEventListener("submit", function (e) {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                const ann = announcementDate.value ? new Date(announcementDate.value) : null;
-                const dead = proposalDeadline.value ? new Date(proposalDeadline.value) : null;
-
-                if (!ann || !dead) {
-                    return;
-                }
-
-                if (ann < today) {
-                    e.preventDefault();
-                    alert("Announcement date cannot be in the past.");
-                    return;
-                }
-
-                if (dead <= ann) {
-                    e.preventDefault();
-                    alert("Proposal deadline must be after announcement date.");
-                    return;
-                }
-            });
-
             syncDeadlineMin();
         });
     </script>

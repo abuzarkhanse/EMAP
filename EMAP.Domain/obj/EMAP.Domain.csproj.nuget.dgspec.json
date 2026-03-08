@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {}
+    "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
+    "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+        "projectUniqueName": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
         "projectName": "EMAP.Domain",
-        "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+        "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
         "packagesPath": "C:\\nuget",
-        "outputPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\obj\\",
+        "outputPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -58,6 +58,10 @@
             "Microsoft.Build": {
               "target": "Package",
               "version": "[17.8.3, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             }
           },
           "imports": [

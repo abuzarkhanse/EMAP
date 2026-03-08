@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "hroD1Hdgefs=",
+  "dgSpecHash": "YX3VmY3wniE=",
   "success": true,
-  "projectFilePath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+  "projectFilePath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
   "expectedPackageFiles": [
     "C:\\nuget\\microsoft.aspnetcore.cryptography.internal\\8.0.0\\microsoft.aspnetcore.cryptography.internal.8.0.0.nupkg.sha512",
     "C:\\nuget\\microsoft.aspnetcore.cryptography.keyderivation\\8.0.0\\microsoft.aspnetcore.cryptography.keyderivation.8.0.0.nupkg.sha512",
@@ -35,6 +35,8 @@
     "C:\\nuget\\system.security.cryptography.protecteddata\\7.0.0\\system.security.cryptography.protecteddata.7.0.0.nupkg.sha512",
     "C:\\nuget\\system.security.permissions\\7.0.0\\system.security.permissions.7.0.0.nupkg.sha512",
     "C:\\nuget\\system.security.principal.windows\\5.0.0\\system.security.principal.windows.5.0.0.nupkg.sha512",
+    "C:\\nuget\\system.text.encodings.web\\8.0.0\\system.text.encodings.web.8.0.0.nupkg.sha512",
+    "C:\\nuget\\system.text.json\\8.0.0\\system.text.json.8.0.0.nupkg.sha512",
     "C:\\nuget\\system.threading.tasks.dataflow\\7.0.0\\system.threading.tasks.dataflow.7.0.0.nupkg.sha512",
     "C:\\nuget\\system.windows.extensions\\7.0.0\\system.windows.extensions.7.0.0.nupkg.sha512"
   ],
@@ -43,10 +45,34 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'Microsoft.Build' 17.8.3 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3q9-fxm7-j8fq",
-      "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+      "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+      "filePath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
       "libraryId": "Microsoft.Build",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Text.Json' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-8g4q-xg66-9fp4",
+      "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+      "libraryId": "System.Text.Json",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Text.Json' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-hh2w-p6rv-4g7w",
+      "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+      "libraryId": "System.Text.Json",
       "targetGraphs": [
         "net8.0"
       ]

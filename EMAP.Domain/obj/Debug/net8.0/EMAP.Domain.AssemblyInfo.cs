@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EMAP.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+72d2d91bb8d32c9f10df125e79a8a924faa8629b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+41e84bf10e60f9fd85c2fbdcf2f73ce4931cd3fe")]
 [assembly: System.Reflection.AssemblyProductAttribute("EMAP.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EMAP.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj": {}
+    "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
+    "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+        "projectUniqueName": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
         "projectName": "EMAP.Domain",
-        "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+        "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
         "packagesPath": "C:\\nuget",
-        "outputPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\obj\\",
+        "outputPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -58,6 +58,10 @@
             "Microsoft.Build": {
               "target": "Package",
               "version": "[17.8.3, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             }
           },
           "imports": [
@@ -80,14 +84,14 @@
         }
       }
     },
-    "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj": {
+    "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
         "projectName": "EMAP.Infrastructure",
-        "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
+        "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
         "packagesPath": "C:\\nuget",
-        "outputPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\obj\\",
+        "outputPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -109,8 +113,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
-                "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj"
+              "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
+                "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj"
               }
             }
           }
@@ -188,14 +192,14 @@
         }
       }
     },
-    "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj": {
+    "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+        "projectUniqueName": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
         "projectName": "EMAP.Web",
-        "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+        "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
         "packagesPath": "C:\\nuget",
-        "outputPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\obj\\",
+        "outputPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -217,11 +221,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
-                "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj"
+              "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
+                "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj"
               },
-              "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj"
+              "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj": {
+                "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj"
               }
             }
           }
@@ -242,6 +246,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "ClosedXML": {
+              "target": "Package",
+              "version": "[0.105.0, )"
+            },
             "MailKit": {
               "target": "Package",
               "version": "[4.14.1, )"
@@ -275,6 +283,10 @@
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
               "version": "[8.0.7, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             }
           },
           "imports": [

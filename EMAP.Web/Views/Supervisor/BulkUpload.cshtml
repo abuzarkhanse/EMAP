@@ -1,0 +1,42 @@
+﻿@model EMAP.Web.ViewModels.Fyp.BulkSupervisorUploadViewModel
+
+@{
+    ViewData["Title"] = "Bulk Upload Supervisors";
+}
+
+<h1>Bulk Upload Supervisors</h1>
+
+<div class="mb-3">
+    <p><strong>Excel format:</strong></p>
+    <p>Name | Email | Department | FieldOfExpertise | MaxSlots | CurrentSlots | IsAvailable</p>
+</div>
+
+<form asp-action="BulkUpload" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="File" class="form-label"></label>
+        <input asp-for="File" type="file" class="form-control" accept=".xlsx" />
+        <span asp-validation-for="File" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Upload</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
+
+@if (ViewBag.Errors != null)
+{
+    <div class="alert alert-warning mt-4">
+        <h5>Some rows were not uploaded:</h5>
+        <ul>
+            @foreach (string error in ViewBag.Errors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

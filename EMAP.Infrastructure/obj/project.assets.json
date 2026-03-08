@@ -1695,7 +1695,8 @@
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.0",
-          "Microsoft.Build": "17.8.3"
+          "Microsoft.Build": "17.8.3",
+          "System.Text.Json": "8.0.0"
         },
         "compile": {
           "bin/placeholder/EMAP.Domain.dll": {}
@@ -4620,11 +4621,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
+      "projectUniqueName": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
       "projectName": "EMAP.Infrastructure",
-      "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
+      "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
       "packagesPath": "C:\\nuget",
-      "outputPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\obj\\",
+      "outputPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -4646,8 +4647,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
-              "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj"
+            "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
+              "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj"
             }
           }
         }
