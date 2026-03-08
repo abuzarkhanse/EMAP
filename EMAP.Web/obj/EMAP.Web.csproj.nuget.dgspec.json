@@ -10,7 +10,7 @@
         "projectUniqueName": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
         "projectName": "EMAP.Domain",
         "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
-        "packagesPath": "C:\\Users\\mrabu\\.nuget\\packages\\",
+        "packagesPath": "C:\\nuget",
         "outputPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
@@ -54,6 +54,10 @@
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.0, )"
+            },
+            "Microsoft.Build": {
+              "target": "Package",
+              "version": "[17.8.3, )"
             }
           },
           "imports": [
@@ -72,7 +76,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
@@ -82,7 +86,7 @@
         "projectUniqueName": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
         "projectName": "EMAP.Infrastructure",
         "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\mrabu\\.nuget\\packages\\",
+        "packagesPath": "C:\\nuget",
         "outputPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
@@ -131,6 +135,10 @@
               "target": "Package",
               "version": "[8.0.0, )"
             },
+            "Microsoft.Build": {
+              "target": "Package",
+              "version": "[17.8.3, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.6, )"
@@ -176,7 +184,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
@@ -186,7 +194,7 @@
         "projectUniqueName": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
         "projectName": "EMAP.Web",
         "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
-        "packagesPath": "C:\\Users\\mrabu\\.nuget\\packages\\",
+        "packagesPath": "C:\\nuget",
         "outputPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
@@ -246,6 +254,10 @@
               "target": "Package",
               "version": "[8.0.11, )"
             },
+            "Microsoft.Build": {
+              "target": "Package",
+              "version": "[17.8.3, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[8.0.11, )"
@@ -284,7 +296,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

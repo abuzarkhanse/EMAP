@@ -3091,7 +3091,8 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
-          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.0"
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.0",
+          "Microsoft.Build": "17.8.3"
         },
         "compile": {
           "bin/placeholder/EMAP.Domain.dll": {}
@@ -3106,6 +3107,7 @@
         "dependencies": {
           "EMAP.Domain": "1.0.0",
           "Microsoft.Bcl.AsyncInterfaces": "8.0.0",
+          "Microsoft.Build": "17.8.3",
           "Microsoft.EntityFrameworkCore": "8.0.6",
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.6",
           "System.Text.Encodings.Web": "8.0.0",
@@ -8506,6 +8508,7 @@
       "MailKit >= 4.14.1",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.11",
       "Microsoft.AspNetCore.Identity.UI >= 8.0.11",
+      "Microsoft.Build >= 17.8.3",
       "Microsoft.EntityFrameworkCore.SqlServer >= 8.0.11",
       "Microsoft.EntityFrameworkCore.Sqlite >= 8.0.11",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.11",
@@ -8513,7 +8516,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mrabu\\.nuget\\packages\\": {},
+    "C:\\nuget": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
@@ -8522,7 +8525,7 @@
       "projectUniqueName": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
       "projectName": "EMAP.Web",
       "projectPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
-      "packagesPath": "C:\\Users\\mrabu\\.nuget\\packages\\",
+      "packagesPath": "C:\\nuget",
       "outputPath": "C:\\Users\\mrabu\\source\\repos\\abuzarkhanse\\EMAP\\EMAP.Web\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
@@ -8582,6 +8585,10 @@
             "target": "Package",
             "version": "[8.0.11, )"
           },
+          "Microsoft.Build": {
+            "target": "Package",
+            "version": "[17.8.3, )"
+          },
           "Microsoft.EntityFrameworkCore.SqlServer": {
             "target": "Package",
             "version": "[8.0.11, )"
@@ -8620,8 +8627,20 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Microsoft.Build' 17.8.3 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3q9-fxm7-j8fq",
+      "libraryId": "Microsoft.Build",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

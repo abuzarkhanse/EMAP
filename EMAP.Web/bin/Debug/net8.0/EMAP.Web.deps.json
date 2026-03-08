@@ -13,6 +13,7 @@
           "MailKit": "4.14.1",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.11",
           "Microsoft.AspNetCore.Identity.UI": "8.0.11",
+          "Microsoft.Build": "17.8.3",
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.11",
           "Microsoft.EntityFrameworkCore.Sqlite": "8.0.11",
           "Microsoft.EntityFrameworkCore.Tools": "8.0.11",
@@ -2076,7 +2077,8 @@
       },
       "EMAP.Domain/1.0.0": {
         "dependencies": {
-          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.11"
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.11",
+          "Microsoft.Build": "17.8.3"
         },
         "runtime": {
           "EMAP.Domain.dll": {
@@ -2089,6 +2091,7 @@
         "dependencies": {
           "EMAP.Domain": "1.0.0",
           "Microsoft.Bcl.AsyncInterfaces": "8.0.0",
+          "Microsoft.Build": "17.8.3",
           "Microsoft.EntityFrameworkCore": "8.0.11",
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.11"
         },
