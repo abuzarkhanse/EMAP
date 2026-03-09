@@ -1,5 +1,5 @@
 ﻿@using EMAP.Domain.Fyp
-@model IEnumerable<StudentGroup>
+@model IEnumerable<EMAP.Domain.Fyp.StudentGroup>
 
 @{
     ViewData["Title"] = "Supervisor Requests";
@@ -53,6 +53,7 @@
                         <tr>
                             <th>Batch</th>
                             <th>Group Members</th>
+                            <th>Project Title</th>
                             <th>Status</th>
                             <th class="text-end" style="width: 200px;">Decision</th>
                         </tr>
@@ -86,6 +87,11 @@
                                 </td>
 
                                 <td>
+                                    @g.TentativeProjectTitle
+                                </td>
+
+                                <td>
+
                                     <span class="badge bg-warning text-dark">
                                         Pending Approval
                                     </span>

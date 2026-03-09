@@ -13,13 +13,22 @@
         <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index", "FypCoordinator")">Back</a>
     </div>
 
-    <div class="card shadow-sm mb-3">
-        <div class="card-body small">
-            <div><strong>Batch:</strong> @Model.Batch</div>
-            <div><strong>Title:</strong> @Model.Title</div>
-            <div><strong>Group Leader:</strong> @Model.GroupLeader</div>
-            <div><strong>Supervisor:</strong> @Model.SupervisorName</div>
-        </div>
+    <div class="mb-3">
+        <div><strong>Batch:</strong> @Model.Batch</div>
+        <div><strong>Title:</strong> @Model.Title</div>
+        <div><strong>Group Leader:</strong> @Model.GroupLeaderName</div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Member2Name))
+        {
+            <div><strong>Member:</strong> @Model.Member2Name</div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Member3Name))
+        {
+            <div><strong>Member:</strong> @Model.Member3Name</div>
+        }
+
+        <div><strong>Supervisor:</strong> @Model.SupervisorName</div>
     </div>
 
     <div class="card shadow-sm">

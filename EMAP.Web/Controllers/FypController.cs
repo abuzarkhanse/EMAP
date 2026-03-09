@@ -323,6 +323,7 @@ namespace EMAP.Web.Controllers
                 LeaderId = userId,
                 Member2Id = member2Id,
                 Member3Id = member3Id,
+                TentativeProjectTitle = model.TentativeProjectTitle,
                 Status = GroupStatus.PendingSupervisorSelection
             });
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace EMAP.Domain.Fyp
 {
@@ -34,5 +35,9 @@ namespace EMAP.Domain.Fyp
         public FypProject? Project { get; set; }
 
         public GroupStatus Status { get; set; } = GroupStatus.PendingSupervisorSelection;
+
+        [Required]
+        [StringLength(300)]
+        public string TentativeProjectTitle { get; set; } = string.Empty;
     }
 }

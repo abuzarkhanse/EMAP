@@ -51,12 +51,14 @@ namespace EMAP.Web.Controllers.Admin
 
             var users = await _userManager.Users
                 .Where(u => allIds.Contains(u.Id))
-                .Select(u => new { u.Id, u.UserName, u.Email })
+                .Select(u => new { u.Id, u.FullName, u.UserName, u.Email })
                 .ToListAsync();
 
             var userMap = users.ToDictionary(
                 x => x.Id,
-                x => string.IsNullOrWhiteSpace(x.UserName) ? (x.Email ?? x.Id) : x.UserName!);
+                x => !string.IsNullOrWhiteSpace(x.FullName)
+                    ? x.FullName
+                    : (!string.IsNullOrWhiteSpace(x.UserName) ? x.UserName! : (x.Email ?? x.Id)));
 
             var items = proposals.Select(p =>
             {
@@ -129,14 +131,23 @@ namespace EMAP.Web.Controllers.Admin
 
             var users = await _userManager.Users
                 .Where(u => ids.Contains(u.Id))
-                .Select(u => new { u.Id, u.UserName, u.Email })
+                .Select(u => new { u.Id, u.FullName, u.UserName, u.Email })
                 .ToListAsync();
 
             string Display(string? id2)
             {
                 if (string.IsNullOrWhiteSpace(id2)) return "-";
+
                 var u = users.FirstOrDefault(x => x.Id == id2);
-                return u == null ? id2 : (!string.IsNullOrWhiteSpace(u.UserName) ? u.UserName! : (u.Email ?? id2));
+                if (u == null) return id2;
+
+                if (!string.IsNullOrWhiteSpace(u.FullName))
+                    return u.FullName;
+
+                if (!string.IsNullOrWhiteSpace(u.UserName))
+                    return u.UserName!;
+
+                return u.Email ?? id2;
             }
 
             var leader = Display(proposal.Group.LeaderId);

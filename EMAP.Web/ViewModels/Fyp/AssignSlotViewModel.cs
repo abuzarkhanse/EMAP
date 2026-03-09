@@ -9,7 +9,9 @@ namespace EMAP.Web.ViewModels.Fyp
         public int ProposalId { get; set; }
 
         public string Title { get; set; } = string.Empty;
-        public string GroupLeader { get; set; } = string.Empty;
+        public string? GroupLeaderName { get; set; }
+        public string? Member2Name { get; set; }
+        public string? Member3Name { get; set; }
 
         public string Batch { get; set; } = string.Empty;
         public string SupervisorName { get; set; } = string.Empty;

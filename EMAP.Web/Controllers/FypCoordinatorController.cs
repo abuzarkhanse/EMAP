@@ -92,7 +92,7 @@ namespace EMAP.Web.Controllers
             if (proposal == null)
                 return NotFound();
 
-            // ✅ Allow both statuses
+            // Allow both statuses
             if (proposal.Status != ProposalStatus.ApprovedForDefense &&
                 proposal.Status != ProposalStatus.ProposalAccepted)
             {
@@ -120,12 +120,27 @@ namespace EMAP.Web.Controllers
                 taken: takenSlots
             );
 
+            var leader = await _userManager.FindByIdAsync(proposal.Group.LeaderId);
+
+            var member2 = !string.IsNullOrWhiteSpace(proposal.Group.Member2Id)
+                ? await _userManager.FindByIdAsync(proposal.Group.Member2Id)
+                : null;
+
+            var member3 = !string.IsNullOrWhiteSpace(proposal.Group.Member3Id)
+                ? await _userManager.FindByIdAsync(proposal.Group.Member3Id)
+                : null;
+
             var vm = new AssignSlotViewModel
             {
                 ProposalId = proposal.Id,
                 Title = proposal.Title,
                 Batch = proposal.Group.FypCall.Batch,
                 SupervisorName = proposal.Group.Supervisor?.Name ?? "-",
+
+                GroupLeaderName = leader?.FullName ?? leader?.UserName ?? leader?.Email ?? "-",
+                Member2Name = member2?.FullName ?? member2?.UserName ?? member2?.Email,
+                Member3Name = member3?.FullName ?? member3?.UserName ?? member3?.Email,
+
                 DefenseDate = date,
                 AvailableSlots = slots,
                 DurationMinutes = 10

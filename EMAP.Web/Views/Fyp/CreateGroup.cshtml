@@ -24,6 +24,12 @@
 
             <form asp-action="CreateGroup" method="post">
                 <div class="mb-3">
+                    <label asp-for="TentativeProjectTitle" class="form-label"></label>
+                    <input asp-for="TentativeProjectTitle" class="form-control" placeholder="Enter expected/tentative project title" />
+                    <span asp-validation-for="TentativeProjectTitle" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label fw-bold">Member 2 Email (optional)</label>
                     <input asp-for="Member2Email" class="form-control" />
                     <span asp-validation-for="Member2Email" class="text-danger small"></span>

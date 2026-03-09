@@ -625,7 +625,7 @@ namespace EMAP.Web.Controllers.Admin
             var sup = group.Supervisor;
 
             if (sup.CurrentSlots >= sup.MaxSlots)
-            {
+            {  
                 TempData["Error"] = $"Supervisor {sup.Name} has no remaining slots.";
                 return RedirectToAction(nameof(PendingRequests));
             }
