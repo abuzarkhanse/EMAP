@@ -1,24 +1,35 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: #f8f9fb;
+    color: #212529;
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem #fff, 0 0 0 0.25rem rgba(37, 140, 251, 0.25);
+}
+
+/* ---------- GLOBAL CARDS ---------- */
+.card {
+    border: 1px solid #edf0f2;
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(15, 23, 42, 0.04);
+    background: #fff;
 }
 
 .dashboard-card {
@@ -29,58 +40,125 @@ body {
         padding: 1.25rem 1.5rem;
     }
 
-.card {
-    border: none;
-}
-
 /* ---------- STATUS CARDS ---------- */
 .status-card {
-    border-radius: 12px;
-    border: 1px solid #eee;
+    border-radius: 14px;
+    border: 1px solid #edf0f2;
     transition: all 0.25s ease;
+    background: #fff;
 }
 
     .status-card.clickable:hover {
         transform: translateY(-4px);
-        box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
         cursor: pointer;
     }
 
-/* ---------- FLOW HEADER ---------- */
-.fyp-flow {
-    margin-bottom: 1.5rem;
+/* ---------- UNIFIED WORKFLOW NAVIGATION ---------- */
+.workflow-card {
+    background: #fff;
+    border: 1px solid #edf0f2;
+    border-radius: 18px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 6px 24px rgba(15, 23, 42, 0.04);
 }
 
-    .fyp-flow .step {
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
-        background: #e9ecef;
-        color: #6c757d;
-    }
+.workflow-badge {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
 
-        .fyp-flow .step.done {
-            background: #198754;
-            color: #fff;
-        }
+.workflow-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
 
-        .fyp-flow .step.active {
-            background: #0d6efd;
-            color: #fff;
-        }
+.workflow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 88px;
+    position: relative;
+}
 
-        .fyp-flow .step.pending {
-            background: #ffc107;
-            color: #000;
-        }
+.workflow-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.55rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: 2px solid #dbe2ea;
+    background: #f8fafc;
+    color: #94a3b8;
+    transition: all 0.2s ease;
+}
 
-    .fyp-flow .line {
-        flex: 1;
-        height: 2px;
-        background: #dee2e6;
-        margin: 0 6px;
-    }
+.workflow-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    line-height: 1.2;
+}
+
+.workflow-line {
+    flex: 1;
+    height: 2px;
+    min-width: 24px;
+    background: #e2e8f0;
+    margin: 0 0.15rem;
+    border-radius: 999px;
+}
+
+.workflow-step.completed .workflow-circle {
+    background: #ecfdf3;
+    border-color: #86efac;
+    color: #15803d;
+}
+
+.workflow-step.completed .workflow-label {
+    color: #334155;
+}
+
+.workflow-step.current .workflow-circle {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #2563eb;
+    box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.08);
+}
+
+.workflow-step.current .workflow-label {
+    color: #0f172a;
+}
+
+.workflow-step.locked .workflow-circle {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #94a3b8;
+}
+
+.workflow-step.locked .workflow-label {
+    color: #94a3b8;
+}
+
+.workflow-line.completed {
+    background: linear-gradient(90deg, #86efac 0%, #bbf7d0 100%);
+}
 
 /* ---------- CARD LINK ---------- */
 .card-link-wrapper {
@@ -88,3 +166,301 @@ body {
     color: inherit;
 }
 
+    .card-link-wrapper:hover {
+        color: inherit;
+    }
+
+/* ---------- SMALL UI POLISH ---------- */
+.text-muted {
+    color: #6b7280 !important;
+}
+
+.btn-outline-secondary {
+    border-color: #d0d7de;
+}
+
+    .btn-outline-secondary:hover {
+        background-color: #f3f4f6;
+        border-color: #c7d0d9;
+        color: #111827;
+    }
+
+/* ---------- STUDENT DASHBOARD ---------- */
+.student-dashboard {
+    max-width: 1280px;
+}
+
+.dashboard-hero {
+    padding: 0.25rem 0;
+}
+
+.dashboard-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-subtitle {
+    color: #64748b;
+    font-size: 1.02rem;
+}
+
+.student-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 0.7rem 1rem;
+    color: #0f172a;
+    font-weight: 600;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+}
+
+.dashboard-main-card {
+    border-radius: 24px;
+    border: 1px solid #e8edf2;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.dashboard-main-text {
+    max-width: 760px;
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.module-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+    .module-badge.active {
+        background: #ecfdf3;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+    }
+
+.feature-points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+    .feature-points span {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 0.85rem;
+        border-radius: 999px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+.dashboard-main-actions {
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.btn-dashboard-action {
+    min-width: 200px;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    font-weight: 600;
+}
+
+.dashboard-panel {
+    border-radius: 20px;
+    border: 1px solid #e8edf2;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.panel-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.quick-action-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.quick-action-btn {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    background: #f8fbff;
+    border: 1px solid #cfe0ff;
+    color: #2563eb;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+    .quick-action-btn:hover {
+        background: #eef5ff;
+        color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    .quick-action-btn.muted {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        color: #64748b;
+    }
+
+        .quick-action-btn.muted:hover {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+.deadline-list,
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.deadline-item {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eef2f7;
+}
+
+    .deadline-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+.deadline-title,
+.activity-title {
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.2rem;
+}
+
+.deadline-meta,
+.activity-meta {
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+.deadline-tag {
+    display: inline-flex;
+    margin-top: 0.55rem;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 999px;
+    padding: 0.28rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+}
+
+.activity-dot {
+    width: 10px;
+    height: 10px;
+    margin-top: 0.45rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+    .activity-dot.success {
+        background: #22c55e;
+    }
+
+    .activity-dot.info {
+        background: #60a5fa;
+    }
+
+    .activity-dot.muted {
+        background: #cbd5e1;
+    }
+
+@media (max-width: 991.98px) {
+    .dashboard-title {
+        font-size: 1.9rem;
+    }
+
+    .dashboard-main-actions {
+        min-width: 100%;
+    }
+
+    .btn-dashboard-action {
+        width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .dashboard-title {
+        font-size: 1.7rem;
+    }
+
+    .student-badge {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .feature-points {
+        flex-direction: column;
+    }
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 991.98px) {
+    .workflow-steps {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 1rem 0.75rem;
+    }
+
+    .workflow-line {
+        display: none;
+    }
+
+    .workflow-step {
+        flex: 0 0 calc(33.333% - 0.5rem);
+        min-width: unset;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .workflow-card {
+        padding: 1rem;
+    }
+
+    .workflow-step {
+        flex: 0 0 calc(50% - 0.5rem);
+    }
+
+    .workflow-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
+    }
+
+    .workflow-label {
+        font-size: 0.85rem;
+    }
+
+    .workflow-badge {
+        font-size: 0.82rem;
+        padding: 0.4rem 0.75rem;
+    }
+}

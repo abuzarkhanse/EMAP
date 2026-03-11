@@ -68,45 +68,91 @@
         <div class="alert alert-success">@TempData["Success"]</div>
     }
 
-    <!-- ===== CONNECTED FLOW (UI only) ===== -->
-    <div class="fyp-flow mb-4">
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="step @(step1Done ? "done" : "pending")">1. Group</div>
-            <div class="line"></div>
-            <div class="step @(step2Done ? "done" : "pending")">2. Supervisor</div>
-            <div class="line"></div>
-            <div class="step @(step3Done ? "done" : "pending")">3. Approval</div>
-            <div class="line"></div>
-            <div class="step @(step4Done ? "done" : "pending")">4. Proposal</div>
-            <div class="line"></div>
-            <div class="step @((defenseHasSlot || defenseHasResult) ? "done" : "pending")">5. Defense</div>
-            <div class="line"></div>
-            <div class="step @(Model.OpenChapter != null ? "done" : "pending")">6. Chapters</div>
-        </div>
-    </div>
+    @{
+        string currentStepKey =
+        !Model.HasGroup ? "group" :
+        !Model.HasSupervisor ? "supervisor" :
+        (Model.Group?.Status != GroupStatus.Approved) ? "approval" :
+        !Model.HasProposal ? "proposal" :
+        !(defenseHasSlot || defenseHasResult) ? "defense" :
+        (Model.OpenChapter == null) ? "chapters" :
+                "chapters";
 
-    <!-- ===== PROGRESS ===== -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h6 class="mb-3">FYP Progress</h6>
-            <div class="d-flex justify-content-between text-center small">
-                <div class="flex-fill">
-                    <div class="fw-bold @(Model.HasGroup ? "text-success" : "text-muted")">1</div>
-                    <div>Create Group</div>
-                </div>
-                <div class="flex-fill">
-                    <div class="fw-bold @(Model.HasSupervisor ? "text-success" : "text-muted")">2</div>
-                    <div>Select Supervisor</div>
-                </div>
-                <div class="flex-fill">
-                    <div class="fw-bold @(Model.Group?.Status == GroupStatus.Approved ? "text-success" : "text-muted")">3</div>
-                    <div>Supervisor Approval</div>
-                </div>
-                <div class="flex-fill">
-                    <div class="fw-bold @(Model.HasProposal ? "text-success" : "text-muted")">4</div>
-                    <div>Proposal</div>
-                </div>
+        string currentStepLabel =
+        currentStepKey == "group" ? "Create Group" :
+        currentStepKey == "supervisor" ? "Select Supervisor" :
+        currentStepKey == "approval" ? "Wait for Approval" :
+        currentStepKey == "proposal" ? "Submit Proposal" :
+        currentStepKey == "defense" ? "Defense" :
+                "Chapters";
+
+        var steps = new[]
+        {
+        new { Order = 1, Key = "group", Title = "Group", Done = Model.HasGroup },
+        new { Order = 2, Key = "supervisor", Title = "Supervisor", Done = Model.HasSupervisor },
+        new { Order = 3, Key = "approval", Title = "Approval", Done = (Model.Group?.Status == GroupStatus.Approved) },
+        new { Order = 4, Key = "proposal", Title = "Proposal", Done = Model.HasProposal },
+        new { Order = 5, Key = "defense", Title = "Defense", Done = (defenseHasSlot || defenseHasResult) },
+        new { Order = 6, Key = "chapters", Title = "Chapters", Done = (Model.OpenChapter != null) }
+        };
+
+        int currentOrder = currentStepKey switch
+        {
+                "group" => 1,
+                "supervisor" => 2,
+                "approval" => 3,
+                "proposal" => 4,
+                "defense" => 5,
+                "chapters" => 6,
+            _ => 1
+        };
+    }
+
+    <!-- ===== UNIFIED WORKFLOW NAVIGATION ===== -->
+    <div class="workflow-card mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+            <div>
+                <h6 class="mb-1">FYP Journey</h6>
+                <p class="text-muted small mb-0">
+                    Follow your progress through the Final Year Project workflow.
+                </p>
             </div>
+
+            <span class="workflow-badge">
+                Current: @currentStepLabel
+            </span>
+        </div>
+
+        <div class="workflow-steps">
+            @for (int i = 0; i < steps.Length; i++)
+            {
+                var step = steps[i];
+                var state = step.Order < currentOrder
+                ? "completed"
+                : step.Order == currentOrder
+                ? "current"
+                : "locked";
+
+                <div class="workflow-step @state">
+                    <div class="workflow-circle">
+                        @if (step.Order < currentOrder)
+                        {
+                            <span>✓</span>
+                        }
+                        else
+                        {
+                            <span>@step.Order</span>
+                        }
+                    </div>
+                    <div class="workflow-label">@step.Title</div>
+                </div>
+
+                @if (i < steps.Length - 1)
+                {
+                    var lineClass = step.Order < currentOrder ? "workflow-line completed" : "workflow-line";
+                    <div class="@lineClass"></div>
+                }
+            }
         </div>
     </div>
 

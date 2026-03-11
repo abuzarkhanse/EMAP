@@ -2,180 +2,148 @@
     ViewData["Title"] = "Student Dashboard";
 }
 
-<div class="container-fluid py-4">
+<div class="container py-4 student-dashboard">
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1">Student Dashboard</h2>
-            <p class="text-muted mb-0">
-                EMAP – Academic Project & Editorial Platform
-            </p>
-        </div>
-        <div class="text-end">
-            <span class="badge bg-light text-dark border px-3 py-2">
-                <i class="bi bi-person-circle me-1"></i>
+    <!-- ===== HEADER ===== -->
+    <div class="dashboard-hero mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h1 class="dashboard-title mb-2">Student Dashboard</h1>
+                <p class="dashboard-subtitle mb-0">
+                    Welcome to EMAP — manage your Final Year Project from one place.
+                </p>
+            </div>
+
+            <div class="student-badge">
+                <i class="bi bi-person-circle me-2"></i>
                 @User.Identity?.Name
-            </span>
+            </div>
         </div>
     </div>
 
-    <!-- Key Modules -->
-    <div class="row g-3 mb-4">
-
-        <!-- FYP MODULE -->
-        <div class="col-lg-6">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body d-flex flex-column">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="mb-0">
-                            <i class="bi bi-mortarboard-fill me-2"></i>Final Year Project (FYP)
-                        </h5>
-                        <span class="badge bg-success">Active</span>
+    <!-- ===== MAIN FYP CARD ===== -->
+    <div class="card dashboard-main-card mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-4">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <h3 class="mb-0">Final Year Project</h3>
+                        <span class="module-badge active">Active</span>
                     </div>
 
-                    <p class="text-muted small">
-                        Manage your FYP lifecycle including group formation, supervisor selection,
-                        proposal submission and review.
+                    <p class="text-muted mb-3 dashboard-main-text">
+                        Access your FYP workspace to manage group formation, supervisor selection,
+                        proposal submission, defense progress, and chapter activities.
                     </p>
 
-                    <ul class="small mb-3">
-                        <li>Create / manage FYP group</li>
-                        <li>Select supervisor & track approval</li>
-                        <li>Submit proposal and revisions</li>
-                        <li>View feedback and defense status</li>
-                    </ul>
-
-                    <div class="mt-auto">
-                        <a asp-controller="Fyp" asp-action="Index"
-                           class="btn btn-primary btn-sm me-2">
-                            Open FYP Portal
-                        </a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm">
-                            View Guidelines
-                        </a>
+                    <div class="feature-points">
+                        <span>Group & supervisor management</span>
+                        <span>Proposal and defense tracking</span>
+                        <span>Chapter submission workflow</span>
                     </div>
+                </div>
+
+                <div class="dashboard-main-actions">
+                    <a asp-controller="Fyp" asp-action="Index" class="btn btn-primary btn-dashboard-action">
+                        Open FYP Portal
+                    </a>
+                    <a href="/templates/SRS%20Template.docx" class="btn btn-light btn-dashboard-action" download>
+                        View Guidelines
+                    </a>
                 </div>
             </div>
         </div>
-
-        <!-- THESIS MODULE -->
-        <div class="col-lg-6">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body d-flex flex-column">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="mb-0">
-                            <i class="bi bi-book-half me-2"></i>Thesis Module
-                        </h5>
-                        <span class="badge bg-secondary">Upcoming</span>
-                    </div>
-
-                    <p class="text-muted small">
-                        Thesis registration, chapter submissions, plagiarism checks
-                        and evaluation workflow.
-                    </p>
-
-                    <ul class="small mb-3">
-                        <li>Register thesis topic</li>
-                        <li>Upload chapters</li>
-                        <li>Track evaluations</li>
-                        <li>Final submission & approval</li>
-                    </ul>
-
-                    <div class="mt-auto">
-                        <button class="btn btn-outline-secondary btn-sm" disabled>
-                            Coming Soon
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Secondary Row -->
-    <div class="row g-3">
-
-        <!-- QUICK ACTIONS -->
+    <!-- ===== LOWER GRID ===== -->
+    <div class="row g-4">
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">
-                        <i class="bi bi-lightning-charge-fill me-2"></i>Quick Actions
-                    </h5>
+            <div class="card dashboard-panel h-100">
+                <div class="card-body p-4">
+                    <h4 class="panel-title mb-3">
+                        <i class="bi bi-lightning-charge me-2"></i>Quick Actions
+                    </h4>
 
-                    <div class="d-grid gap-2">
-                        <a asp-controller="Fyp" asp-action="Index"
-                           class="btn btn-outline-primary btn-sm">
+                    <div class="quick-action-list">
+                        <a asp-controller="Fyp" asp-action="Index" class="quick-action-btn">
                             Go to FYP Portal
                         </a>
-                        <a href="#" class="btn btn-outline-primary btn-sm">
+                        <a href="#" class="quick-action-btn">
                             View My Submissions
                         </a>
-                        <a href="#" class="btn btn-outline-primary btn-sm">
+                        <a href="#" class="quick-action-btn">
                             Supervisor Feedback
                         </a>
-                        <a href="~/templates/SRS Template.docx" class="btn btn-outline-secondary btn-sm">
-                            Download Templates (SRS)
+                        <a href="/templates/SRS%20Template.docx" class="quick-action-btn muted" download>
+                            Download Templates
                         </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- DEADLINES -->
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">
+            <div class="card dashboard-panel h-100">
+                <div class="card-body p-4">
+                    <h4 class="panel-title mb-3">
                         <i class="bi bi-calendar-event me-2"></i>Upcoming Deadlines
-                    </h5>
+                    </h4>
 
-                    <ul class="list-unstyled small mb-0">
-                        <li class="mb-3">
-                            <strong>FYP Proposal Submission</strong><br />
-                            <span class="text-muted">Due: 15 Dec 2025</span><br />
-                            <span class="badge bg-warning text-dark">5 days remaining</span>
-                        </li>
-                        <li class="mb-3">
-                            <strong>Supervisor Approval</strong><br />
-                            <span class="text-muted">Due: 22 Dec 2025</span>
-                        </li>
-                        <li>
-                            <strong>Progress Presentation</strong><br />
-                            <span class="text-muted">Tentative: Jan 2026</span>
-                        </li>
-                    </ul>
+                    <div class="deadline-list">
+                        <div class="deadline-item">
+                            <div class="deadline-title">FYP Proposal Submission</div>
+                            <div class="deadline-meta">Due: 15 Dec 2025</div>
+                            <span class="deadline-tag">5 days remaining</span>
+                        </div>
+
+                        <div class="deadline-item">
+                            <div class="deadline-title">Supervisor Approval</div>
+                            <div class="deadline-meta">Due: 22 Dec 2025</div>
+                        </div>
+
+                        <div class="deadline-item mb-0">
+                            <div class="deadline-title">Progress Presentation</div>
+                            <div class="deadline-meta">Tentative: Jan 2026</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ACTIVITY -->
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">
+            <div class="card dashboard-panel h-100">
+                <div class="card-body p-4">
+                    <h4 class="panel-title mb-3">
                         <i class="bi bi-clock-history me-2"></i>Recent Activity
-                    </h5>
+                    </h4>
 
-                    <ul class="list-unstyled small mb-0">
-                        <li class="mb-2">
-                            ✅ Proposal draft saved<br />
-                            <span class="text-muted">Today, 10:45 AM</span>
-                        </li>
-                        <li class="mb-2">
-                            📩 Supervisor notification received<br />
-                            <span class="text-muted">Yesterday</span>
-                        </li>
-                        <li>
-                            📄 Template downloaded<br />
-                            <span class="text-muted">2 days ago</span>
-                        </li>
-                    </ul>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-dot success"></div>
+                            <div>
+                                <div class="activity-title">Proposal draft saved</div>
+                                <div class="activity-meta">Today, 10:45 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-dot info"></div>
+                            <div>
+                                <div class="activity-title">Supervisor notification received</div>
+                                <div class="activity-meta">Yesterday</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-dot muted"></div>
+                            <div>
+                                <div class="activity-title">Template downloaded</div>
+                                <div class="activity-meta">2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
-
 </div>
