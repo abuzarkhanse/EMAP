@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace EMAP.Domain.Fyp
@@ -28,9 +28,7 @@ namespace EMAP.Domain.Fyp
         public int? SupervisorId { get; set; }
         public FypSupervisor? Supervisor { get; set; }
 
-        //public string Email { get; set; } = null!;
-
-        // project (we will use later)
+        // project
         public int? ProjectId { get; set; }
         public FypProject? Project { get; set; }
 
@@ -39,5 +37,11 @@ namespace EMAP.Domain.Fyp
         [Required]
         [StringLength(300)]
         public string TentativeProjectTitle { get; set; } = string.Empty;
+
+        // New academic stage support
+        public FypStage CurrentStage { get; set; } = FypStage.Fyp1;
+
+        // New evaluations linked to this group
+        public ICollection<FypEvaluation> Evaluations { get; set; } = new List<FypEvaluation>();
     }
 }

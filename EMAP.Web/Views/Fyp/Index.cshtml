@@ -617,6 +617,67 @@
                 }
             </div>
 
+            @if (Model.Group != null && Model.StageMilestones.Any())
+            {
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="mb-1">Stage Roadmap</h5>
+                                <p class="text-muted small mb-0">
+                                    Current stage: <strong>@Model.CurrentStage</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            @foreach (var item in Model.StageMilestones)
+                            {
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="status-card p-3 h-100">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <div class="fw-semibold">@item.Title</div>
+                                                <small class="text-muted">@item.Type</small>
+                                            </div>
+
+                                            @if (item.IsCompleted)
+                                            {
+                                                <span class="badge bg-success-subtle text-success">Done</span>
+                                            }
+                                            else if (item.IsOptional)
+                                            {
+                                                <span class="badge bg-warning-subtle text-warning">Optional</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-light text-dark border">Pending</span>
+                                            }
+                                        </div>
+
+                                        <div class="small text-muted mb-2">
+                                            Order: @item.DisplayOrder
+                                            @if (item.ChapterNumber.HasValue)
+                                            {
+                                                <span> • Chapter @item.ChapterNumber</span>
+                                            }
+                                        </div>
+
+                                        <div class="small">
+                                            <strong>Status:</strong> @item.StatusText
+                                        </div>
+
+                                        <div class="small text-muted mt-1">
+                                            <strong>Due:</strong> @(item.DueDate?.ToString("dd MMM yyyy") ?? "Not set")
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
             <!-- ===== SUPERVISOR LIST ===== -->
             @if (Model.ShowSupervisorList)
             {

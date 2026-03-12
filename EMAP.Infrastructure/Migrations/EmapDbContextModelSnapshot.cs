@@ -114,11 +114,17 @@ namespace EMAP.Infrastructure.Migrations
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MilestoneId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ReviewedById")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Stage")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -140,7 +146,384 @@ namespace EMAP.Infrastructure.Migrations
 
                     b.HasIndex("GroupId");
 
+                    b.HasIndex("MilestoneId");
+
                     b.ToTable("FypChapterSubmissions");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("EvaluatorUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsSubmitted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MilestoneId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ScheduledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TotalMarks")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MilestoneId");
+
+                    b.HasIndex("StudentGroupId");
+
+                    b.ToTable("FypEvaluations");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationCriterion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EvaluationType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("MaxMarks")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EvaluationType", "DisplayOrder");
+
+                    b.ToTable("FypEvaluationCriteria");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DisplayOrder = 1,
+                            EvaluationType = 2,
+                            IsActive = true,
+                            MaxMarks = 10m,
+                            Title = "Problem Understanding"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DisplayOrder = 2,
+                            EvaluationType = 2,
+                            IsActive = true,
+                            MaxMarks = 10m,
+                            Title = "Progress and Methodology"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DisplayOrder = 3,
+                            EvaluationType = 2,
+                            IsActive = true,
+                            MaxMarks = 10m,
+                            Title = "Documentation"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DisplayOrder = 4,
+                            EvaluationType = 2,
+                            IsActive = true,
+                            MaxMarks = 10m,
+                            Title = "Presentation"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            DisplayOrder = 1,
+                            EvaluationType = 3,
+                            IsActive = true,
+                            MaxMarks = 10m,
+                            Title = "Implementation Progress"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            DisplayOrder = 2,
+                            EvaluationType = 3,
+                            IsActive = true,
+                            MaxMarks = 10m,
+                            Title = "Documentation Quality"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            DisplayOrder = 3,
+                            EvaluationType = 3,
+                            IsActive = true,
+                            MaxMarks = 10m,
+                            Title = "Presentation and Readiness"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            DisplayOrder = 1,
+                            EvaluationType = 4,
+                            IsActive = true,
+                            MaxMarks = 20m,
+                            Title = "Final Report"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            DisplayOrder = 2,
+                            EvaluationType = 4,
+                            IsActive = true,
+                            MaxMarks = 20m,
+                            Title = "Implementation"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            DisplayOrder = 3,
+                            EvaluationType = 4,
+                            IsActive = true,
+                            MaxMarks = 10m,
+                            Title = "Presentation"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            DisplayOrder = 4,
+                            EvaluationType = 4,
+                            IsActive = true,
+                            MaxMarks = 10m,
+                            Title = "Viva / Question Answer"
+                        });
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationScore", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AwardedMarks")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CriterionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EvaluationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CriterionId");
+
+                    b.HasIndex("EvaluationId");
+
+                    b.ToTable("FypEvaluationScores");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypMilestone", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ChapterNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOptional")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Stage")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Stage", "Type", "ChapterNumber", "DisplayOrder");
+
+                    b.ToTable("FypMilestones");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ChapterNumber = 1,
+                            DisplayOrder = 1,
+                            IsActive = true,
+                            IsOptional = false,
+                            Stage = 1,
+                            Title = "FYP-1 Chapter 1",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ChapterNumber = 2,
+                            DisplayOrder = 2,
+                            IsActive = true,
+                            IsOptional = false,
+                            Stage = 1,
+                            Title = "FYP-1 Chapter 2",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ChapterNumber = 3,
+                            DisplayOrder = 3,
+                            IsActive = true,
+                            IsOptional = false,
+                            Stage = 1,
+                            Title = "FYP-1 Chapter 3",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DisplayOrder = 4,
+                            IsActive = true,
+                            IsOptional = false,
+                            Stage = 1,
+                            Title = "FYP-1 Mid Evaluation",
+                            Type = 2
+                        },
+                        new
+                        {
+                            Id = 5,
+                            DisplayOrder = 5,
+                            IsActive = true,
+                            IsOptional = false,
+                            Stage = 1,
+                            Title = "FYP-1 Final Evaluation",
+                            Type = 4
+                        },
+                        new
+                        {
+                            Id = 6,
+                            ChapterNumber = 1,
+                            DisplayOrder = 1,
+                            IsActive = true,
+                            IsOptional = false,
+                            Stage = 2,
+                            Title = "FYP-2 Chapter 1",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 7,
+                            ChapterNumber = 2,
+                            DisplayOrder = 2,
+                            IsActive = true,
+                            IsOptional = false,
+                            Stage = 2,
+                            Title = "FYP-2 Chapter 2",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 8,
+                            ChapterNumber = 3,
+                            DisplayOrder = 3,
+                            IsActive = true,
+                            IsOptional = false,
+                            Stage = 2,
+                            Title = "FYP-2 Chapter 3",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 9,
+                            DisplayOrder = 4,
+                            IsActive = true,
+                            IsOptional = false,
+                            Stage = 2,
+                            Title = "FYP-2 Mid Evaluation",
+                            Type = 2
+                        },
+                        new
+                        {
+                            Id = 10,
+                            DisplayOrder = 5,
+                            IsActive = true,
+                            IsOptional = true,
+                            Stage = 2,
+                            Title = "FYP-2 Pre-Final Evaluation",
+                            Type = 3
+                        },
+                        new
+                        {
+                            Id = 11,
+                            DisplayOrder = 6,
+                            IsActive = true,
+                            IsOptional = false,
+                            Stage = 2,
+                            Title = "FYP-2 Final Evaluation",
+                            Type = 4
+                        });
                 });
 
             modelBuilder.Entity("EMAP.Domain.Fyp.FypProject", b =>
@@ -355,6 +738,9 @@ namespace EMAP.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CurrentStage")
+                        .HasColumnType("int");
 
                     b.Property<int>("FypCallId")
                         .HasColumnType("int");
@@ -629,9 +1015,54 @@ namespace EMAP.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("EMAP.Domain.Fyp.FypMilestone", "Milestone")
+                        .WithMany("ChapterSubmissions")
+                        .HasForeignKey("MilestoneId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("ChapterAnnouncement");
 
                     b.Navigation("Group");
+
+                    b.Navigation("Milestone");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluation", b =>
+                {
+                    b.HasOne("EMAP.Domain.Fyp.FypMilestone", "Milestone")
+                        .WithMany("Evaluations")
+                        .HasForeignKey("MilestoneId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EMAP.Domain.Fyp.StudentGroup", "StudentGroup")
+                        .WithMany("Evaluations")
+                        .HasForeignKey("StudentGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Milestone");
+
+                    b.Navigation("StudentGroup");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationScore", b =>
+                {
+                    b.HasOne("EMAP.Domain.Fyp.FypEvaluationCriterion", "Criterion")
+                        .WithMany("Scores")
+                        .HasForeignKey("CriterionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EMAP.Domain.Fyp.FypEvaluation", "Evaluation")
+                        .WithMany("Scores")
+                        .HasForeignKey("EvaluationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Criterion");
+
+                    b.Navigation("Evaluation");
                 });
 
             modelBuilder.Entity("EMAP.Domain.Fyp.FypProject", b =>
@@ -773,11 +1204,33 @@ namespace EMAP.Infrastructure.Migrations
                     b.Navigation("Projects");
                 });
 
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluation", b =>
+                {
+                    b.Navigation("Scores");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationCriterion", b =>
+                {
+                    b.Navigation("Scores");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypMilestone", b =>
+                {
+                    b.Navigation("ChapterSubmissions");
+
+                    b.Navigation("Evaluations");
+                });
+
             modelBuilder.Entity("EMAP.Domain.Fyp.ProposalSubmission", b =>
                 {
                     b.Navigation("DefenseEvaluation");
 
                     b.Navigation("DefenseSchedule");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.StudentGroup", b =>
+                {
+                    b.Navigation("Evaluations");
                 });
 #pragma warning restore 612, 618
         }

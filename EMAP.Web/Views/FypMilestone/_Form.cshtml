@@ -1,0 +1,61 @@
+﻿@model EMAP.Web.ViewModels.Fyp.FypMilestoneFormViewModel
+@using EMAP.Domain.Fyp
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Stage" class="form-label"></label>
+        <select asp-for="Stage" class="form-select"
+                asp-items="Html.GetEnumSelectList<FypStage>()"></select>
+        <span asp-validation-for="Stage" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Type" class="form-label"></label>
+        <select asp-for="Type" class="form-select"
+                asp-items="Html.GetEnumSelectList<FypMilestoneType>()"></select>
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="ChapterNumber" class="form-label"></label>
+        <input asp-for="ChapterNumber" class="form-control" />
+        <span asp-validation-for="ChapterNumber" class="text-danger"></span>
+        <div class="form-text">Use only for chapter milestones.</div>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="DisplayOrder" class="form-label"></label>
+        <input asp-for="DisplayOrder" class="form-control" />
+        <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="DueDate" class="form-label"></label>
+        <input asp-for="DueDate" class="form-control" />
+        <span asp-validation-for="DueDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <div class="form-check me-4">
+            <input asp-for="IsOptional" class="form-check-input" />
+            <label asp-for="IsOptional" class="form-check-label"></label>
+        </div>
+
+        <div class="form-check">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+</div>

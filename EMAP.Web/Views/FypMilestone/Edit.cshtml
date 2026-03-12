@@ -1,0 +1,31 @@
+﻿@model EMAP.Web.ViewModels.Fyp.FypMilestoneFormViewModel
+
+@{
+    ViewData["Title"] = "Edit FYP Milestone";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="mb-4">
+                <h3 class="mb-1">Edit FYP Milestone</h3>
+                <small class="text-muted">Update chapter or evaluation milestone details.</small>
+            </div>
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+                <partial name="_Form" model="Model" />
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

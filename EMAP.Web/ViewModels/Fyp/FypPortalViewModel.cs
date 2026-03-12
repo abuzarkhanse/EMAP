@@ -42,5 +42,8 @@ namespace EMAP.Web.ViewModels.Fyp
             = new List<FypChapterSubmission>();
 
         public List<ChapterBoxViewModel> ChapterBoxes { get; set; } = new();
+
+        public FypStage CurrentStage { get; set; } = FypStage.Fyp1;
+        public List<FypStudentMilestoneViewModel> StageMilestones { get; set; } = new();
     }
 }

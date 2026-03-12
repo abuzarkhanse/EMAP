@@ -55,6 +55,8 @@ namespace EMAP.Web.Controllers
             FypChapterAnnouncement? openChapter = null;
 
             var chapterBoxes = new List<EMAP.Web.ViewModels.Fyp.ChapterBoxViewModel>();
+            var stageMilestones = new List<FypStudentMilestoneViewModel>();
+            var currentStage = FypStage.Fyp1;
 
             if (activeCall != null)
             {
@@ -70,6 +72,8 @@ namespace EMAP.Web.Controllers
 
                 if (group != null)
                 {
+                    currentStage = group.CurrentStage;
+
                     proposal = await _db.ProposalSubmissions
                         .Where(p => p.GroupId == group.Id)
                         .OrderByDescending(p => p.SubmittedAt)
@@ -96,13 +100,12 @@ namespace EMAP.Web.Controllers
 
                 if (group != null && chapters.Any())
                 {
-                    // Load all submissions of this group
                     var submissions = await _db.FypChapterSubmissions
                         .Where(x => x.GroupId == group.Id)
                         .OrderByDescending(x => x.SubmittedAt)
                         .ToListAsync();
 
-                    bool previousChapterCompleted = true;   // first chapter unlocked by default
+                    bool previousChapterCompleted = true;
 
                     foreach (var ch in chapters)
                     {
@@ -134,10 +137,8 @@ namespace EMAP.Web.Controllers
                             Feedback = latest?.Feedback,
                             SubmittedAt = latest?.SubmittedAt,
 
-                            // 🔒 Unlock based ONLY on previous chapter completion
                             IsUnlocked = previousChapterCompleted,
 
-                            // Allow first-time submission
                             CanSubmitNow = previousChapterCompleted &&
                                            ch.IsOpen &&
                                            !isCompleted &&
@@ -145,7 +146,6 @@ namespace EMAP.Web.Controllers
                                            latest == null &&
                                            isLeader,
 
-                            // Allow resubmission only if changes requested
                             CanResubmit = previousChapterCompleted &&
                                           ch.IsOpen &&
                                           isChangesRequested &&
@@ -154,11 +154,53 @@ namespace EMAP.Web.Controllers
 
                         chapterBoxes.Add(box);
 
-                        // 🔥 CRITICAL FIX:
-                        // Next chapter unlock depends ONLY on completion,
-                        // not on IsOpen and not on coordinator actions.
                         previousChapterCompleted = isCompleted;
                     }
+                }
+
+                // New stage-aware milestone roadmap
+                if (group != null)
+                {
+                    var milestoneEntities = await _db.FypMilestones
+                        .Where(x => x.Stage == currentStage && x.IsActive)
+                        .OrderBy(x => x.DisplayOrder)
+                        .ThenBy(x => x.Id)
+                        .ToListAsync();
+
+                    var submittedMilestoneIds = await _db.FypChapterSubmissions
+                        .Where(x => x.GroupId == group.Id &&
+                                    x.MilestoneId != null &&
+                                    x.Stage == currentStage)
+                        .Select(x => x.MilestoneId!.Value)
+                        .Distinct()
+                        .ToListAsync();
+
+                    var evaluatedMilestoneIds = await _db.FypEvaluations
+                        .Where(x => x.StudentGroupId == group.Id && x.IsSubmitted)
+                        .Select(x => x.MilestoneId)
+                        .Distinct()
+                        .ToListAsync();
+
+                    stageMilestones = milestoneEntities
+                        .Select(m => new FypStudentMilestoneViewModel
+                        {
+                            Id = m.Id,
+                            Title = m.Title,
+                            Stage = m.Stage,
+                            Type = m.Type,
+                            ChapterNumber = m.ChapterNumber,
+                            DisplayOrder = m.DisplayOrder,
+                            DueDate = m.DueDate,
+                            IsOptional = m.IsOptional,
+                            IsActive = m.IsActive,
+                            IsCompleted = m.Type == FypMilestoneType.Chapter
+                                ? submittedMilestoneIds.Contains(m.Id)
+                                : evaluatedMilestoneIds.Contains(m.Id),
+                            StatusText = m.Type == FypMilestoneType.Chapter
+                                ? (submittedMilestoneIds.Contains(m.Id) ? "Submitted" : "Pending")
+                                : (evaluatedMilestoneIds.Contains(m.Id) ? "Completed" : "Pending")
+                        })
+                        .ToList();
                 }
             }
 
@@ -178,12 +220,11 @@ namespace EMAP.Web.Controllers
                 DefenseEvaluation = defenseEvaluation,
                 AvailableSupervisors = supervisors,
                 IsGroupLeader = group != null && group.LeaderId == userId,
-
                 OpenChapter = openChapter,
-
-                ChapterSubmission = null, // no longer used
-
-                ChapterBoxes = chapterBoxes
+                ChapterSubmission = null,
+                ChapterBoxes = chapterBoxes,
+                CurrentStage = currentStage,
+                StageMilestones = stageMilestones
             };
 
             return View(model);

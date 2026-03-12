@@ -110,6 +110,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ29vcmRpbmF0b3JcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Dev/abuzarkhanse/EMAP/EMAP.Web/Views/FypMilestone/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwTWlsZXN0b25lXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Dev/abuzarkhanse/EMAP/EMAP.Web/Views/FypMilestone/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwTWlsZXN0b25lXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Dev/abuzarkhanse/EMAP/EMAP.Web/Views/FypMilestone/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwTWlsZXN0b25lXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Dev/abuzarkhanse/EMAP/EMAP.Web/Views/FypMilestone/_Form.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwTWlsZXN0b25lXF9Gb3JtLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Dev/abuzarkhanse/EMAP/EMAP.Web/Views/Fyp/CreateGroup.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwXENyZWF0ZUdyb3VwLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
