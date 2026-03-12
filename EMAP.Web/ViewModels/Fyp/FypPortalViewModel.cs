@@ -45,5 +45,7 @@ namespace EMAP.Web.ViewModels.Fyp
 
         public FypStage CurrentStage { get; set; } = FypStage.Fyp1;
         public List<FypStudentMilestoneViewModel> StageMilestones { get; set; } = new();
+
+        public List<EMAP.Domain.Fyp.FypMilestone> EvaluationMilestones { get; set; } = new();
     }
 }

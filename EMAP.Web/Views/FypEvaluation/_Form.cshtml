@@ -1,0 +1,62 @@
+﻿@model EMAP.Web.ViewModels.Fyp.FypEvaluationFormViewModel
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="StudentGroupId" class="form-label"></label>
+        <select asp-for="StudentGroupId" asp-items="Model.GroupOptions" class="form-select">
+            <option value="">Select group</option>
+        </select>
+        <span asp-validation-for="StudentGroupId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="MilestoneId" class="form-label"></label>
+        <select asp-for="MilestoneId" asp-items="Model.MilestoneOptions" class="form-select">
+            <option value="">Select milestone</option>
+        </select>
+        <span asp-validation-for="MilestoneId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="ScheduledAt" class="form-label"></label>
+        <input asp-for="ScheduledAt" type="datetime-local" class="form-control" />
+        <span asp-validation-for="ScheduledAt" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Venue" class="form-label"></label>
+        <input asp-for="Venue" class="form-control" />
+        <span asp-validation-for="Venue" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Instructions" class="form-label"></label>
+        <textarea asp-for="Instructions" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Instructions" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="CommitteeMembers" class="form-label"></label>
+        <textarea asp-for="CommitteeMembers" class="form-control" rows="4"
+                  placeholder="One line or comma-separated names"></textarea>
+        <span asp-validation-for="CommitteeMembers" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="EvaluatorUserId" class="form-label"></label>
+        <input asp-for="EvaluatorUserId" class="form-control" />
+        <span asp-validation-for="EvaluatorUserId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6 d-flex align-items-end gap-4">
+        <div class="form-check">
+            <input asp-for="IsPublishedToStudent" class="form-check-input" />
+            <label asp-for="IsPublishedToStudent" class="form-check-label"></label>
+        </div>
+
+        <div class="form-check">
+            <input asp-for="ShowCommitteeToStudent" class="form-check-input" />
+            <label asp-for="ShowCommitteeToStudent" class="form-check-label"></label>
+        </div>
+    </div>
+</div>

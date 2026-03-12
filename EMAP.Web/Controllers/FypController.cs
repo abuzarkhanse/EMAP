@@ -55,7 +55,7 @@ namespace EMAP.Web.Controllers
             FypChapterAnnouncement? openChapter = null;
 
             var chapterBoxes = new List<EMAP.Web.ViewModels.Fyp.ChapterBoxViewModel>();
-            var stageMilestones = new List<FypStudentMilestoneViewModel>();
+            var evaluationMilestones = new List<FypMilestone>();
             var currentStage = FypStage.Fyp1;
 
             if (activeCall != null)
@@ -161,47 +161,15 @@ namespace EMAP.Web.Controllers
                 // New stage-aware milestone roadmap
                 if (group != null)
                 {
-                    var milestoneEntities = await _db.FypMilestones
-                        .Where(x => x.Stage == currentStage && x.IsActive)
+                    evaluationMilestones = await _db.FypMilestones
+                        .Where(x => x.Stage == currentStage
+                                 && x.IsActive
+                                 && x.Type != FypMilestoneType.Chapter)
                         .OrderBy(x => x.DisplayOrder)
                         .ThenBy(x => x.Id)
                         .ToListAsync();
-
-                    var submittedMilestoneIds = await _db.FypChapterSubmissions
-                        .Where(x => x.GroupId == group.Id &&
-                                    x.MilestoneId != null &&
-                                    x.Stage == currentStage)
-                        .Select(x => x.MilestoneId!.Value)
-                        .Distinct()
-                        .ToListAsync();
-
-                    var evaluatedMilestoneIds = await _db.FypEvaluations
-                        .Where(x => x.StudentGroupId == group.Id && x.IsSubmitted)
-                        .Select(x => x.MilestoneId)
-                        .Distinct()
-                        .ToListAsync();
-
-                    stageMilestones = milestoneEntities
-                        .Select(m => new FypStudentMilestoneViewModel
-                        {
-                            Id = m.Id,
-                            Title = m.Title,
-                            Stage = m.Stage,
-                            Type = m.Type,
-                            ChapterNumber = m.ChapterNumber,
-                            DisplayOrder = m.DisplayOrder,
-                            DueDate = m.DueDate,
-                            IsOptional = m.IsOptional,
-                            IsActive = m.IsActive,
-                            IsCompleted = m.Type == FypMilestoneType.Chapter
-                                ? submittedMilestoneIds.Contains(m.Id)
-                                : evaluatedMilestoneIds.Contains(m.Id),
-                            StatusText = m.Type == FypMilestoneType.Chapter
-                                ? (submittedMilestoneIds.Contains(m.Id) ? "Submitted" : "Pending")
-                                : (evaluatedMilestoneIds.Contains(m.Id) ? "Completed" : "Pending")
-                        })
-                        .ToList();
                 }
+
             }
 
             var supervisors = await _db.FypSupervisors
@@ -224,7 +192,7 @@ namespace EMAP.Web.Controllers
                 ChapterSubmission = null,
                 ChapterBoxes = chapterBoxes,
                 CurrentStage = currentStage,
-                StageMilestones = stageMilestones
+                EvaluationMilestones = evaluationMilestones
             };
 
             return View(model);

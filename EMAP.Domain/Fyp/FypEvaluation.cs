@@ -28,5 +28,15 @@ namespace EMAP.Domain.Fyp
         public DateTime? SubmittedAt { get; set; }
 
         public ICollection<FypEvaluationScore> Scores { get; set; } = new List<FypEvaluationScore>();
+
+        public string? Venue { get; set; }
+
+        public string? Instructions { get; set; }
+
+        public string? CommitteeMembers { get; set; }
+
+        public bool IsPublishedToStudent { get; set; } = false;
+
+        public bool ShowCommitteeToStudent { get; set; } = false;
     }
 }
