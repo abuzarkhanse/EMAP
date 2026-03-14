@@ -56,6 +56,7 @@ namespace EMAP.Web.Controllers
 
             var chapterBoxes = new List<EMAP.Web.ViewModels.Fyp.ChapterBoxViewModel>();
             var evaluationMilestones = new List<FypMilestone>();
+            var publishedEvaluations = new List<FypEvaluation>();
             var currentStage = FypStage.Fyp1;
 
             if (activeCall != null)
@@ -168,6 +169,14 @@ namespace EMAP.Web.Controllers
                         .OrderBy(x => x.DisplayOrder)
                         .ThenBy(x => x.Id)
                         .ToListAsync();
+
+                    publishedEvaluations = await _db.FypEvaluations
+                        .Include(x => x.Milestone)
+                        .Where(x => x.StudentGroupId == group.Id
+                                 && x.IsPublishedToStudent)
+                        .OrderBy(x => x.ScheduledAt)
+                        .ThenBy(x => x.Id)
+                        .ToListAsync();
                 }
 
             }
@@ -192,7 +201,8 @@ namespace EMAP.Web.Controllers
                 ChapterSubmission = null,
                 ChapterBoxes = chapterBoxes,
                 CurrentStage = currentStage,
-                EvaluationMilestones = evaluationMilestones
+                EvaluationMilestones = evaluationMilestones,
+                PublishedEvaluations = publishedEvaluations
             };
 
             return View(model);

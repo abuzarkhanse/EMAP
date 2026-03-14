@@ -464,3 +464,148 @@ body {
         padding: 0.4rem 0.75rem;
     }
 }
+
+/* ---------- COORDINATOR DASHBOARD ---------- */
+.coordinator-dashboard {
+    max-width: 1280px;
+}
+
+.dashboard-hero {
+    padding: 0.25rem 0;
+}
+
+.dashboard-title {
+    font-size: 2.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-subtitle {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.user-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 0.7rem 1rem;
+    color: #0f172a;
+    font-weight: 600;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+}
+
+.dashboard-panel {
+    border-radius: 22px;
+    border: 1px solid #e8edf2;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    background: #fff;
+}
+
+.dashboard-panel-highlight {
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+    border-color: #dfe7f0;
+}
+
+.panel-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    font-size: 1.15rem;
+}
+
+.panel-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.panel-text {
+    color: #64748b;
+    font-size: 0.98rem;
+    line-height: 1.7;
+}
+
+.btn-dashboard-action {
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+}
+
+.metric-badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    background: #eef4ff;
+    color: #1d4ed8;
+    border: 1px solid #cfe0ff;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.section-badge {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    background: #ecfdf3;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    border-radius: 999px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.feature-points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+    .feature-points span {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 0.85rem;
+        border-radius: 999px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+@media (max-width: 991.98px) {
+    .dashboard-title {
+        font-size: 1.9rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .dashboard-title {
+        font-size: 1.7rem;
+    }
+
+    .user-badge {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .feature-points {
+        flex-direction: column;
+    }
+
+    .btn-dashboard-action {
+        width: 100%;
+    }
+}

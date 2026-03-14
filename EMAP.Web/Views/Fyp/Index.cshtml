@@ -1,4 +1,5 @@
 ﻿@using EMAP.Domain.Fyp
+@using System
 @model EMAP.Web.ViewModels.Fyp.FypPortalViewModel
 
 @{
@@ -655,13 +656,74 @@
                                     <div class="small mt-2">
                                         @if (m.IsActive)
                                         {
-                                            <span class="text-success fw-semibold">Open</span>
+                                            <span class="text-success fw-semibold">Available</span>
                                         }
                                         else
                                         {
-                                            <span class="text-muted fw-semibold">Closed</span>
+                                            <span class="text-muted fw-semibold">Inactive</span>
                                         }
                                     </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+
+            @if (Model.PublishedEvaluations.Any())
+            {
+                <div class="mt-4">
+                    <h5 class="mb-3">Evaluation Schedule & Instructions</h5>
+
+                    <div class="row g-3">
+                        @foreach (var eval in Model.PublishedEvaluations)
+                        {
+                            <div class="col-md-6 col-xl-4">
+                                <div class="status-card p-3 h-100">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <div class="fw-semibold">
+                                                @(eval.Milestone?.Title ?? "Evaluation")
+                                            </div>
+                                            <small class="text-muted">@eval.Status</small>
+                                        </div>
+
+                                        <span class="badge bg-info text-dark">Published</span>
+                                    </div>
+
+                                    <div class="small mb-2">
+                                        <strong>Date & Time:</strong><br />
+                                        @(eval.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "Not scheduled yet")
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(eval.Venue))
+                                    {
+                                        <div class="small mb-2">
+                                            <strong>Venue:</strong><br />
+                                            @eval.Venue
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(eval.Instructions))
+                                    {
+                                        <div class="small mb-2">
+                                            <strong>Instructions:</strong><br />
+                                            @eval.Instructions
+                                        </div>
+                                    }
+
+                                    @if (eval.ShowCommitteeToStudent && !string.IsNullOrWhiteSpace(eval.CommitteeMembers))
+                                    {
+                                        <div class="small">
+                                            <strong>Committee:</strong><br />
+                                            @foreach (var line in eval.CommitteeMembers
+                                                                            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                                            {
+                                                <div>@line</div>
+                                            }
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         }

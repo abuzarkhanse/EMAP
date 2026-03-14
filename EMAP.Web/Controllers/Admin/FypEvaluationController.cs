@@ -58,7 +58,6 @@ namespace EMAP.Web.Controllers.Admin
             {
                 StudentGroupId = vm.StudentGroupId,
                 MilestoneId = vm.MilestoneId,
-                EvaluatorUserId = string.IsNullOrWhiteSpace(vm.EvaluatorUserId) ? "" : vm.EvaluatorUserId.Trim(),
                 ScheduledAt = vm.ScheduledAt,
                 Venue = string.IsNullOrWhiteSpace(vm.Venue) ? null : vm.Venue.Trim(),
                 Instructions = string.IsNullOrWhiteSpace(vm.Instructions) ? null : vm.Instructions.Trim(),
@@ -86,7 +85,6 @@ namespace EMAP.Web.Controllers.Admin
                 Id = entity.Id,
                 StudentGroupId = entity.StudentGroupId,
                 MilestoneId = entity.MilestoneId,
-                EvaluatorUserId = entity.EvaluatorUserId,
                 ScheduledAt = entity.ScheduledAt,
                 Venue = entity.Venue,
                 Instructions = entity.Instructions,
@@ -118,7 +116,6 @@ namespace EMAP.Web.Controllers.Admin
 
             entity.StudentGroupId = vm.StudentGroupId;
             entity.MilestoneId = vm.MilestoneId;
-            entity.EvaluatorUserId = string.IsNullOrWhiteSpace(vm.EvaluatorUserId) ? "" : vm.EvaluatorUserId.Trim();
             entity.ScheduledAt = vm.ScheduledAt;
             entity.Venue = string.IsNullOrWhiteSpace(vm.Venue) ? null : vm.Venue.Trim();
             entity.Instructions = string.IsNullOrWhiteSpace(vm.Instructions) ? null : vm.Instructions.Trim();
@@ -127,7 +124,6 @@ namespace EMAP.Web.Controllers.Admin
             entity.ShowCommitteeToStudent = vm.ShowCommitteeToStudent;
 
             await _db.SaveChangesAsync();
-
             TempData["Success"] = "Evaluation updated successfully.";
             return RedirectToAction(nameof(Index));
         }
@@ -135,11 +131,16 @@ namespace EMAP.Web.Controllers.Admin
         private async Task LoadOptions(FypEvaluationFormViewModel vm)
         {
             vm.GroupOptions = await _db.StudentGroups
-                .OrderBy(x => x.Id)
-                .Select(x => new SelectListItem
+                .Where(g =>
+                    g.Status == GroupStatus.Approved &&
+                    _db.FypChapterSubmissions.Any(s =>
+                        s.GroupId == g.Id &&
+                        s.Status == ChapterSubmissionStatus.CoordinatorApproved))
+                .OrderBy(g => g.Id)
+                .Select(g => new SelectListItem
                 {
-                    Value = x.Id.ToString(),
-                    Text = $"Group #{x.Id} - {x.TentativeProjectTitle}"
+                    Value = g.Id.ToString(),
+                    Text = $"Group #{g.Id} - {g.TentativeProjectTitle}"
                 })
                 .ToListAsync();
 

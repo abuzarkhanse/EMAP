@@ -17,9 +17,6 @@ namespace EMAP.Web.ViewModels.Fyp
         [Display(Name = "Milestone")]
         public int MilestoneId { get; set; }
 
-        [Display(Name = "Evaluator User Id")]
-        public string EvaluatorUserId { get; set; } = string.Empty;
-
         [Display(Name = "Scheduled Date & Time")]
         public DateTime? ScheduledAt { get; set; }
 

@@ -9,9 +9,11 @@
         <div class="card-body d-flex justify-content-between align-items-center">
             <div>
                 <h3 class="mb-1">FYP Evaluations</h3>
-                <small class="text-muted">Schedule and manage evaluation events for student groups.</small>
+                <small class="text-muted">
+                    Manage evaluation scheduling, publishing, venue, committee visibility, and student instructions.
+                </small>
             </div>
-            <a asp-action="Create" class="btn btn-primary">Schedule Evaluation</a>
+            <a asp-action="Create" class="btn btn-primary">Create Evaluation Event</a>
         </div>
     </div>
 
@@ -27,7 +29,7 @@
                     <thead>
                         <tr>
                             <th>Group</th>
-                            <th>Milestone</th>
+                            <th>Evaluation</th>
                             <th>Schedule</th>
                             <th>Venue</th>
                             <th>Published</th>
@@ -40,16 +42,52 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td>#@item.StudentGroupId</td>
-                                <td>@item.Milestone.Title</td>
-                                <td>@(item.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")</td>
-                                <td>@(string.IsNullOrWhiteSpace(item.Venue) ? "-" : item.Venue)</td>
-                                <td>@(item.IsPublishedToStudent ? "Yes" : "No")</td>
-                                <td>@(item.ShowCommitteeToStudent ? "Yes" : "No")</td>
-                                <td>@item.Status</td>
+                                <td>
+                                    <div class="fw-semibold">#@item.StudentGroupId</div>
+                                </td>
+
+                                <td>
+                                    <div class="fw-semibold">@item.Milestone.Title</div>
+                                    <small class="text-muted">@item.Milestone.Stage</small>
+                                </td>
+
+                                <td>
+                                    @(item.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "Not scheduled")
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.Venue) ? "-" : item.Venue)
+                                </td>
+
+                                <td>
+                                    @if (item.IsPublishedToStudent)
+                                    {
+                                        <span class="badge bg-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (item.ShowCommitteeToStudent)
+                                    {
+                                        <span class="badge bg-info text-dark">Visible</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-dark border">Hidden</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-warning text-dark">@item.Status</span>
+                                </td>
+
                                 <td class="text-end">
                                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                                        Edit
+                                        Manage
                                     </a>
                                 </td>
                             </tr>
