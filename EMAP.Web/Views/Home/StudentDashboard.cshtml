@@ -2,148 +2,160 @@
     ViewData["Title"] = "Student Dashboard";
 }
 
-<div class="container py-4 student-dashboard">
+<div class="container py-4 student-dashboard-page">
 
-    <!-- ===== HEADER ===== -->
-    <div class="dashboard-hero mb-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <h1 class="dashboard-title mb-2">Student Dashboard</h1>
-                <p class="dashboard-subtitle mb-0">
-                    Welcome to EMAP — manage your Final Year Project from one place.
+    <!-- Header -->
+    <div class="dashboard-topbar mb-4">
+        <div>
+            <h1 class="dashboard-heading mb-1">Student Dashboard</h1>
+            <p class="dashboard-subheading mb-0">
+                Access your academic project workspace and follow your current progress.
+            </p>
+        </div>
+
+        <div class="dashboard-user-pill">
+            <i class="bi bi-person-circle me-2"></i>
+            @User.Identity?.Name
+        </div>
+    </div>
+
+    <!-- Main hero -->
+    <section class="student-hero-card mb-4">
+        <div class="student-hero-content">
+            <div class="student-hero-left">
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <h2 class="mb-0">Final Year Project</h2>
+                    <span class="dashboard-status-pill">Active</span>
+                </div>
+
+                <p class="student-hero-text">
+                    Use your FYP workspace to manage group formation, supervisor selection,
+                    proposal progress, defense workflow, and chapter submissions.
                 </p>
-            </div>
 
-            <div class="student-badge">
-                <i class="bi bi-person-circle me-2"></i>
-                @User.Identity?.Name
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== MAIN FYP CARD ===== -->
-    <div class="card dashboard-main-card mb-4">
-        <div class="card-body p-4">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-4">
-                <div class="flex-grow-1">
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <h3 class="mb-0">Final Year Project</h3>
-                        <span class="module-badge active">Active</span>
-                    </div>
-
-                    <p class="text-muted mb-3 dashboard-main-text">
-                        Access your FYP workspace to manage group formation, supervisor selection,
-                        proposal submission, defense progress, and chapter activities.
-                    </p>
-
-                    <div class="feature-points">
-                        <span>Group & supervisor management</span>
-                        <span>Proposal and defense tracking</span>
-                        <span>Chapter submission workflow</span>
-                    </div>
-                </div>
-
-                <div class="dashboard-main-actions">
-                    <a asp-controller="Fyp" asp-action="Index" class="btn btn-primary btn-dashboard-action">
-                        Open FYP Portal
-                    </a>
-                    <a href="/templates/SRS%20Template.docx" class="btn btn-light btn-dashboard-action" download>
-                        View Guidelines
-                    </a>
+                <div class="dashboard-feature-tags">
+                    <span>Group & supervisor</span>
+                    <span>Proposal progress</span>
+                    <span>Defense workflow</span>
+                    <span>Chapter submissions</span>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- ===== LOWER GRID ===== -->
-    <div class="row g-4">
-        <div class="col-lg-4">
-            <div class="card dashboard-panel h-100">
-                <div class="card-body p-4">
-                    <h4 class="panel-title mb-3">
-                        <i class="bi bi-lightning-charge me-2"></i>Quick Actions
-                    </h4>
+            <div class="student-hero-actions">
+                <a asp-controller="Fyp" asp-action="Index"
+                   class="btn btn-primary student-main-btn">
+                    Open FYP Portal
+                </a>
 
-                    <div class="quick-action-list">
-                        <a asp-controller="Fyp" asp-action="Index" class="quick-action-btn">
-                            Go to FYP Portal
-                        </a>
-                        <a href="#" class="quick-action-btn">
-                            View My Submissions
-                        </a>
-                        <a href="#" class="quick-action-btn">
-                            Supervisor Feedback
-                        </a>
-                        <a href="/templates/SRS%20Template.docx" class="quick-action-btn muted" download>
-                            Download Templates
-                        </a>
-                    </div>
-                </div>
+                <a href="/templates/SRS%20Template.docx"
+                   class="btn btn-light student-secondary-btn"
+                   download>
+                    View Guidelines
+                </a>
             </div>
         </div>
+    </section>
 
-        <div class="col-lg-4">
-            <div class="card dashboard-panel h-100">
-                <div class="card-body p-4">
-                    <h4 class="panel-title mb-3">
-                        <i class="bi bi-calendar-event me-2"></i>Upcoming Deadlines
-                    </h4>
+    <!-- Secondary grid -->
+    <div class="dashboard-grid-student">
 
-                    <div class="deadline-list">
-                        <div class="deadline-item">
-                            <div class="deadline-title">FYP Proposal Submission</div>
-                            <div class="deadline-meta">Due: 15 Dec 2025</div>
-                            <span class="deadline-tag">5 days remaining</span>
-                        </div>
+        <!-- Next Step -->
+        <section class="student-card student-card-highlight">
+            <div class="student-card-icon">
+                <i class="bi bi-lightning-charge"></i>
+            </div>
 
-                        <div class="deadline-item">
-                            <div class="deadline-title">Supervisor Approval</div>
-                            <div class="deadline-meta">Due: 22 Dec 2025</div>
-                        </div>
+            <div class="student-card-body">
+                <h3>Your Next Step</h3>
+                <p class="student-card-text">
+                    Continue your FYP work from the portal and complete the next required task.
+                </p>
 
-                        <div class="deadline-item mb-0">
-                            <div class="deadline-title">Progress Presentation</div>
-                            <div class="deadline-meta">Tentative: Jan 2026</div>
-                        </div>
+                <div class="student-next-step-box">
+                    <div class="student-next-step-label">Recommended action</div>
+                    <div class="student-next-step-title">Go to FYP Portal</div>
+                </div>
+
+                <div class="student-link-list">
+                    <a href="#">View My Submissions</a>
+                    <a href="#">Supervisor Feedback</a>
+                    <a href="/templates/SRS%20Template.docx" download>Download Templates</a>
+                </div>
+            </div>
+
+            <div class="student-card-footer">
+                <a asp-controller="Fyp" asp-action="Index"
+                   class="btn btn-sm btn-outline-primary admin-action-btn">
+                    Continue
+                </a>
+            </div>
+        </section>
+
+        <!-- Deadlines -->
+        <section class="student-card">
+            <div class="student-card-icon">
+                <i class="bi bi-calendar-event"></i>
+            </div>
+
+            <div class="student-card-body">
+                <h3>Upcoming Deadlines</h3>
+
+                <div class="student-info-list">
+                    <div class="student-info-item">
+                        <div class="student-info-title">FYP Proposal Submission</div>
+                        <div class="student-info-meta">Due: 15 Dec 2025</div>
+                        <span class="student-warning-chip">5 days remaining</span>
+                    </div>
+
+                    <div class="student-info-item">
+                        <div class="student-info-title">Supervisor Approval</div>
+                        <div class="student-info-meta">Due: 22 Dec 2025</div>
+                    </div>
+
+                    <div class="student-info-item">
+                        <div class="student-info-title">Progress Presentation</div>
+                        <div class="student-info-meta">Tentative: Jan 2026</div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="col-lg-4">
-            <div class="card dashboard-panel h-100">
-                <div class="card-body p-4">
-                    <h4 class="panel-title mb-3">
-                        <i class="bi bi-clock-history me-2"></i>Recent Activity
-                    </h4>
+        <!-- Activity -->
+        <section class="student-card">
+            <div class="student-card-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
 
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-dot success"></div>
-                            <div>
-                                <div class="activity-title">Proposal draft saved</div>
-                                <div class="activity-meta">Today, 10:45 AM</div>
-                            </div>
+            <div class="student-card-body">
+                <h3>Recent Activity</h3>
+
+                <div class="student-activity-list">
+                    <div class="student-activity-item">
+                        <span class="activity-dot success"></span>
+                        <div>
+                            <div class="student-info-title">Proposal draft saved</div>
+                            <div class="student-info-meta">Today, 10:45 AM</div>
                         </div>
+                    </div>
 
-                        <div class="activity-item">
-                            <div class="activity-dot info"></div>
-                            <div>
-                                <div class="activity-title">Supervisor notification received</div>
-                                <div class="activity-meta">Yesterday</div>
-                            </div>
+                    <div class="student-activity-item">
+                        <span class="activity-dot info"></span>
+                        <div>
+                            <div class="student-info-title">Supervisor notification received</div>
+                            <div class="student-info-meta">Yesterday</div>
                         </div>
+                    </div>
 
-                        <div class="activity-item">
-                            <div class="activity-dot muted"></div>
-                            <div>
-                                <div class="activity-title">Template downloaded</div>
-                                <div class="activity-meta">2 days ago</div>
-                            </div>
+                    <div class="student-activity-item">
+                        <span class="activity-dot muted"></span>
+                        <div>
+                            <div class="student-info-title">Template downloaded</div>
+                            <div class="student-info-meta">2 days ago</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
     </div>
 </div>

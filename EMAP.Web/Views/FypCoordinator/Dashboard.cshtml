@@ -2,164 +2,134 @@
     ViewData["Title"] = "FYP Coordinator Dashboard";
 }
 
-<div class="container py-4 coordinator-dashboard">
+<div class="container py-4 coordinator-dashboard-page">
 
-    <!-- ===== HEADER ===== -->
-    <div class="dashboard-hero mb-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <h1 class="dashboard-title mb-2">FYP Coordinator Dashboard</h1>
-                <p class="dashboard-subtitle mb-0">
-                    Manage proposal defense, chapter workflow, and evaluation activities from one place.
-                </p>
-            </div>
+    <!-- Header -->
+    <div class="dashboard-topbar mb-4">
+        <div>
+            <h1 class="dashboard-heading mb-1">FYP Coordinator Dashboard</h1>
+            <p class="dashboard-subheading mb-0">
+                Manage proposal defense, chapter workflow, and evaluation operations.
+            </p>
+        </div>
 
-            <div class="user-badge">
-                <i class="bi bi-person-circle me-2"></i>
-                @User.Identity?.Name
-            </div>
+        <div class="dashboard-user-pill">
+            <i class="bi bi-person-circle me-2"></i>
+            @User.Identity?.Name
         </div>
     </div>
 
-    <!-- ===== MAIN GRID ===== -->
-    <div class="row g-4">
+    <!-- Main grid -->
+    <div class="dashboard-grid">
 
         <!-- Slot Allocation -->
-        <div class="col-md-6 col-xl-4">
-            <div class="card dashboard-panel h-100">
-                <div class="card-body p-4 d-flex flex-column">
-                    <div class="panel-icon mb-3">
-                        <i class="bi bi-calendar-check"></i>
-                    </div>
-
-                    <h4 class="panel-title mb-2">Slot Allocation</h4>
-                    <p class="panel-text mb-4">
-                        Assign proposal defense date and time slots for approved student groups.
-                    </p>
-
-                    <div class="mt-auto">
-                        <a asp-controller="FypCoordinator"
-                           asp-action="SlotAllocation"
-                           class="btn btn-primary btn-dashboard-action">
-                            Open Slot Allocation
-                        </a>
-                    </div>
-                </div>
+        <section class="admin-card">
+            <div class="admin-card-icon">
+                <i class="bi bi-calendar-check"></i>
             </div>
-        </div>
+            <div class="admin-card-body">
+                <h3>Slot Allocation</h3>
+                <p>Assign proposal defense date and time slots to approved student groups.</p>
+            </div>
+            <div class="admin-card-footer">
+                <a asp-controller="FypCoordinator"
+                   asp-action="SlotAllocation"
+                   class="btn btn-sm btn-primary admin-action-btn">
+                    Open
+                </a>
+            </div>
+        </section>
 
         <!-- Defense Evaluations -->
-        <div class="col-md-6 col-xl-4">
-            <div class="card dashboard-panel h-100">
-                <div class="card-body p-4 d-flex flex-column">
-                    <div class="panel-icon mb-3">
-                        <i class="bi bi-shield-check"></i>
-                    </div>
-
-                    <h4 class="panel-title mb-2">Defense Evaluations</h4>
-                    <p class="panel-text mb-4">
-                        Record proposal defense attendance, committee feedback, and final decisions.
-                    </p>
-
-                    <div class="mt-auto">
-                        <a asp-controller="DefenseCommittee"
-                           asp-action="Index"
-                           class="btn btn-success btn-dashboard-action">
-                            Open Evaluations
-                        </a>
-                    </div>
-                </div>
+        <section class="admin-card">
+            <div class="admin-card-icon">
+                <i class="bi bi-shield-check"></i>
             </div>
-        </div>
+            <div class="admin-card-body">
+                <h3>Defense Evaluations</h3>
+                <p>Record defense attendance, committee feedback, and final proposal decisions.</p>
+            </div>
+            <div class="admin-card-footer">
+                <a asp-controller="DefenseCommittee"
+                   asp-action="Index"
+                   class="btn btn-sm btn-success admin-action-btn">
+                    Open
+                </a>
+            </div>
+        </section>
 
         <!-- Chapters -->
-        <div class="col-md-6 col-xl-4">
-            <div class="card dashboard-panel h-100">
-                <div class="card-body p-4 d-flex flex-column">
-                    <div class="panel-icon mb-3">
-                        <i class="bi bi-journal-text"></i>
-                    </div>
-
-                    <h4 class="panel-title mb-2">Chapters</h4>
-                    <p class="panel-text mb-4">
-                        Open chapter submission windows and manage the phased document workflow for students.
-                    </p>
-
-                    <div class="mt-auto">
-                        <a asp-controller="FypCoordinator"
-                           asp-action="Chapters"
-                           class="btn btn-outline-primary btn-dashboard-action">
-                            Manage Chapters
-                        </a>
-                    </div>
-                </div>
+        <section class="admin-card">
+            <div class="admin-card-icon">
+                <i class="bi bi-journal-text"></i>
             </div>
-        </div>
+            <div class="admin-card-body">
+                <h3>Chapters</h3>
+                <p>Open submission windows and control phased chapter workflow for students.</p>
+            </div>
+            <div class="admin-card-footer">
+                <a asp-controller="FypCoordinator"
+                   asp-action="Chapters"
+                   class="btn btn-sm btn-outline-primary admin-action-btn">
+                    Manage
+                </a>
+            </div>
+        </section>
 
         <!-- Chapter Approvals -->
-        <div class="col-md-6 col-xl-4">
-            <div class="card dashboard-panel h-100">
-                <div class="card-body p-4 d-flex flex-column">
-                    <div class="panel-icon mb-3">
-                        <i class="bi bi-journal-check"></i>
-                    </div>
-
-                    <h4 class="panel-title mb-2">Chapter Approvals</h4>
-                    <p class="panel-text mb-3">
-                        Review chapter submissions that have already been approved by supervisors.
-                    </p>
-
-                    <div class="metric-badge mb-4">
-                        Pending: @ViewBag.PendingChapterApprovals
-                    </div>
-
-                    <div class="mt-auto">
-                        <a asp-controller="FypCoordinator"
-                           asp-action="ChapterApprovals"
-                           class="btn btn-outline-primary btn-dashboard-action">
-                            Review Chapters
-                        </a>
-                    </div>
-                </div>
+        <section class="admin-card">
+            <div class="admin-card-icon">
+                <i class="bi bi-journal-check"></i>
             </div>
-        </div>
+            <div class="admin-card-body">
+                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                    <h3 class="mb-0">Chapter Approvals</h3>
+                    <span class="dashboard-count-chip">
+                        Pending: @ViewBag.PendingChapterApprovals
+                    </span>
+                </div>
+                <p>Review chapter submissions already approved by supervisors.</p>
+            </div>
+            <div class="admin-card-footer">
+                <a asp-controller="FypCoordinator"
+                   asp-action="ChapterApprovals"
+                   class="btn btn-sm btn-outline-primary admin-action-btn">
+                    Review
+                </a>
+            </div>
+        </section>
 
         <!-- FYP Evaluations -->
-        <div class="col-md-6 col-xl-8">
-            <div class="card dashboard-panel dashboard-panel-highlight h-100">
-                <div class="card-body p-4 d-flex flex-column">
-                    <div class="panel-icon mb-3">
-                        <i class="bi bi-clipboard-check"></i>
-                    </div>
+        <section class="admin-card admin-card-wide admin-card-highlight">
+            <div class="admin-card-icon">
+                <i class="bi bi-clipboard-check"></i>
+            </div>
+            <div class="admin-card-body">
+                <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-2">
+                    <h3 class="mb-0">FYP Evaluations</h3>
+                    <span class="dashboard-status-pill">Unified Workflow</span>
+                </div>
 
-                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-2">
-                        <div>
-                            <h4 class="panel-title mb-2">FYP Evaluations</h4>
-                            <p class="panel-text mb-0">
-                                Manage Mid, Pre-Final, and Final evaluations including activation,
-                                scheduling, publishing, venue details, and student instructions.
-                            </p>
-                        </div>
+                <p>
+                    Manage Mid, Pre-Final, and Final evaluations including activation,
+                    scheduling, publication, venue details, and student instructions.
+                </p>
 
-                        <span class="section-badge">Unified Workflow</span>
-                    </div>
-
-                    <div class="feature-points mt-3 mb-4">
-                        <span>Activate evaluation milestones</span>
-                        <span>Schedule date, time, and venue</span>
-                        <span>Publish instructions to students</span>
-                    </div>
-
-                    <div class="mt-auto">
-                        <a asp-controller="FypEvaluation"
-                           asp-action="Index"
-                           class="btn btn-outline-primary btn-dashboard-action">
-                            Manage Evaluations
-                        </a>
-                    </div>
+                <div class="dashboard-feature-tags">
+                    <span>Milestones</span>
+                    <span>Scheduling</span>
+                    <span>Venue & instructions</span>
+                    <span>Student visibility</span>
                 </div>
             </div>
-        </div>
+            <div class="admin-card-footer">
+                <a asp-controller="FypEvaluation"
+                   asp-action="Index"
+                   class="btn btn-sm btn-outline-primary admin-action-btn">
+                    Manage Evaluations
+                </a>
+            </div>
+        </section>
 
     </div>
 </div>
