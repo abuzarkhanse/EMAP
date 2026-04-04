@@ -199,7 +199,8 @@ body {
 
 /* ---------- STUDENT DASHBOARD ---------- */
 .student-dashboard {
-    max-width: 1280px;
+    transform: scale(0.92);
+    transform-origin: top center;
 }
 
 .dashboard-hero {
