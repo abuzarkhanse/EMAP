@@ -1,0 +1,62 @@
+﻿@model EMAP.Web.ViewModels.Fyp.BulkAssignProposalSlotsViewModel
+
+@{
+    ViewData["Title"] = "Bulk Assign Proposal Defense Slots";
+}
+
+<h2>Bulk Assign Proposal Defense Slots</h2>
+
+<form asp-action="BulkAssignSlots" method="post">
+    @for (int i = 0; i < Model.ProposalIds.Count; i++)
+    {
+        <input type="hidden" asp-for="ProposalIds[@i]" />
+    }
+
+    <div class="mb-3">
+        <label asp-for="DefenseDate" class="form-label"></label>
+        <input asp-for="DefenseDate" class="form-control" type="date" />
+        <span asp-validation-for="DefenseDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="StartTime" class="form-label"></label>
+        <input asp-for="StartTime" class="form-control" type="time" />
+        <span asp-validation-for="StartTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SlotDurationMinutes" class="form-label"></label>
+        <input asp-for="SlotDurationMinutes" class="form-control" />
+        <span asp-validation-for="SlotDurationMinutes" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BreakAfterEvery" class="form-label"></label>
+        <input asp-for="BreakAfterEvery" class="form-control" />
+        <span asp-validation-for="BreakAfterEvery" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BreakMinutes" class="form-label"></label>
+        <input asp-for="BreakMinutes" class="form-control" />
+        <span asp-validation-for="BreakMinutes" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Venue" class="form-label"></label>
+        <input asp-for="Venue" class="form-control" />
+        <span asp-validation-for="Venue" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Instructions" class="form-label"></label>
+        <textarea asp-for="Instructions" class="form-control" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Generate Slots</button>
+    <a asp-action="PendingProposalSlots" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -27,6 +27,9 @@ namespace EMAP.Infrastructure.Data
         public DbSet<FypEvaluationCriterion> FypEvaluationCriteria => Set<FypEvaluationCriterion>();
         public DbSet<FypEvaluationScore> FypEvaluationScores => Set<FypEvaluationScore>();
 
+        public DbSet<FypCommittee> FypCommittees { get; set; }
+        public DbSet<FypCommitteeProgram> FypCommitteePrograms { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -387,6 +390,38 @@ namespace EMAP.Infrastructure.Data
                     IsActive = true
                 }
             );
+
+            modelBuilder.Entity<FypEvaluationCriterion>().HasData(
+                new FypEvaluationCriterion { Id = 1001, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Content & Knowledge", Description = "Understanding of project domain, concepts and technical knowledge.", MaxMarks = 5, DisplayOrder = 1, IsActive = true },
+                new FypEvaluationCriterion { Id = 1002, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Problem Analysis", Description = "Problem understanding, clarity and relevance of analysis.", MaxMarks = 5, DisplayOrder = 2, IsActive = true },
+                new FypEvaluationCriterion { Id = 1003, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Investigation", Description = "Research effort, literature study, requirement exploration and findings.", MaxMarks = 5, DisplayOrder = 3, IsActive = true },
+                new FypEvaluationCriterion { Id = 1004, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Design of Solution", Description = "Architecture, design thinking, modeling and solution planning.", MaxMarks = 5, DisplayOrder = 4, IsActive = true },
+                new FypEvaluationCriterion { Id = 1005, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Progress & Tool Usage", Description = "Progress made so far and effective use of tools/technologies.", MaxMarks = 5, DisplayOrder = 5, IsActive = true },
+                new FypEvaluationCriterion { Id = 1006, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Project Management", Description = "Planning, task tracking, teamwork and timeline management.", MaxMarks = 5, DisplayOrder = 6, IsActive = true },
+                new FypEvaluationCriterion { Id = 1007, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Presentation", Description = "Presentation quality, clarity, confidence and structure.", MaxMarks = 5, DisplayOrder = 7, IsActive = true },
+                new FypEvaluationCriterion { Id = 1008, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Viva", Description = "Response quality, confidence and understanding during questioning.", MaxMarks = 5, DisplayOrder = 8, IsActive = true }
+            );
+
+            modelBuilder.Entity<FypCommittee>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.HasMany(x => x.CommitteePrograms)
+                      .WithOne(x => x.FypCommittee)
+                      .HasForeignKey(x => x.FypCommitteeId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<FypCommitteeProgram>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.ProgramCode)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.HasIndex(x => new { x.FypCommitteeId, x.ProgramCode }).IsUnique();
+            });
         }
     }
 }

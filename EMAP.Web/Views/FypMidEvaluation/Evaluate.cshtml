@@ -1,0 +1,133 @@
+﻿@model EMAP.Web.ViewModels.Fyp.FypMidEvaluationFormViewModel
+
+@{
+    ViewData["Title"] = "Mid Evaluation";
+}
+
+<div class="mb-4">
+    <h2 class="mb-1">Mid Evaluation Form</h2>
+    <p class="text-muted mb-0">Professional rubric-based assessment for committee members.</p>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="fw-semibold">Project Title</label>
+                <div>@Model.GroupTitle</div>
+            </div>
+            <div class="col-md-3">
+                <label class="fw-semibold">Batch</label>
+                <div>@Model.Batch</div>
+            </div>
+            <div class="col-md-3">
+                <label class="fw-semibold">Program</label>
+                <div>@Model.ProgramCode</div>
+            </div>
+            <div class="col-md-6">
+                <label class="fw-semibold">Supervisor</label>
+                <div>@Model.SupervisorName</div>
+            </div>
+            <div class="col-md-3">
+                <label class="fw-semibold">Scheduled</label>
+                <div>@(Model.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")</div>
+            </div>
+            <div class="col-md-3">
+                <label class="fw-semibold">Venue</label>
+                <div>@Model.Venue</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-action="Evaluate" method="post">
+    <input asp-for="EvaluationId" type="hidden" />
+    <input asp-for="StudentGroupId" type="hidden" />
+    <input asp-for="GroupTitle" type="hidden" />
+    <input asp-for="Batch" type="hidden" />
+    <input asp-for="ProgramCode" type="hidden" />
+    <input asp-for="SupervisorName" type="hidden" />
+    <input asp-for="Venue" type="hidden" />
+    <input asp-for="ScheduledAt" type="hidden" />
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 28%;">Criterion</th>
+                            <th style="width: 28%;">Description</th>
+                            <th style="width: 12%;">Max</th>
+                            <th style="width: 14%;">Awarded</th>
+                            <th style="width: 18%;">Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @for (int i = 0; i < Model.Criteria.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                <input asp-for="Criteria[@i].CriterionId" type="hidden" />
+                                <input asp-for="Criteria[@i].Title" type="hidden" />
+                                <input asp-for="Criteria[@i].Description" type="hidden" />
+                                <input asp-for="Criteria[@i].MaxMarks" type="hidden" />
+                                <strong>@Model.Criteria[i].Title</strong>
+                            </td>
+                            <td class="text-muted">@Model.Criteria[i].Description</td>
+                            <td>
+                                <span class="badge bg-light text-dark border">@Model.Criteria[i].MaxMarks</span>
+                            </td>
+                            <td>
+                                <input asp-for="Criteria[@i].AwardedMarks" class="form-control score-input" type="number" step="0.5" min="0" max="@Model.Criteria[i].MaxMarks" />
+                            </td>
+                            <td>
+                                <input asp-for="Criteria[@i].Comment" class="form-control" />
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-end">Total</th>
+                            <th>
+                                <input type="text" id="totalBox" class="form-control fw-bold" readonly />
+                            </th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                <label asp-for="Remarks" class="form-label fw-semibold">Overall Remarks</label>
+                <textarea asp-for="Remarks" rows="4" class="form-control" placeholder="Overall committee remarks, strengths, weaknesses, and next actions."></textarea>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white d-flex gap-2">
+            <button type="submit" class="btn btn-success">Submit Evaluation</button>
+            <a asp-action="MyAssigned" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll('.score-input').forEach(function (input) {
+                const val = parseFloat(input.value);
+                if (!isNaN(val)) total += val;
+            });
+            document.getElementById('totalBox').value = total.toFixed(1);
+        }
+
+        document.querySelectorAll('.score-input').forEach(function (input) {
+            input.addEventListener('input', updateTotal);
+        });
+
+        updateTotal();
+    </script>
+}

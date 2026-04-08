@@ -1,0 +1,36 @@
+﻿@model IEnumerable<EMAP.Domain.Fyp.FypCommittee>
+
+@{
+    ViewData["Title"] = "FYP Committees";
+}
+
+<h2>FYP Committees</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create Committee</a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Session</th>
+            <th>Coordinator</th>
+            <th>Convenor</th>
+            <th>Programs</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Session</td>
+                <td>@item.CoordinatorEmail</td>
+            <td>@string.Join(", ", item.CommitteePrograms.Select(x => x.ProgramCode))</td>
+            <td>@(item.IsActive ? "Active" : "Inactive")</td>
+        </tr>
+    }
+    </tbody>
+</table>

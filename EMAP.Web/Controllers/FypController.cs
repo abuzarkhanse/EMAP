@@ -329,6 +329,11 @@ namespace EMAP.Web.Controllers
                 }
             }
 
+            if (string.IsNullOrWhiteSpace(model.ProgramCode))
+            {
+                ModelState.AddModelError(nameof(model.ProgramCode), "Program code is required.");
+            }
+
             if (!ModelState.IsValid)
             {
                 model.ActiveCallTitle = activeCall.Title;
@@ -342,7 +347,8 @@ namespace EMAP.Web.Controllers
                 LeaderId = userId,
                 Member2Id = member2Id,
                 Member3Id = member3Id,
-                TentativeProjectTitle = model.TentativeProjectTitle,
+                ProgramCode = model.ProgramCode.Trim().ToUpper(),
+                TentativeProjectTitle = model.TentativeProjectTitle.Trim(),
                 Status = GroupStatus.PendingSupervisorSelection
             });
 

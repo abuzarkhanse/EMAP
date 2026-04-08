@@ -31,5 +31,6 @@ namespace EMAP.Domain.Fyp
         public string AssignedById { get; set; } = string.Empty; // FYPCoordinator userId
 
         public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
+
     }
 }

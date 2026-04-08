@@ -1,14 +1,15 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.InkML;
 using EMAP.Domain.Fyp;
 using EMAP.Domain.Users;
 using EMAP.Infrastructure.Data;
+using EMAP.Web.ViewModels;
+using EMAP.Web.ViewModels.Fyp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using EMAP.Web.ViewModels;
-using EMAP.Web.ViewModels.Fyp;
 
 namespace EMAP.Web.Controllers.Admin
 {
@@ -732,7 +733,8 @@ namespace EMAP.Web.Controllers.Admin
                 .Include(p => p.Group)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
-            if (proposal == null) return NotFound();
+            if (proposal == null)
+                return NotFound();
 
             if (proposal.Status == ProposalStatus.ApprovedForDefense ||
                 proposal.Status == ProposalStatus.DefenseScheduled)
@@ -776,6 +778,7 @@ namespace EMAP.Web.Controllers.Admin
             TempData["Success"] = "Feedback saved. Student must revise and resubmit.";
             return RedirectToAction(nameof(Proposals));
         }
+
 
         // ===================== CHAPTER REVIEWS (SUPERVISOR) =====================
         //

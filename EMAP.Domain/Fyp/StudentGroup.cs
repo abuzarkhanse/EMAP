@@ -34,6 +34,9 @@ namespace EMAP.Domain.Fyp
 
         public GroupStatus Status { get; set; } = GroupStatus.PendingSupervisorSelection;
 
+        [StringLength(50)]
+        public string ProgramCode { get; set; } = string.Empty; // synced from LMS/CMS
+
         [Required]
         [StringLength(300)]
         public string TentativeProjectTitle { get; set; } = string.Empty;

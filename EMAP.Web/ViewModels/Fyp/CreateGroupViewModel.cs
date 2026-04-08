@@ -4,7 +4,6 @@ namespace EMAP.Web.ViewModels.Fyp
 {
     public class CreateGroupViewModel
     {
-        // Display fields (used in heading)
         public string Batch { get; set; } = string.Empty;
         public string ActiveCallTitle { get; set; } = string.Empty;
 
@@ -13,7 +12,11 @@ namespace EMAP.Web.ViewModels.Fyp
         [StringLength(300)]
         public string TentativeProjectTitle { get; set; } = string.Empty;
 
-        // Form fields (used by asp-for in your view)
+        [Required(ErrorMessage = "Program code is required.")]
+        [Display(Name = "Program Code")]
+        [StringLength(50)]
+        public string ProgramCode { get; set; } = string.Empty;
+
         [EmailAddress]
         public string? Member2Email { get; set; }
 

@@ -877,3 +877,148 @@ body {
         justify-content: center;
     }
 }
+
+
+/* =========================
+   Coordinator Dashboard UI
+   ========================= */
+
+.coord-page {
+    padding: 1.25rem 0 2rem 0;
+}
+
+.coord-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.coord-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.02em;
+}
+
+.coord-subtitle {
+    font-size: 1.05rem;
+    color: #64748b;
+    max-width: 900px;
+    margin-bottom: 0;
+}
+
+.coord-user-chip {
+    background: #ffffff;
+    border: 1px solid #dbe4f0;
+    border-radius: 999px;
+    padding: 0.8rem 1.1rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    min-width: 240px;
+    text-align: center;
+}
+
+.coord-user-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 0.2rem;
+}
+
+.coord-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.25rem;
+}
+
+.coord-card {
+    grid-column: span 4;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 22px;
+    padding: 1.4rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.coord-card-highlight {
+    border: 1px solid #bfd7ff;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.coord-card h3 {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0.35rem 0 0.8rem 0;
+}
+
+.coord-card p {
+    font-size: 1.02rem;
+    line-height: 1.7;
+    color: #64748b;
+    margin-bottom: 1rem;
+}
+
+.coord-card-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    border: 1px solid #dbe4f0;
+    font-size: 1.4rem;
+}
+
+.coord-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: auto;
+}
+
+.coord-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.coord-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    background: #f1f5f9;
+    border: 1px solid #dbe4f0;
+    font-size: 0.86rem;
+    color: #334155;
+    font-weight: 600;
+}
+
+@media (max-width: 1199px) {
+    .coord-card {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 767px) {
+    .coord-card {
+        grid-column: span 12;
+    }
+
+    .coord-title {
+        font-size: 1.75rem;
+    }
+
+    .coord-user-chip {
+        width: 100%;
+    }
+}

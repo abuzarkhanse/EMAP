@@ -1,0 +1,44 @@
+﻿@model EMAP.Web.ViewModels.Fyp.FypCommitteeFormViewModel
+
+@{
+    ViewData["Title"] = "Create FYP Committee";
+}
+
+<h2>Create FYP Committee</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Session" class="form-label"></label>
+        <input asp-for="Session" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CoordinatorEmail" class="form-label"></label>
+        <input asp-for="CoordinatorEmail" class="form-control" placeholder="coordinator@university.edu" />
+        <span asp-validation-for="CoordinatorEmail" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ProgramCodesCsv" class="form-label">Program Codes (comma separated)</label>
+        <input asp-for="ProgramCodesCsv" class="form-control" placeholder="SE,CY or AI,DS" />
+        <span asp-validation-for="ProgramCodesCsv" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

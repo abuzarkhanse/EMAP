@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
+﻿using DocumentFormat.OpenXml.InkML;
 using EMAP.Domain.Fyp;
 using EMAP.Domain.Users;
 using EMAP.Infrastructure.Data;
@@ -14,6 +9,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace EMAP.Web.Controllers
 {
@@ -54,7 +55,7 @@ namespace EMAP.Web.Controllers
         // So we provide an alias action to prevent 404.
         public IActionResult SlotAllocation()
         {
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(PendingProposalSlots));
         }
 
         // ================= LIST ELIGIBLE PROPOSALS =================
@@ -221,6 +222,53 @@ namespace EMAP.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        private string GetCurrentUserEmail()
+        {
+            return User.FindFirstValue(ClaimTypes.Email)?.Trim().ToLower()
+                ?? User.Identity?.Name?.Trim().ToLower()
+                ?? string.Empty;
+        }
+
+        public async Task<IActionResult> PendingProposalSlots()
+        {
+            var currentEmail = GetCurrentUserEmail();
+
+            var committee = await _db.FypCommittees
+                .Include(x => x.CommitteePrograms)
+                .FirstOrDefaultAsync(x =>
+                    x.CoordinatorEmail.ToLower() == currentEmail &&
+                    x.IsActive);
+
+            if (committee == null)
+            {
+                TempData["Error"] = "No active committee assigned to you.";
+                return View(new List<ProposalSubmission>());
+            }
+
+            var programCodes = committee.CommitteePrograms
+                .Select(x => x.ProgramCode.Trim().ToUpper())
+                .ToList();
+
+            var proposals = await _db.ProposalSubmissions
+                .Include(p => p.Group)
+                    .ThenInclude(g => g.FypCall)
+                .Include(p => p.Group)
+                    .ThenInclude(g => g.Supervisor)
+                .Include(p => p.DefenseSchedule)
+                .Where(p =>
+                    p.Group != null &&
+                    !string.IsNullOrWhiteSpace(p.Group.ProgramCode) &&
+                    programCodes.Contains(p.Group.ProgramCode.ToUpper()) &&
+                    p.DefenseSchedule == null &&
+                    (p.Status == ProposalStatus.ApprovedForDefense ||
+                     p.Status == ProposalStatus.ProposalAccepted))
+                .OrderByDescending(p => p.SubmittedAt)
+                .ToListAsync();
+
+            ViewBag.CommitteeName = committee.Name;
+            return View(proposals);
+        }
+
         private async Task SendDefenseScheduledEmailToGroupAsync(int proposalId, int scheduleId)
         {
             // Reload fresh from DB to avoid lazy/null issues
@@ -321,6 +369,121 @@ namespace EMAP.Web.Controllers
             }
 
             return list;
+        }
+
+        private string GetCurrentUserId()
+        {
+            return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        }
+
+        // ===================== Bulk Slot Allocation =====================
+
+        [HttpGet]
+        public IActionResult BulkAssignSlots(List<int> proposalIds)
+        {
+            if (proposalIds == null || !proposalIds.Any())
+            {
+                TempData["Error"] = "Please select at least one proposal.";
+                return RedirectToAction(nameof(PendingProposalSlots));
+            }
+
+            var vm = new BulkAssignProposalSlotsViewModel
+            {
+                ProposalIds = proposalIds,
+                DefenseDate = DateTime.Today.AddDays(1)
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkAssignSlots(BulkAssignProposalSlotsViewModel vm)
+        {
+            if (!ModelState.IsValid)
+                return View(vm);
+
+            var currentEmail = GetCurrentUserEmail();
+
+            var committee = await _db.FypCommittees
+                .Include(x => x.CommitteePrograms)
+                .FirstOrDefaultAsync(x =>
+                    x.CoordinatorEmail.ToLower() == currentEmail &&
+                    x.IsActive);
+
+            if (committee == null)
+            {
+                TempData["Error"] = "No active committee assigned to you.";
+                return RedirectToAction(nameof(PendingProposalSlots));
+            }
+
+            var programCodes = committee.CommitteePrograms
+                .Select(x => x.ProgramCode.Trim().ToUpper())
+                .ToList();
+
+            var proposals = await _db.ProposalSubmissions
+                .Include(p => p.Group)
+                .Include(p => p.DefenseSchedule)
+                .Where(p => vm.ProposalIds.Contains(p.Id))
+                .Where(p => p.Group != null &&
+                            !string.IsNullOrWhiteSpace(p.Group.ProgramCode) &&
+                            programCodes.Contains(p.Group.ProgramCode.ToUpper()))
+                .Where(p => p.DefenseSchedule == null)
+                .Where(p => p.Status == ProposalStatus.ApprovedForDefense ||
+                            p.Status == ProposalStatus.ProposalAccepted)
+                .OrderBy(p => p.Id)
+                .ToListAsync();
+
+            if (!proposals.Any())
+            {
+                TempData["Error"] = "No valid proposals found for slot assignment.";
+                return RedirectToAction(nameof(PendingProposalSlots));
+            }
+
+            var currentTime = vm.StartTime;
+            var counter = 0;
+
+            foreach (var proposal in proposals)
+            {
+                bool taken = await _db.ProposalDefenseSchedules.AnyAsync(s =>
+                    s.DefenseDate == vm.DefenseDate.Date &&
+                    s.DefenseTime == currentTime);
+
+                if (taken)
+                {
+                    TempData["Error"] = $"The slot {currentTime:hh\\:mm} on {vm.DefenseDate:dd-MMM-yyyy} is already taken.";
+                    return RedirectToAction(nameof(PendingProposalSlots));
+                }
+
+                var schedule = new ProposalDefenseSchedule
+                {
+                    ProposalSubmissionId = proposal.Id,
+                    DefenseDate = vm.DefenseDate.Date,
+                    DefenseTime = currentTime,
+                    DurationMinutes = vm.SlotDurationMinutes <= 0 ? 10 : vm.SlotDurationMinutes,
+                    Venue = vm.Venue,
+                    Instructions = vm.Instructions,
+                    AssignedById = CurrentUserId
+                };
+
+                _db.ProposalDefenseSchedules.Add(schedule);
+                proposal.Status = ProposalStatus.DefenseScheduled;
+
+                counter++;
+                currentTime = currentTime.Add(TimeSpan.FromMinutes(vm.SlotDurationMinutes));
+
+                if (vm.BreakAfterEvery > 0 &&
+                    vm.BreakMinutes > 0 &&
+                    counter % vm.BreakAfterEvery == 0)
+                {
+                    currentTime = currentTime.Add(TimeSpan.FromMinutes(vm.BreakMinutes));
+                }
+            }
+
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = $"{proposals.Count} proposal defense slots assigned successfully.";
+            return RedirectToAction(nameof(PendingProposalSlots));
         }
 
         // ===================== CHAPTER MANAGEMENT (COORDINATOR) =====================

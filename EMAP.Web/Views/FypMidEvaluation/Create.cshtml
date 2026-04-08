@@ -1,0 +1,49 @@
+﻿@{
+    ViewData["Title"] = "Create Mid Evaluation";
+}
+
+<h2 class="mb-4">Create Mid Evaluation</h2>
+
+<form asp-action="Create" method="post" class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label">Student Group</label>
+            <select name="studentGroupId" class="form-select" asp-items="ViewBag.Groups"></select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Milestone</label>
+            <select name="milestoneId" class="form-select" asp-items="ViewBag.Milestones"></select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Evaluator Email</label>
+            <input name="evaluatorEmail" class="form-control" placeholder="committee.member@university.edu" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Scheduled At</label>
+            <input name="scheduledAt" type="datetime-local" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Venue</label>
+            <input name="venue" class="form-control" placeholder="Seminar Hall / Lab 2" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Committee Members</label>
+            <input name="committeeMembers" class="form-control" placeholder="Dr. A, Dr. B, Dr. C" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Instructions</label>
+            <textarea name="instructions" rows="3" class="form-control" placeholder="Bring slides, working demo, and report copy."></textarea>
+        </div>
+    </div>
+
+    <div class="card-footer bg-white">
+        <button type="submit" class="btn btn-success">Assign Mid Evaluation</button>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </div>
+</form>

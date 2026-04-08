@@ -151,6 +151,65 @@ namespace EMAP.Infrastructure.Migrations
                     b.ToTable("FypChapterSubmissions");
                 });
 
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypCommittee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ConvenorEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("CoordinatorEmail")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Session")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FypCommittees");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypCommitteeProgram", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FypCommitteeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProgramCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FypCommitteeId", "ProgramCode")
+                        .IsUnique();
+
+                    b.ToTable("FypCommitteePrograms");
+                });
+
             modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluation", b =>
                 {
                     b.Property<int>("Id")
@@ -770,6 +829,11 @@ namespace EMAP.Infrastructure.Migrations
                     b.Property<string>("Member3Id")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ProgramCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<int?>("ProjectId")
                         .HasColumnType("int");
 
@@ -1042,6 +1106,17 @@ namespace EMAP.Infrastructure.Migrations
                     b.Navigation("Milestone");
                 });
 
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypCommitteeProgram", b =>
+                {
+                    b.HasOne("EMAP.Domain.Fyp.FypCommittee", "FypCommittee")
+                        .WithMany("CommitteePrograms")
+                        .HasForeignKey("FypCommitteeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FypCommittee");
+                });
+
             modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluation", b =>
                 {
                     b.HasOne("EMAP.Domain.Fyp.FypMilestone", "Milestone")
@@ -1217,6 +1292,11 @@ namespace EMAP.Infrastructure.Migrations
             modelBuilder.Entity("EMAP.Domain.Fyp.FypCall", b =>
                 {
                     b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypCommittee", b =>
+                {
+                    b.Navigation("CommitteePrograms");
                 });
 
             modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluation", b =>
