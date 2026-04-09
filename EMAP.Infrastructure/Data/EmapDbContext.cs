@@ -392,15 +392,16 @@ namespace EMAP.Infrastructure.Data
             );
 
             modelBuilder.Entity<FypEvaluationCriterion>().HasData(
-                new FypEvaluationCriterion { Id = 1001, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Content & Knowledge", Description = "Understanding of project domain, concepts and technical knowledge.", MaxMarks = 5, DisplayOrder = 1, IsActive = true },
-                new FypEvaluationCriterion { Id = 1002, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Problem Analysis", Description = "Problem understanding, clarity and relevance of analysis.", MaxMarks = 5, DisplayOrder = 2, IsActive = true },
-                new FypEvaluationCriterion { Id = 1003, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Investigation", Description = "Research effort, literature study, requirement exploration and findings.", MaxMarks = 5, DisplayOrder = 3, IsActive = true },
-                new FypEvaluationCriterion { Id = 1004, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Design of Solution", Description = "Architecture, design thinking, modeling and solution planning.", MaxMarks = 5, DisplayOrder = 4, IsActive = true },
-                new FypEvaluationCriterion { Id = 1005, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Progress & Tool Usage", Description = "Progress made so far and effective use of tools/technologies.", MaxMarks = 5, DisplayOrder = 5, IsActive = true },
-                new FypEvaluationCriterion { Id = 1006, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Project Management", Description = "Planning, task tracking, teamwork and timeline management.", MaxMarks = 5, DisplayOrder = 6, IsActive = true },
-                new FypEvaluationCriterion { Id = 1007, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Presentation", Description = "Presentation quality, clarity, confidence and structure.", MaxMarks = 5, DisplayOrder = 7, IsActive = true },
-                new FypEvaluationCriterion { Id = 1008, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Viva", Description = "Response quality, confidence and understanding during questioning.", MaxMarks = 5, DisplayOrder = 8, IsActive = true }
+                new FypEvaluationCriterion { Id = 3001, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Content & Knowledge", Description = "Understanding of project domain, concepts, and technical knowledge.", MaxMarks = 5, DisplayOrder = 1, IsActive = true },
+                new FypEvaluationCriterion { Id = 3002, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Problem Analysis", Description = "Clarity and depth of problem understanding and analysis.", MaxMarks = 5, DisplayOrder = 2, IsActive = true },
+                new FypEvaluationCriterion { Id = 3003, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Investigation", Description = "Research effort, literature review, and technical investigation.", MaxMarks = 5, DisplayOrder = 3, IsActive = true },
+                new FypEvaluationCriterion { Id = 3004, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Design of Solution", Description = "System design, architecture, modeling, and proposed solution quality.", MaxMarks = 5, DisplayOrder = 4, IsActive = true },
+                new FypEvaluationCriterion { Id = 3005, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Progress & Tool Usage", Description = "Implementation progress and effective use of tools/frameworks.", MaxMarks = 5, DisplayOrder = 5, IsActive = true },
+                new FypEvaluationCriterion { Id = 3006, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Project Management", Description = "Planning, task management, teamwork, and timeline handling.", MaxMarks = 5, DisplayOrder = 6, IsActive = true },
+                new FypEvaluationCriterion { Id = 3007, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Presentation", Description = "Presentation quality, flow, communication, and confidence.", MaxMarks = 5, DisplayOrder = 7, IsActive = true },
+                new FypEvaluationCriterion { Id = 3008, EvaluationType = FypMilestoneType.MidEvaluation, Title = "Viva", Description = "Answers during questioning, conceptual clarity, and confidence.", MaxMarks = 5, DisplayOrder = 8, IsActive = true }
             );
+
 
             modelBuilder.Entity<FypCommittee>(entity =>
             {

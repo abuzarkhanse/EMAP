@@ -15,6 +15,13 @@ namespace EMAP.Web.ViewModels.Fyp
         public string Venue { get; set; } = string.Empty;
         public DateTime? ScheduledAt { get; set; }
 
+        [Range(0, 100)]
+        public decimal WeightagePercent { get; set; } = 20;
+
+        public decimal WeightedMarks { get; set; }
+
+        public string? EvaluatorName { get; set; }
+
         public string? Remarks { get; set; }
 
         public List<FypMidEvaluationCriterionItem> Criteria { get; set; } = new();
@@ -30,7 +37,7 @@ namespace EMAP.Web.ViewModels.Fyp
 
         public decimal MaxMarks { get; set; }
 
-        [Range(0, 1000)]
+        [Range(0, 5)]
         public decimal AwardedMarks { get; set; }
 
         public string? Comment { get; set; }

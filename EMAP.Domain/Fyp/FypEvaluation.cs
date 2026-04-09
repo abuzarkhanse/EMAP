@@ -15,9 +15,15 @@ namespace EMAP.Domain.Fyp
 
         public string EvaluatorUserId { get; set; } = string.Empty;
 
+        public string? EvaluatorName { get; set; }
+
         public DateTime? ScheduledAt { get; set; }
 
         public decimal TotalMarks { get; set; }
+
+        public decimal WeightagePercent { get; set; } = 20;
+
+        public decimal WeightedMarks { get; set; }
 
         public string? Remarks { get; set; }
 

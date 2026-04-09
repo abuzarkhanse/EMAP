@@ -216,7 +216,7 @@ namespace EMAP.Web.Controllers
             catch
             {
                 TempData["Success"] = "Defense slot assigned successfully.";
-                TempData["Error"] = "Slot assigned but email sending failed. Check SMTP settings in appsettings.json.";
+                TempData["Error"] = "Slot assigned but email sending failed.";
             }
 
             return RedirectToAction(nameof(Index));

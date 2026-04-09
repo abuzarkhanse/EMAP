@@ -11,6 +11,7 @@ using EMAP.Web.ViewModels.Fyp;
 
 namespace EMAP.Web.Controllers
 {
+    [Authorize(Roles = "FYPCoordinator")]
     public class FypMidEvaluationController : Controller
     {
         private readonly EmapDbContext _db;
@@ -34,7 +35,14 @@ namespace EMAP.Web.Controllers
                 ?? string.Empty;
         }
 
-        // ===================== COORDINATOR: LIST =====================
+        private async Task<string> GetCurrentUserDisplayNameAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return User.Identity?.Name ?? "Coordinator";
+            return !string.IsNullOrWhiteSpace(user.FullName)
+                ? user.FullName
+                : (user.Email ?? user.UserName ?? "Coordinator");
+        }
 
         public async Task<IActionResult> Index()
         {
@@ -46,45 +54,55 @@ namespace EMAP.Web.Controllers
                     x.CoordinatorEmail.ToLower() == currentEmail &&
                     x.IsActive);
 
-            if (committee == null && !User.IsInRole("Admin"))
+            if (committee == null)
             {
                 TempData["Error"] = "No active committee assigned to you.";
                 return View(new List<FypEvaluation>());
             }
 
-            var programCodes = committee?.CommitteePrograms
+            var programCodes = committee.CommitteePrograms
                 .Select(x => x.ProgramCode.Trim().ToUpper())
-                .ToList() ?? new List<string>();
+                .ToList();
 
-            var evaluationsQuery = _db.FypEvaluations
+            var data = await _db.FypEvaluations
                 .Include(e => e.StudentGroup)
                     .ThenInclude(g => g.FypCall)
                 .Include(e => e.StudentGroup)
                     .ThenInclude(g => g.Supervisor)
                 .Include(e => e.Milestone)
                 .Include(e => e.Scores)
-                .Where(e => e.Milestone.Type == FypMilestoneType.MidEvaluation);
-
-            if (!User.IsInRole("Admin"))
-            {
-                evaluationsQuery = evaluationsQuery.Where(e =>
+                .Where(e => e.Milestone.Type == FypMilestoneType.MidEvaluation)
+                .Where(e =>
                     e.StudentGroup != null &&
                     !string.IsNullOrWhiteSpace(e.StudentGroup.ProgramCode) &&
-                    programCodes.Contains(e.StudentGroup.ProgramCode.ToUpper()));
-            }
-
-            var data = await evaluationsQuery
+                    programCodes.Contains(e.StudentGroup.ProgramCode.ToUpper()))
                 .OrderByDescending(e => e.ScheduledAt)
                 .ToListAsync();
 
             return View(data);
         }
 
-        // ===================== COORDINATOR: CREATE =====================
-
         [HttpGet]
         public async Task<IActionResult> Create()
         {
+            var currentEmail = GetCurrentUserEmail();
+
+            var committee = await _db.FypCommittees
+                .Include(x => x.CommitteePrograms)
+                .FirstOrDefaultAsync(x =>
+                    x.CoordinatorEmail.ToLower() == currentEmail &&
+                    x.IsActive);
+
+            if (committee == null)
+            {
+                TempData["Error"] = "No active committee assigned to you.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var programCodes = committee.CommitteePrograms
+                .Select(x => x.ProgramCode.Trim().ToUpper())
+                .ToList();
+
             var midMilestones = await _db.FypMilestones
                 .Where(m => m.Type == FypMilestoneType.MidEvaluation && m.IsActive)
                 .OrderBy(m => m.Title)
@@ -94,6 +112,8 @@ namespace EMAP.Web.Controllers
                 .Include(g => g.FypCall)
                 .Include(g => g.Supervisor)
                 .Where(g => g.Status == GroupStatus.Approved)
+                .Where(g => !string.IsNullOrWhiteSpace(g.ProgramCode) &&
+                            programCodes.Contains(g.ProgramCode.ToUpper()))
                 .OrderBy(g => g.Id)
                 .ToListAsync();
 
@@ -109,43 +129,70 @@ namespace EMAP.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int studentGroupId, int milestoneId, string evaluatorEmail, DateTime? scheduledAt, string? venue, string? instructions, string? committeeMembers)
+        public async Task<IActionResult> Create(int studentGroupId, int milestoneId, DateTime? scheduledAt, string? venue, string? instructions, string? committeeMembers, decimal weightagePercent)
         {
-            if (studentGroupId <= 0 || milestoneId <= 0 || string.IsNullOrWhiteSpace(evaluatorEmail))
+            var currentUserId = GetCurrentUserId();
+            var currentEmail = GetCurrentUserEmail();
+
+            var committee = await _db.FypCommittees
+                .Include(x => x.CommitteePrograms)
+                .FirstOrDefaultAsync(x =>
+                    x.CoordinatorEmail.ToLower() == currentEmail &&
+                    x.IsActive);
+
+            if (committee == null)
             {
-                TempData["Error"] = "Group, milestone and evaluator email are required.";
+                TempData["Error"] = "No active committee assigned to you.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var programCodes = committee.CommitteePrograms
+                .Select(x => x.ProgramCode.Trim().ToUpper())
+                .ToList();
+
+            var group = await _db.StudentGroups
+                .FirstOrDefaultAsync(g =>
+                    g.Id == studentGroupId &&
+                    !string.IsNullOrWhiteSpace(g.ProgramCode) &&
+                    programCodes.Contains(g.ProgramCode.ToUpper()));
+
+            if (group == null || milestoneId <= 0)
+            {
+                TempData["Error"] = "Invalid group or milestone selection.";
                 return RedirectToAction(nameof(Create));
             }
 
-            evaluatorEmail = evaluatorEmail.Trim().ToLower();
-
-            var evaluator = await _userManager.FindByEmailAsync(evaluatorEmail);
-            if (evaluator == null)
+            if (weightagePercent < 0 || weightagePercent > 100)
             {
-                TempData["Error"] = "Evaluator email not found.";
+                TempData["Error"] = "Weightage must be between 0 and 100.";
                 return RedirectToAction(nameof(Create));
             }
 
             var exists = await _db.FypEvaluations.AnyAsync(e =>
                 e.StudentGroupId == studentGroupId &&
                 e.MilestoneId == milestoneId &&
-                e.EvaluatorUserId == evaluator.Id);
+                e.EvaluatorUserId == currentUserId);
 
             if (exists)
             {
-                TempData["Error"] = "This evaluator is already assigned for this group's mid evaluation.";
+                TempData["Error"] = "Mid evaluation already exists for this group.";
                 return RedirectToAction(nameof(Index));
             }
+
+            var evaluatorName = await GetCurrentUserDisplayNameAsync();
 
             var evaluation = new FypEvaluation
             {
                 StudentGroupId = studentGroupId,
                 MilestoneId = milestoneId,
-                EvaluatorUserId = evaluator.Id,
+                EvaluatorUserId = currentUserId,
+                EvaluatorName = evaluatorName,
                 ScheduledAt = scheduledAt,
                 Venue = venue,
                 Instructions = instructions,
-                CommitteeMembers = committeeMembers,
+                CommitteeMembers = string.IsNullOrWhiteSpace(committeeMembers) ? evaluatorName : committeeMembers,
+                WeightagePercent = weightagePercent,
+                WeightedMarks = 0,
                 Status = FypEvaluationStatus.Draft,
                 IsSubmitted = false,
                 TotalMarks = 0
@@ -154,11 +201,9 @@ namespace EMAP.Web.Controllers
             _db.FypEvaluations.Add(evaluation);
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = "Mid evaluation assigned successfully.";
+            TempData["Success"] = "Mid evaluation created successfully.";
             return RedirectToAction(nameof(Index));
         }
-
-        // ===================== EVALUATOR: MY ASSIGNED MID EVALUATIONS =====================
 
         public async Task<IActionResult> MyAssigned()
         {
@@ -178,8 +223,6 @@ namespace EMAP.Web.Controllers
             return View(data);
         }
 
-        // ===================== EVALUATOR: FORM =====================
-
         [HttpGet]
         public async Task<IActionResult> Evaluate(int id)
         {
@@ -196,7 +239,7 @@ namespace EMAP.Web.Controllers
             if (evaluation == null)
                 return NotFound();
 
-            if (!User.IsInRole("Admin") && evaluation.EvaluatorUserId != currentUserId)
+            if (evaluation.EvaluatorUserId != currentUserId)
             {
                 TempData["Error"] = "You are not assigned to this evaluation.";
                 return RedirectToAction(nameof(MyAssigned));
@@ -218,6 +261,9 @@ namespace EMAP.Web.Controllers
                 Venue = evaluation.Venue ?? string.Empty,
                 ScheduledAt = evaluation.ScheduledAt,
                 Remarks = evaluation.Remarks,
+                EvaluatorName = evaluation.EvaluatorName,
+                WeightagePercent = evaluation.WeightagePercent,
+                WeightedMarks = evaluation.WeightedMarks,
                 Criteria = criteria.Select(c =>
                 {
                     var existing = evaluation.Scores.FirstOrDefault(s => s.CriterionId == c.Id);
@@ -250,7 +296,7 @@ namespace EMAP.Web.Controllers
             if (evaluation == null)
                 return NotFound();
 
-            if (!User.IsInRole("FypCoordinator") && evaluation.EvaluatorUserId != currentUserId)
+            if (evaluation.EvaluatorUserId != currentUserId)
             {
                 TempData["Error"] = "You are not assigned to this evaluation.";
                 return RedirectToAction(nameof(MyAssigned));
@@ -266,9 +312,9 @@ namespace EMAP.Web.Controllers
                 if (criterion == null)
                     continue;
 
-                if (item.AwardedMarks < 0 || item.AwardedMarks > criterion.MaxMarks)
+                if (item.AwardedMarks < 0 || item.AwardedMarks > 5)
                 {
-                    ModelState.AddModelError(string.Empty, $"{criterion.Title} marks must be between 0 and {criterion.MaxMarks}.");
+                    ModelState.AddModelError(string.Empty, $"{criterion.Title} marks must be between 0 and 5.");
                 }
             }
 
@@ -297,6 +343,11 @@ namespace EMAP.Web.Controllers
             }
 
             evaluation.TotalMarks = evaluation.Scores.Sum(x => x.AwardedMarks);
+            evaluation.WeightedMarks = evaluation.WeightagePercent <= 0
+                ? 0
+                : Math.Round((evaluation.TotalMarks / 40m) * evaluation.WeightagePercent, 2);
+
+            evaluation.EvaluatorName = vm.EvaluatorName;
             evaluation.Remarks = vm.Remarks;
             evaluation.IsSubmitted = true;
             evaluation.SubmittedAt = DateTime.Now;

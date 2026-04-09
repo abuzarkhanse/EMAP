@@ -305,10 +305,10 @@ C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\staticwebassets.build.json.ca
 C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\staticwebassets.development.json
 C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\swae.build.ex.cache
-C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\EMAP.Web.csproj.Up2Date
 C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\EMAP.Web.dll
 C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\refint\EMAP.Web.dll
 C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\EMAP.Web.pdb
 C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\EMAP.Web.genruntimeconfig.cache
 C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\ref\EMAP.Web.dll
+C:\Dev\abuzarkhanse\EMAP\EMAP.Web\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

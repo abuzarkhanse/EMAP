@@ -1022,3 +1022,118 @@ body {
         width: 100%;
     }
 }
+
+
+/* =========================
+   Mid Evaluation UI
+   ========================= */
+
+.mid-eval-page {
+    padding-bottom: 2rem;
+}
+
+.mid-eval-title {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.02em;
+}
+
+.mid-eval-subtitle {
+    font-size: 1.05rem;
+    color: #64748b;
+    margin-bottom: 0;
+}
+
+.mid-eval-info-card {
+    border-radius: 24px;
+}
+
+.mid-eval-section-head h4 {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.mid-eval-info-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1rem 1rem 0.9rem 1rem;
+    height: 100%;
+}
+
+.mid-eval-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.mid-eval-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.4;
+}
+
+.mid-eval-summary-banner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: center;
+    justify-content: space-between;
+    background: #e0f2fe;
+    border: 1px solid #bae6fd;
+    border-radius: 16px;
+    padding: 1rem 1.2rem;
+    color: #0c4a6e;
+    font-size: 1rem;
+}
+
+.mid-rubric-table thead th {
+    background: #f8fafc;
+    vertical-align: middle;
+}
+
+.mid-rubric-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.35;
+    margin-bottom: 0.2rem;
+}
+
+.mid-rubric-max {
+    color: #64748b;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.mid-score-input {
+    min-height: 44px;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.mid-comment-input {
+    min-height: 42px;
+}
+
+.mid-total-box {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+@media (max-width: 991px) {
+    .mid-eval-title {
+        font-size: 1.8rem;
+    }
+
+    .mid-eval-summary-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
