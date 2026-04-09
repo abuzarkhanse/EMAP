@@ -57,6 +57,7 @@ namespace EMAP.Web.Controllers
             var chapterBoxes = new List<EMAP.Web.ViewModels.Fyp.ChapterBoxViewModel>();
             var evaluationMilestones = new List<FypMilestone>();
             var publishedEvaluations = new List<FypEvaluation>();
+            var publishedMemberEvaluations = new List<StudentPublishedEvaluationCardViewModel>();
             var currentStage = FypStage.Fyp1;
 
             if (activeCall != null)
@@ -172,11 +173,63 @@ namespace EMAP.Web.Controllers
 
                     publishedEvaluations = await _db.FypEvaluations
                         .Include(x => x.Milestone)
+                        .Include(x => x.Members)
+                            .ThenInclude(m => m.Scores)
                         .Where(x => x.StudentGroupId == group.Id
-                                 && x.IsPublishedToStudent)
+                                && x.IsPublishedToStudent)
                         .OrderBy(x => x.ScheduledAt)
                         .ThenBy(x => x.Id)
                         .ToListAsync();
+
+                    var criteriaMap = await _db.FypEvaluationCriteria
+                        .Where(x => x.IsActive)
+                        .ToDictionaryAsync(x => x.Id, x => x);
+
+                    foreach (var evaluation in publishedEvaluations)
+                    {
+                        var myMember = evaluation.Members.FirstOrDefault(m => m.StudentUserId == userId);
+                        if (myMember == null)
+                            continue;
+
+                        var card = new StudentPublishedEvaluationCardViewModel
+                        {
+                            EvaluationId = evaluation.Id,
+                            EvaluationTitle = evaluation.Milestone?.Title ?? "Evaluation",
+                            ProjectTitle = group.TentativeProjectTitle,
+                            Batch = activeCall?.Batch ?? "-",
+                            ProgramCode = group.ProgramCode,
+                            StudentName = myMember.StudentName,
+                            RegistrationNo = myMember.RegistrationNo,
+                            SupervisorName = group.Supervisor?.Name ?? "-",
+                            Venue = evaluation.Venue,
+                            ScheduledAt = evaluation.ScheduledAt,
+                            TotalMarks = myMember.TotalMarks,
+                            WeightedMarks = myMember.WeightedMarks,
+                            WeightagePercent = evaluation.WeightagePercent,
+                            OverallRemarks = evaluation.Remarks,
+                            StudentRemarks = myMember.Remarks,
+                            EvaluatorName = evaluation.ShowCommitteeToStudent ? evaluation.EvaluatorName : null,
+                            ShowCommitteeToStudent = evaluation.ShowCommitteeToStudent
+                        };
+
+                        foreach (var score in myMember.Scores.OrderBy(x =>
+                                     criteriaMap.ContainsKey(x.CriterionId) ? criteriaMap[x.CriterionId].DisplayOrder : 999))
+                        {
+                            var criterion = criteriaMap.ContainsKey(score.CriterionId)
+                                ? criteriaMap[score.CriterionId]
+                                : null;
+
+                            card.Criteria.Add(new StudentPublishedEvaluationCriterionViewModel
+                            {
+                                CriterionTitle = criterion?.Title ?? "Criterion",
+                                MaxMarks = criterion?.MaxMarks ?? 5,
+                                AwardedMarks = score.AwardedMarks,
+                                Comment = score.Comment
+                            });
+                        }
+
+                        publishedMemberEvaluations.Add(card);
+                    }
                 }
 
             }
@@ -202,7 +255,8 @@ namespace EMAP.Web.Controllers
                 ChapterBoxes = chapterBoxes,
                 CurrentStage = currentStage,
                 EvaluationMilestones = evaluationMilestones,
-                PublishedEvaluations = publishedEvaluations
+                PublishedEvaluations = publishedEvaluations,
+                PublishedMemberEvaluations = publishedMemberEvaluations
             };
 
             return View(model);

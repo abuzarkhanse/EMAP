@@ -699,6 +699,125 @@
                 </div>
             }
 
+            <!-- ===== Evaluation Result Card ===== -->
+            @if (Model.PublishedMemberEvaluations != null && Model.PublishedMemberEvaluations.Any())
+            {
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-header bg-white border-0 pt-4 pb-0">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h3 class="mb-1">My Published Evaluation Results</h3>
+                                <p class="text-muted mb-0">
+                                    Only published results are shown here.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        @foreach (var eval in Model.PublishedMemberEvaluations)
+                        {
+                            <div class="border rounded-4 p-4 mb-4">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-4">
+                                        <div class="text-muted small">Evaluation</div>
+                                        <div class="fw-semibold">@eval.EvaluationTitle</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-muted small">Project Title</div>
+                                        <div class="fw-semibold">@eval.ProjectTitle</div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="text-muted small">Batch</div>
+                                        <div class="fw-semibold">@eval.Batch</div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="text-muted small">Program</div>
+                                        <div class="fw-semibold">@eval.ProgramCode</div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="text-muted small">Student</div>
+                                        <div class="fw-semibold">@eval.StudentName</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-muted small">Supervisor</div>
+                                        <div class="fw-semibold">@eval.SupervisorName</div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="text-muted small">Total Marks</div>
+                                        <div class="fw-bold text-primary">@eval.TotalMarks</div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="text-muted small">Weighted</div>
+                                        <div class="fw-bold text-success">@eval.WeightedMarks / @eval.WeightagePercent</div>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-bordered align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Criterion</th>
+                                                <th>Max</th>
+                                                <th>Awarded</th>
+                                                <th>Comment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in eval.Criteria)
+                                            {
+                                                <tr>
+                                                    <td class="fw-semibold">@item.CriterionTitle</td>
+                                                    <td>@item.MaxMarks</td>
+                                                    <td>@item.AwardedMarks</td>
+                                                    <td>@(string.IsNullOrWhiteSpace(item.Comment) ? "-" : item.Comment)</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="row g-3 mt-2">
+                                    <div class="col-md-6">
+                                        <div class="text-muted small">Student Remarks</div>
+                                        <div class="border rounded-3 p-3 bg-light">
+                                            @(string.IsNullOrWhiteSpace(eval.StudentRemarks) ? "No remarks provided." : eval.StudentRemarks)
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="text-muted small">Overall Evaluation Comment</div>
+                                        <div class="border rounded-3 p-3 bg-light">
+                                            @(string.IsNullOrWhiteSpace(eval.OverallRemarks) ? "No overall comment provided." : eval.OverallRemarks)
+                                        </div>
+                                    </div>
+
+                                    @if (eval.ShowCommitteeToStudent && !string.IsNullOrWhiteSpace(eval.EvaluatorName))
+                                    {
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Evaluator</div>
+                                            <div class="fw-semibold">@eval.EvaluatorName</div>
+                                        </div>
+                                    }
+
+                                    <div class="col-md-6">
+                                        <div class="text-muted small">Schedule</div>
+                                        <div class="fw-semibold">
+                                            @(eval.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")
+                                            @if (!string.IsNullOrWhiteSpace(eval.Venue))
+                                            {
+                                                <span> | @eval.Venue</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
             <!-- ===== SUPERVISOR LIST ===== -->
             @if (Model.ShowSupervisorList)
             {
@@ -800,6 +919,7 @@
 
     </div>
 </div>
+
 
 <!-- =================== MODALS =================== -->
 @* ✅ MODAL: defense schedule *@

@@ -10,7 +10,7 @@ namespace EMAP.Domain.Fyp
     {
         Draft = 1,
         Scheduled = 2,
-        Submitted = 3,
-        Finalized = 4
+        Completed = 3,
+        Published = 4
     }
 }

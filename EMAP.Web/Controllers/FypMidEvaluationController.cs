@@ -201,13 +201,45 @@ namespace EMAP.Web.Controllers
             _db.FypEvaluations.Add(evaluation);
             await _db.SaveChangesAsync();
 
+            // Create per-member evaluation rows for all students in the group
+            var memberUserIds = new List<string?> { group.LeaderId, group.Member2Id, group.Member3Id }
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct()
+                .ToList();
+
+            foreach (var userId in memberUserIds)
+            {
+                var user = await _userManager.FindByIdAsync(userId!);
+                if (user == null) continue;
+
+                _db.FypEvaluationMembers.Add(new FypEvaluationMember
+                {
+                    EvaluationId = evaluation.Id,
+                    StudentUserId = user.Id,
+                    StudentName = !string.IsNullOrWhiteSpace(user.FullName)
+                        ? user.FullName
+                        : (user.UserName ?? user.Email ?? "Student"),
+                    RegistrationNo = user.UserName,
+                    TotalMarks = 0,
+                    WeightedMarks = 0
+                });
+            }
+
+            await _db.SaveChangesAsync();
+
             TempData["Success"] = "Mid evaluation created successfully.";
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> MyAssigned()
         {
-            var currentUserId = GetCurrentUserId();
+            var programCodes = await GetCurrentCoordinatorProgramCodesAsync();
+
+            if (!programCodes.Any())
+            {
+                TempData["Error"] = "No active committee assigned to you.";
+                return View(new List<FypEvaluation>());
+            }
 
             var data = await _db.FypEvaluations
                 .Include(e => e.StudentGroup)
@@ -216,7 +248,11 @@ namespace EMAP.Web.Controllers
                     .ThenInclude(g => g.Supervisor)
                 .Include(e => e.Milestone)
                 .Include(e => e.Scores)
-                .Where(e => e.EvaluatorUserId == currentUserId && e.Milestone.Type == FypMilestoneType.MidEvaluation)
+                .Where(e => e.Milestone.Type == FypMilestoneType.MidEvaluation)
+                .Where(e =>
+                    e.StudentGroup != null &&
+                    !string.IsNullOrWhiteSpace(e.StudentGroup.ProgramCode) &&
+                    programCodes.Contains(e.StudentGroup.ProgramCode.ToUpper()))
                 .OrderByDescending(e => e.ScheduledAt)
                 .ToListAsync();
 
@@ -226,24 +262,38 @@ namespace EMAP.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Evaluate(int id)
         {
-            var currentUserId = GetCurrentUserId();
-
             var evaluation = await _db.FypEvaluations
                 .Include(e => e.StudentGroup)
                     .ThenInclude(g => g.FypCall)
                 .Include(e => e.StudentGroup)
                     .ThenInclude(g => g.Supervisor)
-                .Include(e => e.Scores)
+                .Include(e => e.Members)
+                    .ThenInclude(m => m.Scores)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (evaluation == null)
                 return NotFound();
 
-            if (evaluation.EvaluatorUserId != currentUserId)
+            if (!await CanCurrentCoordinatorAccessEvaluationAsync(evaluation))
             {
-                TempData["Error"] = "You are not assigned to this evaluation.";
-                return RedirectToAction(nameof(MyAssigned));
+                TempData["Error"] = "You are not allowed to access this evaluation.";
+                return RedirectToAction(nameof(Index));
             }
+
+            await EnsureEvaluationMembersExistAsync(evaluation);
+
+            // Reload after creating members
+            evaluation = await _db.FypEvaluations
+                .Include(e => e.StudentGroup)
+                    .ThenInclude(g => g.FypCall)
+                .Include(e => e.StudentGroup)
+                    .ThenInclude(g => g.Supervisor)
+                .Include(e => e.Members)
+                    .ThenInclude(m => m.Scores)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (evaluation == null)
+                return NotFound();
 
             var criteria = await _db.FypEvaluationCriteria
                 .Where(c => c.EvaluationType == FypMilestoneType.MidEvaluation && c.IsActive)
@@ -253,31 +303,53 @@ namespace EMAP.Web.Controllers
             var vm = new FypMidEvaluationFormViewModel
             {
                 EvaluationId = evaluation.Id,
-                StudentGroupId = evaluation.StudentGroupId,
-                GroupTitle = evaluation.StudentGroup?.TentativeProjectTitle ?? "-",
+                GroupId = evaluation.StudentGroupId,
+                ProjectTitle = evaluation.StudentGroup?.TentativeProjectTitle ?? "-",
                 Batch = evaluation.StudentGroup?.FypCall?.Batch ?? "-",
                 ProgramCode = evaluation.StudentGroup?.ProgramCode ?? "-",
                 SupervisorName = evaluation.StudentGroup?.Supervisor?.Name ?? "-",
-                Venue = evaluation.Venue ?? string.Empty,
+                Venue = evaluation.Venue,
                 ScheduledAt = evaluation.ScheduledAt,
-                Remarks = evaluation.Remarks,
-                EvaluatorName = evaluation.EvaluatorName,
                 WeightagePercent = evaluation.WeightagePercent,
-                WeightedMarks = evaluation.WeightedMarks,
-                Criteria = criteria.Select(c =>
+                OverallRemarks = evaluation.Remarks,
+                EvaluatorName = evaluation.EvaluatorName ?? string.Empty,
+                Criteria = criteria.Select(c => new CriterionHeaderViewModel
                 {
-                    var existing = evaluation.Scores.FirstOrDefault(s => s.CriterionId == c.Id);
-                    return new FypMidEvaluationCriterionItem
-                    {
-                        CriterionId = c.Id,
-                        Title = c.Title,
-                        Description = c.Description,
-                        MaxMarks = c.MaxMarks,
-                        AwardedMarks = existing?.AwardedMarks ?? 0,
-                        Comment = existing?.Comment
-                    };
+                    CriterionId = c.Id,
+                    Title = c.Title,
+                    MaxMarks = c.MaxMarks
                 }).ToList()
             };
+
+            foreach (var member in evaluation.Members.OrderBy(m => m.StudentName))
+            {
+                var row = new MemberEvaluationRowViewModel
+                {
+                    EvaluationMemberId = member.Id,
+                    StudentUserId = member.StudentUserId,
+                    StudentName = member.StudentName,
+                    RegistrationNo = member.RegistrationNo,
+                    Remarks = member.Remarks,
+                    TotalMarks = member.TotalMarks,
+                    WeightedMarks = member.WeightedMarks
+                };
+
+                foreach (var criterion in criteria)
+                {
+                    var existingScore = member.Scores.FirstOrDefault(s => s.CriterionId == criterion.Id);
+
+                    row.Scores.Add(new MemberCriterionScoreViewModel
+                    {
+                        CriterionId = criterion.Id,
+                        CriterionTitle = criterion.Title,
+                        MaxMarks = criterion.MaxMarks,
+                        AwardedMarks = existingScore?.AwardedMarks ?? 0,
+                        Comment = existingScore?.Comment
+                    });
+                }
+
+                vm.Members.Add(row);
+            }
 
             return View(vm);
         }
@@ -286,77 +358,192 @@ namespace EMAP.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Evaluate(FypMidEvaluationFormViewModel vm)
         {
-            var currentUserId = GetCurrentUserId();
-
             var evaluation = await _db.FypEvaluations
-                .Include(e => e.Scores)
-                .Include(e => e.Milestone)
+                .Include(e => e.StudentGroup)
+                .Include(e => e.Members)
+                    .ThenInclude(m => m.Scores)
                 .FirstOrDefaultAsync(e => e.Id == vm.EvaluationId);
 
             if (evaluation == null)
                 return NotFound();
 
-            if (evaluation.EvaluatorUserId != currentUserId)
+            if (!await CanCurrentCoordinatorAccessEvaluationAsync(evaluation))
             {
-                TempData["Error"] = "You are not assigned to this evaluation.";
-                return RedirectToAction(nameof(MyAssigned));
+                TempData["Error"] = "You are not allowed to update this evaluation.";
+                return RedirectToAction(nameof(Index));
             }
 
             var criteria = await _db.FypEvaluationCriteria
                 .Where(c => c.EvaluationType == FypMilestoneType.MidEvaluation && c.IsActive)
+                .OrderBy(c => c.DisplayOrder)
                 .ToListAsync();
 
-            foreach (var item in vm.Criteria)
+            foreach (var memberVm in vm.Members)
             {
-                var criterion = criteria.FirstOrDefault(c => c.Id == item.CriterionId);
-                if (criterion == null)
-                    continue;
+                var member = evaluation.Members.FirstOrDefault(m => m.Id == memberVm.EvaluationMemberId);
+                if (member == null) continue;
 
-                if (item.AwardedMarks < 0 || item.AwardedMarks > 5)
+                foreach (var scoreVm in memberVm.Scores)
                 {
-                    ModelState.AddModelError(string.Empty, $"{criterion.Title} marks must be between 0 and 5.");
-                }
-            }
+                    var criterion = criteria.FirstOrDefault(c => c.Id == scoreVm.CriterionId);
+                    if (criterion == null) continue;
 
-            if (!ModelState.IsValid)
-                return View(vm);
+                    var marks = scoreVm.AwardedMarks;
+                    if (marks < 0) marks = 0;
+                    if (marks > criterion.MaxMarks) marks = criterion.MaxMarks;
 
-            foreach (var item in vm.Criteria)
-            {
-                var score = evaluation.Scores.FirstOrDefault(s => s.CriterionId == item.CriterionId);
+                    var existingScore = member.Scores.FirstOrDefault(s => s.CriterionId == scoreVm.CriterionId);
 
-                if (score == null)
-                {
-                    score = new FypEvaluationScore
+                    if (existingScore == null)
                     {
-                        CriterionId = item.CriterionId,
-                        AwardedMarks = item.AwardedMarks,
-                        Comment = item.Comment
-                    };
-                    evaluation.Scores.Add(score);
+                        member.Scores.Add(new FypEvaluationMemberScore
+                        {
+                            CriterionId = scoreVm.CriterionId,
+                            AwardedMarks = marks,
+                            Comment = scoreVm.Comment
+                        });
+                    }
+                    else
+                    {
+                        existingScore.AwardedMarks = marks;
+                        existingScore.Comment = scoreVm.Comment;
+                    }
                 }
-                else
-                {
-                    score.AwardedMarks = item.AwardedMarks;
-                    score.Comment = item.Comment;
-                }
+
+                member.TotalMarks = member.Scores.Sum(x => x.AwardedMarks);
+
+                var maxTotal = criteria.Sum(x => x.MaxMarks);
+
+                member.WeightedMarks = maxTotal <= 0 || evaluation.WeightagePercent <= 0
+                    ? 0
+                    : Math.Round((member.TotalMarks / maxTotal) * evaluation.WeightagePercent, 2);
+
+                member.Remarks = memberVm.Remarks;
             }
 
-            evaluation.TotalMarks = evaluation.Scores.Sum(x => x.AwardedMarks);
-            evaluation.WeightedMarks = evaluation.WeightagePercent <= 0
-                ? 0
-                : Math.Round((evaluation.TotalMarks / 40m) * evaluation.WeightagePercent, 2);
+            evaluation.TotalMarks = evaluation.Members.Any()
+                ? Math.Round(evaluation.Members.Average(x => x.TotalMarks), 2)
+                : 0;
+
+            evaluation.WeightedMarks = evaluation.Members.Any()
+                ? Math.Round(evaluation.Members.Average(x => x.WeightedMarks), 2)
+                : 0;
 
             evaluation.EvaluatorName = vm.EvaluatorName;
-            evaluation.Remarks = vm.Remarks;
+            evaluation.Remarks = vm.OverallRemarks;
             evaluation.IsSubmitted = true;
             evaluation.SubmittedAt = DateTime.Now;
-            evaluation.Status = FypEvaluationStatus.Submitted;
+            evaluation.Status = FypEvaluationStatus.Completed;
+            evaluation.IsPublishedToStudent = false;
 
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = "Mid evaluation submitted successfully.";
-            return RedirectToAction(nameof(MyAssigned));
+            TempData["Success"] = "Per-member evaluation saved successfully.";
+            return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Publish(int id)
+        {
+            var evaluation = await _db.FypEvaluations
+                .Include(e => e.StudentGroup)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (evaluation == null)
+                return NotFound();
+
+            if (!await CanCurrentCoordinatorAccessEvaluationAsync(evaluation))
+            {
+                TempData["Error"] = "You are not allowed to publish this evaluation.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (evaluation.Status != FypEvaluationStatus.Completed)
+            {
+                TempData["Error"] = "Only completed evaluations can be published.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            evaluation.IsPublishedToStudent = true;
+            evaluation.Status = FypEvaluationStatus.Published;
+
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Evaluation result published successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<List<string>> GetCurrentCoordinatorProgramCodesAsync()
+        {
+            var currentEmail = GetCurrentUserEmail();
+
+            var committee = await _db.FypCommittees
+                .Include(x => x.CommitteePrograms)
+                .FirstOrDefaultAsync(x =>
+                    x.CoordinatorEmail.ToLower() == currentEmail &&
+                    x.IsActive);
+
+            if (committee == null)
+                return new List<string>();
+
+            return committee.CommitteePrograms
+                .Select(x => x.ProgramCode.Trim().ToUpper())
+                .Distinct()
+                .ToList();
+        }
+
+        private async Task<bool> CanCurrentCoordinatorAccessEvaluationAsync(FypEvaluation evaluation)
+        {
+            var programCodes = await GetCurrentCoordinatorProgramCodesAsync();
+
+            if (!programCodes.Any())
+                return false;
+
+            var groupProgram = evaluation.StudentGroup?.ProgramCode?.Trim().ToUpper();
+
+            return !string.IsNullOrWhiteSpace(groupProgram) &&
+                   programCodes.Contains(groupProgram);
+        }
+
+
+
+        private async Task EnsureEvaluationMembersExistAsync(FypEvaluation evaluation)
+        {
+            if (evaluation.Members != null && evaluation.Members.Any())
+                return;
+
+            var group = await _db.StudentGroups
+                .FirstOrDefaultAsync(g => g.Id == evaluation.StudentGroupId);
+
+            if (group == null)
+                return;
+
+            var memberUserIds = new List<string?> { group.LeaderId, group.Member2Id, group.Member3Id }
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct()
+                .ToList();
+
+            foreach (var userId in memberUserIds)
+            {
+                var user = await _userManager.FindByIdAsync(userId!);
+                if (user == null) continue;
+
+                _db.FypEvaluationMembers.Add(new FypEvaluationMember
+                {
+                    EvaluationId = evaluation.Id,
+                    StudentUserId = user.Id,
+                    StudentName = !string.IsNullOrWhiteSpace(user.FullName)
+                        ? user.FullName
+                        : (user.UserName ?? user.Email ?? "Student"),
+                    RegistrationNo = user.UserName,
+                    TotalMarks = 0,
+                    WeightedMarks = 0
+                });
+            }
+
+            await _db.SaveChangesAsync();
+        }
+
     }
 }

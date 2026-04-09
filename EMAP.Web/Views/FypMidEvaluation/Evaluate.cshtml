@@ -1,239 +1,189 @@
 ﻿@model EMAP.Web.ViewModels.Fyp.FypMidEvaluationFormViewModel
 
 @{
-    ViewData["Title"] = "Mid Evaluation";
+    ViewData["Title"] = "Per Member Mid Evaluation";
+    var totalMax = Model.Criteria.Sum(x => x.MaxMarks);
 }
 
-<div class="mid-eval-page">
+<div class="container py-4">
     <div class="mb-4">
-        <h2 class="mid-eval-title">Mid Evaluation Form</h2>
-        <p class="mid-eval-subtitle">
-            Structured committee-based assessment for FYP mid evaluation.
+        <div class="text-uppercase text-muted fw-semibold small">Coordinator Assessment Panel</div>
+        <h2 class="mb-2">Mid Evaluation — Per Member Rubric</h2>
+        <p class="text-muted mb-0">
+            Each student is evaluated separately under the same group evaluation session.
         </p>
     </div>
 
-    <form asp-action="Evaluate" method="post">
-        <input asp-for="EvaluationId" type="hidden" />
-        <input asp-for="StudentGroupId" type="hidden" />
-        <input asp-for="GroupTitle" type="hidden" />
-        <input asp-for="Batch" type="hidden" />
-        <input asp-for="ProgramCode" type="hidden" />
-        <input asp-for="SupervisorName" type="hidden" />
-        <input asp-for="Venue" type="hidden" />
-        <input asp-for="ScheduledAt" type="hidden" />
-        <input asp-for="WeightagePercent" type="hidden" />
-
-        <!-- GROUP + EVALUATION INFO -->
-        <div class="card shadow-sm border-0 mid-eval-info-card mb-4">
-            <div class="card-body">
-                <div class="mid-eval-section-head mb-3">
-                    <h4 class="mb-1">Evaluation Details</h4>
-                    <p class="text-muted mb-0">Group profile, schedule, and academic evaluation metadata.</p>
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="fw-semibold text-dark">Project Title</div>
+                    <div>@Model.ProjectTitle</div>
                 </div>
+                <div class="col-md-2">
+                    <div class="fw-semibold text-dark">Group ID</div>
+                    <div>@Model.GroupId</div>
+                </div>
+                <div class="col-md-2">
+                    <div class="fw-semibold text-dark">Batch</div>
+                    <div>@Model.Batch</div>
+                </div>
+                <div class="col-md-2">
+                    <div class="fw-semibold text-dark">Program</div>
+                    <div>@Model.ProgramCode</div>
+                </div>
+                <div class="col-md-2">
+                    <div class="fw-semibold text-dark">Weightage</div>
+                    <div>@Model.WeightagePercent %</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="fw-semibold text-dark">Supervisor</div>
+                    <div>@Model.SupervisorName</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="fw-semibold text-dark">Scheduled</div>
+                    <div>@(Model.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="fw-semibold text-dark">Venue</div>
+                    <div>@Model.Venue</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="row g-4">
-                    <div class="col-lg-4">
-                        <div class="mid-eval-info-box">
-                            <div class="mid-eval-label">Project / Group Title</div>
-                            <div class="mid-eval-value">@Model.GroupTitle</div>
-                        </div>
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="EvaluationId" />
+        <input type="hidden" asp-for="GroupId" />
+        <input type="hidden" asp-for="ProjectTitle" />
+        <input type="hidden" asp-for="Batch" />
+        <input type="hidden" asp-for="ProgramCode" />
+        <input type="hidden" asp-for="SupervisorName" />
+        <input type="hidden" asp-for="ScheduledAt" />
+        <input type="hidden" asp-for="Venue" />
+        <input type="hidden" asp-for="WeightagePercent" />
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body bg-light">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-6">
+                        <label asp-for="EvaluatorName" class="form-label fw-semibold">Evaluator Name</label>
+                        <input asp-for="EvaluatorName" class="form-control" />
+                        <span asp-validation-for="EvaluatorName" class="text-danger"></span>
                     </div>
-
-                    <div class="col-lg-2 col-md-4">
-                        <div class="mid-eval-info-box">
-                            <div class="mid-eval-label">Group ID</div>
-                            <div class="mid-eval-value">@Model.StudentGroupId</div>
-                        </div>
+                    <div class="col-md-6">
+                        <label asp-for="OverallRemarks" class="form-label fw-semibold">Overall Evaluation Comment</label>
+                        <textarea asp-for="OverallRemarks" rows="2" class="form-control"></textarea>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="col-lg-2 col-md-4">
-                        <div class="mid-eval-info-box">
-                            <div class="mid-eval-label">Batch</div>
-                            <div class="mid-eval-value">@Model.Batch</div>
+        @for (int i = 0; i < Model.Members.Count; i++)
+        {
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h4 class="mb-1">@Model.Members[i].StudentName</h4>
+                            <div class="text-muted small">
+                                @(!string.IsNullOrWhiteSpace(Model.Members[i].RegistrationNo) ? Model.Members[i].RegistrationNo : "Group Member")
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="col-lg-2 col-md-4">
-                        <div class="mid-eval-info-box">
-                            <div class="mid-eval-label">Program</div>
-                            <div class="mid-eval-value">@Model.ProgramCode</div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-md-4">
-                        <div class="mid-eval-info-box">
-                            <div class="mid-eval-label">Weightage</div>
-                            <div class="mid-eval-value">@Model.WeightagePercent %</div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <div class="mid-eval-info-box">
-                            <div class="mid-eval-label">Supervisor</div>
-                            <div class="mid-eval-value">@Model.SupervisorName</div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <div class="mid-eval-info-box">
-                            <div class="mid-eval-label">Scheduled</div>
-                            <div class="mid-eval-value">
-                                @(Model.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")
+                        <div class="text-end">
+                            <div class="small text-muted">Student Total</div>
+                            <div class="fw-bold fs-5">
+                                <span class="member-total" data-member-index="@i">@Model.Members[i].TotalMarks</span> / @totalMax
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <div class="mid-eval-info-box">
-                            <div class="mid-eval-label">Venue</div>
-                            <div class="mid-eval-value">@Model.Venue</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- RUBRIC SUMMARY -->
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body">
-                <div class="mid-eval-summary-banner">
-                    <div>
-                        <strong>Rubric Structure:</strong>
-                        8 criteria × 5 marks each
-                    </div>
-                    <div>
-                        <strong>Total:</strong> 40
-                    </div>
-                    <div>
-                        <strong>Weighted Result:</strong>
-                        Based on @Model.WeightagePercent%
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- RUBRIC TABLE -->
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body">
-                <div class="mid-eval-section-head mb-3">
-                    <h4 class="mb-1">Rubric Assessment</h4>
-                    <p class="text-muted mb-0">Enter awarded marks and optional comments for each criterion.</p>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle text-center mid-rubric-table">
-                        <thead>
-                            <tr>
-                                @for (int i = 0; i < Model.Criteria.Count; i++)
+                <div class="card-body">
+                    <input type="hidden" asp-for="Members[i].EvaluationMemberId" />
+                    <input type="hidden" asp-for="Members[i].StudentUserId" />
+                    <input type="hidden" asp-for="Members[i].StudentName" />
+                    <input type="hidden" asp-for="Members[i].RegistrationNo" />
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle rubric-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="min-width:260px;">Criterion</th>
+                                    <th style="width:120px;">Max</th>
+                                    <th style="width:150px;">Marks</th>
+                                    <th style="min-width:260px;">Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int j = 0; j < Model.Members[i].Scores.Count; j++)
                                 {
-                                    <th style="min-width:170px;">
-                                        <input asp-for="Criteria[@i].CriterionId" type="hidden" />
-                                        <input asp-for="Criteria[@i].Title" type="hidden" />
-                                        <input asp-for="Criteria[@i].Description" type="hidden" />
-                                        <input asp-for="Criteria[@i].MaxMarks" type="hidden" />
-
-                                        <div class="mid-rubric-title">@Model.Criteria[i].Title</div>
-                                        <div class="mid-rubric-max">Max: 5</div>
-                                    </th>
+                                    <tr>
+                                        <td>
+                                            <strong>@Model.Members[i].Scores[j].CriterionTitle</strong>
+                                            <input type="hidden" asp-for="Members[i].Scores[j].CriterionId" />
+                                            <input type="hidden" asp-for="Members[i].Scores[j].CriterionTitle" />
+                                            <input type="hidden" asp-for="Members[i].Scores[j].MaxMarks" />
+                                        </td>
+                                        <td>@Model.Members[i].Scores[j].MaxMarks</td>
+                                        <td>
+                                            <input asp-for="Members[i].Scores[j].AwardedMarks"
+                                                   class="form-control member-mark-input"
+                                                   type="number"
+                                                   step="0.5"
+                                                   min="0"
+                                                   max="@Model.Members[i].Scores[j].MaxMarks"
+                                                   data-member-index="@i" />
+                                        </td>
+                                        <td>
+                                            <input asp-for="Members[i].Scores[j].Comment" class="form-control" />
+                                        </td>
+                                    </tr>
                                 }
-                                <th style="min-width:130px;">Total</th>
-                                <th style="min-width:150px;">Weighted</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                @for (int i = 0; i < Model.Criteria.Count; i++)
-                                {
-                                    <td>
-                                        <input asp-for="Criteria[@i].AwardedMarks"
-                                               class="form-control text-center score-input mid-score-input"
-                                               type="number"
-                                               step="0.5"
-                                               min="0"
-                                               max="5"
-                                               placeholder="0-5" />
-                                    </td>
-                                }
-
-                                <td>
-                                    <input type="text" id="totalBox" class="form-control fw-bold text-center mid-total-box" readonly />
-                                </td>
-
-                                <td>
-                                    <input type="text" id="weightedBox" class="form-control fw-bold text-center mid-total-box" readonly />
-                                </td>
-                            </tr>
-
-                            <tr>
-                                @for (int i = 0; i < Model.Criteria.Count; i++)
-                                {
-                                    <td>
-                                        <input asp-for="Criteria[@i].Comment"
-                                               class="form-control mid-comment-input"
-                                               placeholder="Comment" />
-                                    </td>
-                                }
-
-                                <td class="fw-semibold align-middle bg-light">/ 40</td>
-                                <td class="fw-semibold align-middle bg-light">/ @Model.WeightagePercent</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- FINAL REMARKS -->
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body">
-                <div class="mid-eval-section-head mb-3">
-                    <h4 class="mb-1">Final Evaluation Notes</h4>
-                    <p class="text-muted mb-0">Provide evaluator identity and overall academic remarks.</p>
-                </div>
-
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <label asp-for="EvaluatorName" class="form-label fw-semibold">Evaluator Name</label>
-                        <input asp-for="EvaluatorName" class="form-control" placeholder="Enter evaluator name" />
+                            </tbody>
+                        </table>
                     </div>
 
-                    <div class="col-md-12">
-                        <label asp-for="Remarks" class="form-label fw-semibold">Evaluation Comment</label>
-                        <textarea asp-for="Remarks" rows="4" class="form-control"
-                                  placeholder="Write overall evaluation comments, strengths, weaknesses, and recommendations."></textarea>
+                    <div class="mt-3">
+                        <label asp-for="Members[i].Remarks" class="form-label fw-semibold">Student Remarks</label>
+                        <textarea asp-for="Members[i].Remarks" rows="2" class="form-control"></textarea>
                     </div>
                 </div>
             </div>
+        }
 
-            <div class="card-footer bg-white d-flex gap-2">
-                <button type="submit" class="btn btn-success">Submit Evaluation</button>
-                <a asp-action="MyAssigned" class="btn btn-secondary">Back</a>
-            </div>
+        <div class="d-flex justify-content-end gap-2 pb-4">
+            <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+            <button type="submit" class="btn btn-primary">Save Evaluation</button>
         </div>
     </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
-        function updateTotals() {
-            let total = 0;
-            document.querySelectorAll('.score-input').forEach(function (input) {
-                const val = parseFloat(input.value);
-                if (!isNaN(val)) total += val;
+        function updateMemberTotals() {
+            const totals = {};
+
+            document.querySelectorAll('.member-mark-input').forEach(input => {
+                const idx = input.dataset.memberIndex;
+                const value = parseFloat(input.value || '0');
+                totals[idx] = (totals[idx] || 0) + value;
             });
 
-            const weightage = parseFloat('@Model.WeightagePercent');
-            const weighted = weightage > 0 ? ((total / 40.0) * weightage) : 0;
-
-            document.getElementById('totalBox').value = total.toFixed(2);
-            document.getElementById('weightedBox').value = weighted.toFixed(2);
+            document.querySelectorAll('.member-total').forEach(span => {
+                const idx = span.dataset.memberIndex;
+                span.textContent = (totals[idx] || 0).toFixed(2);
+            });
         }
 
-        document.querySelectorAll('.score-input').forEach(function (input) {
-            input.addEventListener('input', updateTotals);
+        document.querySelectorAll('.member-mark-input').forEach(input => {
+            input.addEventListener('input', updateMemberTotals);
         });
 
-        updateTotals();
+        updateMemberTotals();
     </script>
 }

@@ -1,55 +1,110 @@
 ﻿@model IEnumerable<EMAP.Domain.Fyp.FypEvaluation>
 
 @{
-    ViewData["Title"] = "Mid Evaluations";
+    ViewData["Title"] = "Evaluation Management";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Mid Evaluations</h2>
-    <a asp-action="Create" class="btn btn-primary">Create Mid Evaluation</a>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <div class="text-uppercase text-muted fw-semibold small">Coordinator Panel</div>
+        <h2 class="mb-1">Evaluation Management</h2>
+        <p class="text-muted mb-0">
+            Create evaluation sessions, assess each group member separately, save results, and publish later when needed.
+        </p>
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary">
+        Create Evaluation
+    </a>
 </div>
 
 <div class="card shadow-sm border-0">
     <div class="card-body">
-        <table class="table table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>Group</th>
-                    <th>Program</th>
-                    <th>Batch</th>
-                    <th>Scheduled</th>
-                    <th>Venue</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
                     <tr>
-                        <td>@item.StudentGroup?.TentativeProjectTitle</td>
-                        <td>@item.StudentGroup?.ProgramCode</td>
-                        <td>@item.StudentGroup?.FypCall?.Batch</td>
-                        <td>@(item.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")</td>
-                        <td>@item.Venue</td>
-                        <td>@item.TotalMarks</td>
-                        <td>
-                            @if (item.IsSubmitted)
-                            {
-                                <span class="badge bg-success">Submitted</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning text-dark">Pending</span>
-                            }
-                        </td>
-                        <td>
-                            <a asp-action="Evaluate" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Open</a>
-                        </td>
+                        <th>Group</th>
+                        <th>Program</th>
+                        <th>Batch</th>
+                        <th>Scheduled</th>
+                        <th>Venue</th>
+                        <th>Total</th>
+                        <th>Weightage</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">
+                                No evaluations found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@item.StudentGroup?.TentativeProjectTitle</div>
+                                    <div class="text-muted small">Group #@item.StudentGroupId</div>
+                                </td>
+                                <td>@item.StudentGroup?.ProgramCode</td>
+                                <td>@item.StudentGroup?.FypCall?.Batch</td>
+                                <td>@(item.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")</td>
+                                <td>@item.Venue</td>
+                                <td>@item.TotalMarks</td>
+                                <td>@item.WeightagePercent %</td>
+                                <td>
+                                    @if (item.Status == EMAP.Domain.Fyp.FypEvaluationStatus.Draft)
+                                    {
+                                        <span class="badge bg-secondary">Draft</span>
+                                    }
+                                    else if (item.Status == EMAP.Domain.Fyp.FypEvaluationStatus.Scheduled)
+                                    {
+                                        <span class="badge bg-info text-dark">Scheduled</span>
+                                    }
+                                    else if (item.Status == EMAP.Domain.Fyp.FypEvaluationStatus.Completed)
+                                    {
+                                        <span class="badge bg-success">Completed</span>
+                                    }
+                                    else if (item.Status == EMAP.Domain.Fyp.FypEvaluationStatus.Published)
+                                    {
+                                        <span class="badge bg-primary">Published</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end flex-wrap gap-2">
+                                        <a asp-action="Evaluate" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                            Conduct
+                                        </a>
+
+                                        @if (item.Status == EMAP.Domain.Fyp.FypEvaluationStatus.Completed && !item.IsPublishedToStudent)
+                                        {
+                                            <form asp-action="Publish" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    Publish
+                                                </button>
+                                            </form>
+                                        }
+
+                                        @if (item.IsPublishedToStudent)
+                                        {
+                                            <span class="badge bg-light text-dark border align-self-center">Visible to Student</span>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

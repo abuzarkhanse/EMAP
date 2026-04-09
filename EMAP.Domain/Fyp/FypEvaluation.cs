@@ -15,17 +15,17 @@ namespace EMAP.Domain.Fyp
 
         public string EvaluatorUserId { get; set; } = string.Empty;
 
-        public string? EvaluatorName { get; set; }
-
         public DateTime? ScheduledAt { get; set; }
 
         public decimal TotalMarks { get; set; }
 
-        public decimal WeightagePercent { get; set; } = 20;
+        public decimal WeightagePercent { get; set; }
 
         public decimal WeightedMarks { get; set; }
 
         public string? Remarks { get; set; }
+
+        public string? EvaluatorName { get; set; }
 
         public FypEvaluationStatus Status { get; set; } = FypEvaluationStatus.Draft;
 
@@ -33,7 +33,11 @@ namespace EMAP.Domain.Fyp
 
         public DateTime? SubmittedAt { get; set; }
 
+        // old group-level scores, keep for compatibility if already used
         public ICollection<FypEvaluationScore> Scores { get; set; } = new List<FypEvaluationScore>();
+
+        // new per-member evaluation
+        public ICollection<FypEvaluationMember> Members { get; set; } = new List<FypEvaluationMember>();
 
         public string? Venue { get; set; }
 

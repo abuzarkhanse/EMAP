@@ -30,6 +30,9 @@ namespace EMAP.Infrastructure.Data
         public DbSet<FypCommittee> FypCommittees { get; set; }
         public DbSet<FypCommitteeProgram> FypCommitteePrograms { get; set; }
 
+        public DbSet<FypEvaluationMember> FypEvaluationMembers { get; set; } = default!;
+        public DbSet<FypEvaluationMemberScore> FypEvaluationMemberScores { get; set; } = default!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -422,6 +425,57 @@ namespace EMAP.Infrastructure.Data
                       .IsRequired();
 
                 entity.HasIndex(x => new { x.FypCommitteeId, x.ProgramCode }).IsUnique();
+            });
+
+            modelBuilder.Entity<FypEvaluationMember>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.StudentUserId)
+                    .IsRequired()
+                    .HasMaxLength(450);
+
+                entity.Property(x => x.StudentName)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(x => x.RegistrationNo)
+                    .HasMaxLength(100);
+
+                entity.Property(x => x.TotalMarks)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.WeightedMarks)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Remarks)
+                    .HasMaxLength(1000);
+
+                entity.HasOne(x => x.Evaluation)
+                    .WithMany(x => x.Members)
+                    .HasForeignKey(x => x.EvaluationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<FypEvaluationMemberScore>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.AwardedMarks)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Comment)
+                    .HasMaxLength(500);
+
+                entity.HasOne(x => x.EvaluationMember)
+                    .WithMany(x => x.Scores)
+                    .HasForeignKey(x => x.EvaluationMemberId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(x => x.Criterion)
+                    .WithMany()
+                    .HasForeignKey(x => x.CriterionId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using EMAP.Domain.Fyp;
+using EMAP.Web.ViewModels.Fyp;
 
 namespace EMAP.Web.ViewModels.Fyp
 {
@@ -48,5 +49,8 @@ namespace EMAP.Web.ViewModels.Fyp
 
         public List<EMAP.Domain.Fyp.FypMilestone> EvaluationMilestones { get; set; } = new();
         public List<EMAP.Domain.Fyp.FypEvaluation> PublishedEvaluations { get; set; } = new();
+
+        public List<StudentPublishedEvaluationCardViewModel> PublishedMemberEvaluations { get; set; } = new();
+
     }
 }

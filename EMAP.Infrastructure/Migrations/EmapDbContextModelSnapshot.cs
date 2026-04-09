@@ -497,6 +497,78 @@ namespace EMAP.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EvaluationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegistrationNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("StudentName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("StudentUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("TotalMarks")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("WeightedMarks")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EvaluationId");
+
+                    b.ToTable("FypEvaluationMembers");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationMemberScore", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AwardedMarks")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("CriterionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EvaluationMemberId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CriterionId");
+
+                    b.HasIndex("EvaluationMemberId");
+
+                    b.ToTable("FypEvaluationMemberScores");
+                });
+
             modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationScore", b =>
                 {
                     b.Property<int>("Id")
@@ -1225,6 +1297,36 @@ namespace EMAP.Infrastructure.Migrations
                     b.Navigation("StudentGroup");
                 });
 
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationMember", b =>
+                {
+                    b.HasOne("EMAP.Domain.Fyp.FypEvaluation", "Evaluation")
+                        .WithMany("Members")
+                        .HasForeignKey("EvaluationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Evaluation");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationMemberScore", b =>
+                {
+                    b.HasOne("EMAP.Domain.Fyp.FypEvaluationCriterion", "Criterion")
+                        .WithMany()
+                        .HasForeignKey("CriterionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EMAP.Domain.Fyp.FypEvaluationMember", "EvaluationMember")
+                        .WithMany("Scores")
+                        .HasForeignKey("EvaluationMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Criterion");
+
+                    b.Navigation("EvaluationMember");
+                });
+
             modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationScore", b =>
                 {
                     b.HasOne("EMAP.Domain.Fyp.FypEvaluationCriterion", "Criterion")
@@ -1390,10 +1492,17 @@ namespace EMAP.Infrastructure.Migrations
 
             modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluation", b =>
                 {
+                    b.Navigation("Members");
+
                     b.Navigation("Scores");
                 });
 
             modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationCriterion", b =>
+                {
+                    b.Navigation("Scores");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationMember", b =>
                 {
                     b.Navigation("Scores");
                 });
