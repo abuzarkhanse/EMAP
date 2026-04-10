@@ -39,9 +39,108 @@ namespace EMAP.Web.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return User.Identity?.Name ?? "Coordinator";
+
             return !string.IsNullOrWhiteSpace(user.FullName)
                 ? user.FullName
                 : (user.Email ?? user.UserName ?? "Coordinator");
+        }
+
+        private static List<FypMilestoneType> SupportedEvaluationTypes()
+        {
+            return new List<FypMilestoneType>
+            {
+                FypMilestoneType.MidEvaluation,
+                FypMilestoneType.PreFinalEvaluation,
+                FypMilestoneType.FinalEvaluation
+            };
+        }
+
+        private async Task<List<string>> GetCurrentCoordinatorProgramCodesAsync()
+        {
+            var currentEmail = GetCurrentUserEmail();
+
+            var committee = await _db.FypCommittees
+                .Include(x => x.CommitteePrograms)
+                .FirstOrDefaultAsync(x =>
+                    x.CoordinatorEmail.ToLower() == currentEmail &&
+                    x.IsActive);
+
+            if (committee == null)
+                return new List<string>();
+
+            return committee.CommitteePrograms
+                .Select(x => x.ProgramCode.Trim().ToUpper())
+                .Distinct()
+                .ToList();
+        }
+
+        private async Task<bool> CanCurrentCoordinatorAccessEvaluationAsync(FypEvaluation evaluation)
+        {
+            var programCodes = await GetCurrentCoordinatorProgramCodesAsync();
+
+            if (!programCodes.Any())
+                return false;
+
+            var groupProgram = evaluation.StudentGroup?.ProgramCode?.Trim().ToUpper();
+
+            return !string.IsNullOrWhiteSpace(groupProgram) &&
+                   programCodes.Contains(groupProgram);
+        }
+
+        private async Task EnsureEvaluationMembersExistAsync(FypEvaluation evaluation)
+        {
+            if (evaluation.Members != null && evaluation.Members.Any())
+                return;
+
+            var group = await _db.StudentGroups
+                .FirstOrDefaultAsync(g => g.Id == evaluation.StudentGroupId);
+
+            if (group == null)
+                return;
+
+            var memberUserIds = new List<string?> { group.LeaderId, group.Member2Id, group.Member3Id }
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct()
+                .ToList();
+
+            foreach (var userId in memberUserIds)
+            {
+                var user = await _userManager.FindByIdAsync(userId!);
+                if (user == null) continue;
+
+                _db.FypEvaluationMembers.Add(new FypEvaluationMember
+                {
+                    EvaluationId = evaluation.Id,
+                    StudentUserId = user.Id,
+                    StudentName = !string.IsNullOrWhiteSpace(user.FullName)
+                        ? user.FullName
+                        : (user.UserName ?? user.Email ?? "Student"),
+                    RegistrationNo = user.UserName,
+                    TotalMarks = 0,
+                    WeightedMarks = 0
+                });
+            }
+
+            await _db.SaveChangesAsync();
+        }
+
+        private async Task<List<FypEvaluationCriterion>> GetCriteriaForEvaluationTypeAsync(FypMilestoneType milestoneType)
+        {
+            var criteria = await _db.FypEvaluationCriteria
+                .Where(c => c.EvaluationType == milestoneType && c.IsActive)
+                .OrderBy(c => c.DisplayOrder)
+                .ToListAsync();
+
+            // Fallback: use MidEvaluation rubric for Final / PreFinal if not seeded yet
+            if (!criteria.Any() && milestoneType != FypMilestoneType.MidEvaluation)
+            {
+                criteria = await _db.FypEvaluationCriteria
+                    .Where(c => c.EvaluationType == FypMilestoneType.MidEvaluation && c.IsActive)
+                    .OrderBy(c => c.DisplayOrder)
+                    .ToListAsync();
+            }
+
+            return criteria;
         }
 
         public async Task<IActionResult> Index()
@@ -64,6 +163,8 @@ namespace EMAP.Web.Controllers
                 .Select(x => x.ProgramCode.Trim().ToUpper())
                 .ToList();
 
+            var allowedTypes = SupportedEvaluationTypes();
+
             var data = await _db.FypEvaluations
                 .Include(e => e.StudentGroup)
                     .ThenInclude(g => g.FypCall)
@@ -71,7 +172,7 @@ namespace EMAP.Web.Controllers
                     .ThenInclude(g => g.Supervisor)
                 .Include(e => e.Milestone)
                 .Include(e => e.Scores)
-                .Where(e => e.Milestone.Type == FypMilestoneType.MidEvaluation)
+                .Where(e => allowedTypes.Contains(e.Milestone.Type))
                 .Where(e =>
                     e.StudentGroup != null &&
                     !string.IsNullOrWhiteSpace(e.StudentGroup.ProgramCode) &&
@@ -103,9 +204,12 @@ namespace EMAP.Web.Controllers
                 .Select(x => x.ProgramCode.Trim().ToUpper())
                 .ToList();
 
-            var midMilestones = await _db.FypMilestones
-                .Where(m => m.Type == FypMilestoneType.MidEvaluation && m.IsActive)
-                .OrderBy(m => m.Title)
+            var allowedTypes = SupportedEvaluationTypes();
+
+            var milestones = await _db.FypMilestones
+                .Where(m => allowedTypes.Contains(m.Type) && m.IsActive)
+                .OrderBy(m => m.Type)
+                .ThenBy(m => m.Title)
                 .ToListAsync();
 
             var groups = await _db.StudentGroups
@@ -117,7 +221,12 @@ namespace EMAP.Web.Controllers
                 .OrderBy(g => g.Id)
                 .ToListAsync();
 
-            ViewBag.Milestones = new SelectList(midMilestones, "Id", "Title");
+            ViewBag.Milestones = new SelectList(milestones.Select(m => new
+            {
+                m.Id,
+                Text = $"{GetTypeLabel(m.Type)} - {m.Title}"
+            }), "Id", "Text");
+
             ViewBag.Groups = new SelectList(groups.Select(g => new
             {
                 g.Id,
@@ -168,6 +277,13 @@ namespace EMAP.Web.Controllers
                 return RedirectToAction(nameof(Create));
             }
 
+            var milestone = await _db.FypMilestones.FirstOrDefaultAsync(m => m.Id == milestoneId && m.IsActive);
+            if (milestone == null || !SupportedEvaluationTypes().Contains(milestone.Type))
+            {
+                TempData["Error"] = "Invalid evaluation type selected.";
+                return RedirectToAction(nameof(Create));
+            }
+
             var exists = await _db.FypEvaluations.AnyAsync(e =>
                 e.StudentGroupId == studentGroupId &&
                 e.MilestoneId == milestoneId &&
@@ -175,7 +291,7 @@ namespace EMAP.Web.Controllers
 
             if (exists)
             {
-                TempData["Error"] = "Mid evaluation already exists for this group.";
+                TempData["Error"] = "This evaluation already exists for the selected group.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -193,7 +309,7 @@ namespace EMAP.Web.Controllers
                 CommitteeMembers = string.IsNullOrWhiteSpace(committeeMembers) ? evaluatorName : committeeMembers,
                 WeightagePercent = weightagePercent,
                 WeightedMarks = 0,
-                Status = FypEvaluationStatus.Draft,
+                Status = FypEvaluationStatus.Scheduled,
                 IsSubmitted = false,
                 TotalMarks = 0
             };
@@ -201,7 +317,6 @@ namespace EMAP.Web.Controllers
             _db.FypEvaluations.Add(evaluation);
             await _db.SaveChangesAsync();
 
-            // Create per-member evaluation rows for all students in the group
             var memberUserIds = new List<string?> { group.LeaderId, group.Member2Id, group.Member3Id }
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Distinct()
@@ -227,7 +342,7 @@ namespace EMAP.Web.Controllers
 
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = "Mid evaluation created successfully.";
+            TempData["Success"] = $"{GetTypeLabel(milestone.Type)} created successfully.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -241,6 +356,8 @@ namespace EMAP.Web.Controllers
                 return View(new List<FypEvaluation>());
             }
 
+            var allowedTypes = SupportedEvaluationTypes();
+
             var data = await _db.FypEvaluations
                 .Include(e => e.StudentGroup)
                     .ThenInclude(g => g.FypCall)
@@ -248,7 +365,7 @@ namespace EMAP.Web.Controllers
                     .ThenInclude(g => g.Supervisor)
                 .Include(e => e.Milestone)
                 .Include(e => e.Scores)
-                .Where(e => e.Milestone.Type == FypMilestoneType.MidEvaluation)
+                .Where(e => allowedTypes.Contains(e.Milestone.Type))
                 .Where(e =>
                     e.StudentGroup != null &&
                     !string.IsNullOrWhiteSpace(e.StudentGroup.ProgramCode) &&
@@ -267,6 +384,7 @@ namespace EMAP.Web.Controllers
                     .ThenInclude(g => g.FypCall)
                 .Include(e => e.StudentGroup)
                     .ThenInclude(g => g.Supervisor)
+                .Include(e => e.Milestone)
                 .Include(e => e.Members)
                     .ThenInclude(m => m.Scores)
                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -282,12 +400,12 @@ namespace EMAP.Web.Controllers
 
             await EnsureEvaluationMembersExistAsync(evaluation);
 
-            // Reload after creating members
             evaluation = await _db.FypEvaluations
                 .Include(e => e.StudentGroup)
                     .ThenInclude(g => g.FypCall)
                 .Include(e => e.StudentGroup)
                     .ThenInclude(g => g.Supervisor)
+                .Include(e => e.Milestone)
                 .Include(e => e.Members)
                     .ThenInclude(m => m.Scores)
                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -295,10 +413,7 @@ namespace EMAP.Web.Controllers
             if (evaluation == null)
                 return NotFound();
 
-            var criteria = await _db.FypEvaluationCriteria
-                .Where(c => c.EvaluationType == FypMilestoneType.MidEvaluation && c.IsActive)
-                .OrderBy(c => c.DisplayOrder)
-                .ToListAsync();
+            var criteria = await GetCriteriaForEvaluationTypeAsync(evaluation.Milestone.Type);
 
             var vm = new FypMidEvaluationFormViewModel
             {
@@ -351,6 +466,9 @@ namespace EMAP.Web.Controllers
                 vm.Members.Add(row);
             }
 
+            ViewBag.EvaluationTypeLabel = GetTypeLabel(evaluation.Milestone.Type);
+            ViewBag.EvaluationTitle = evaluation.Milestone.Title;
+
             return View(vm);
         }
 
@@ -360,6 +478,7 @@ namespace EMAP.Web.Controllers
         {
             var evaluation = await _db.FypEvaluations
                 .Include(e => e.StudentGroup)
+                .Include(e => e.Milestone)
                 .Include(e => e.Members)
                     .ThenInclude(m => m.Scores)
                 .FirstOrDefaultAsync(e => e.Id == vm.EvaluationId);
@@ -373,10 +492,7 @@ namespace EMAP.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var criteria = await _db.FypEvaluationCriteria
-                .Where(c => c.EvaluationType == FypMilestoneType.MidEvaluation && c.IsActive)
-                .OrderBy(c => c.DisplayOrder)
-                .ToListAsync();
+            var criteria = await GetCriteriaForEvaluationTypeAsync(evaluation.Milestone.Type);
 
             foreach (var memberVm in vm.Members)
             {
@@ -438,7 +554,7 @@ namespace EMAP.Web.Controllers
 
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = "Per-member evaluation saved successfully.";
+            TempData["Success"] = "Evaluation saved successfully.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -448,6 +564,7 @@ namespace EMAP.Web.Controllers
         {
             var evaluation = await _db.FypEvaluations
                 .Include(e => e.StudentGroup)
+                .Include(e => e.Milestone)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (evaluation == null)
@@ -470,80 +587,19 @@ namespace EMAP.Web.Controllers
 
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = "Evaluation result published successfully.";
+            TempData["Success"] = $"{GetTypeLabel(evaluation.Milestone.Type)} result published successfully.";
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<List<string>> GetCurrentCoordinatorProgramCodesAsync()
+        private static string GetTypeLabel(FypMilestoneType type)
         {
-            var currentEmail = GetCurrentUserEmail();
-
-            var committee = await _db.FypCommittees
-                .Include(x => x.CommitteePrograms)
-                .FirstOrDefaultAsync(x =>
-                    x.CoordinatorEmail.ToLower() == currentEmail &&
-                    x.IsActive);
-
-            if (committee == null)
-                return new List<string>();
-
-            return committee.CommitteePrograms
-                .Select(x => x.ProgramCode.Trim().ToUpper())
-                .Distinct()
-                .ToList();
-        }
-
-        private async Task<bool> CanCurrentCoordinatorAccessEvaluationAsync(FypEvaluation evaluation)
-        {
-            var programCodes = await GetCurrentCoordinatorProgramCodesAsync();
-
-            if (!programCodes.Any())
-                return false;
-
-            var groupProgram = evaluation.StudentGroup?.ProgramCode?.Trim().ToUpper();
-
-            return !string.IsNullOrWhiteSpace(groupProgram) &&
-                   programCodes.Contains(groupProgram);
-        }
-
-
-
-        private async Task EnsureEvaluationMembersExistAsync(FypEvaluation evaluation)
-        {
-            if (evaluation.Members != null && evaluation.Members.Any())
-                return;
-
-            var group = await _db.StudentGroups
-                .FirstOrDefaultAsync(g => g.Id == evaluation.StudentGroupId);
-
-            if (group == null)
-                return;
-
-            var memberUserIds = new List<string?> { group.LeaderId, group.Member2Id, group.Member3Id }
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .Distinct()
-                .ToList();
-
-            foreach (var userId in memberUserIds)
+            return type switch
             {
-                var user = await _userManager.FindByIdAsync(userId!);
-                if (user == null) continue;
-
-                _db.FypEvaluationMembers.Add(new FypEvaluationMember
-                {
-                    EvaluationId = evaluation.Id,
-                    StudentUserId = user.Id,
-                    StudentName = !string.IsNullOrWhiteSpace(user.FullName)
-                        ? user.FullName
-                        : (user.UserName ?? user.Email ?? "Student"),
-                    RegistrationNo = user.UserName,
-                    TotalMarks = 0,
-                    WeightedMarks = 0
-                });
-            }
-
-            await _db.SaveChangesAsync();
+                FypMilestoneType.MidEvaluation => "Mid Evaluation",
+                FypMilestoneType.PreFinalEvaluation => "Pre-Final Evaluation",
+                FypMilestoneType.FinalEvaluation => "Final Evaluation",
+                _ => "Evaluation"
+            };
         }
-
     }
 }

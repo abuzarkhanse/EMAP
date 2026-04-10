@@ -797,5 +797,37 @@ namespace EMAP.Web.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+
+
+        [Authorize]
+        public async Task<IActionResult> Fyp2Portal()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrWhiteSpace(userId))
+                return Challenge();
+
+            var group = await _db.StudentGroups
+                .Include(g => g.FypCall)
+                .Include(g => g.Supervisor)
+                .FirstOrDefaultAsync(g =>
+                    g.LeaderId == userId ||
+                    g.Member2Id == userId ||
+                    g.Member3Id == userId);
+
+            if (group == null)
+            {
+                TempData["Error"] = "You are not assigned to any FYP group.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (group.CurrentStage != EMAP.Domain.Fyp.FypStage.Fyp2)
+            {
+                TempData["Error"] = "Your group has not yet been promoted to FYP-2.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(group);
+        }
     }
 }

@@ -684,6 +684,86 @@ namespace EMAP.Web.Controllers
 
             return RedirectToAction(nameof(ChapterApprovals));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FinalizeFyp1(int groupId)
+        {
+            var group = await _db.StudentGroups
+                .Include(g => g.FypCall)
+                .FirstOrDefaultAsync(g => g.Id == groupId);
+
+            if (group == null)
+            {
+                TempData["Error"] = "Student group not found.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            if (group.CurrentStage != FypStage.Fyp1)
+            {
+                TempData["Error"] = "This group is not currently in FYP-1.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            var finalEvaluation = await _db.FypEvaluations
+                .Include(e => e.Milestone)
+                .Where(e => e.StudentGroupId == group.Id)
+                .Where(e => e.Milestone.Type == FypMilestoneType.FinalEvaluation)
+                .OrderByDescending(e => e.SubmittedAt)
+                .FirstOrDefaultAsync();
+
+            if (finalEvaluation == null)
+            {
+                TempData["Error"] = "Final evaluation has not been created for this group.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            if (finalEvaluation.Status != FypEvaluationStatus.Completed &&
+                finalEvaluation.Status != FypEvaluationStatus.Published)
+            {
+                TempData["Error"] = "Final evaluation must be completed before finalizing FYP-1.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            group.CurrentStage = FypStage.Fyp2;
+
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "FYP-1 finalized successfully. Group has been promoted to FYP-2.";
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        public async Task<IActionResult> FinalizeFyp1Groups()
+        {
+            var currentEmail = User.FindFirstValue(ClaimTypes.Email)?.Trim().ToLower()
+                ?? User.Identity?.Name?.Trim().ToLower()
+                ?? string.Empty;
+
+            var committee = await _db.FypCommittees
+                .Include(x => x.CommitteePrograms)
+                .FirstOrDefaultAsync(x => x.CoordinatorEmail.ToLower() == currentEmail && x.IsActive);
+
+            if (committee == null)
+            {
+                TempData["Error"] = "No active committee assigned to you.";
+                return View(new List<StudentGroup>());
+            }
+
+            var programCodes = committee.CommitteePrograms
+                .Select(x => x.ProgramCode.Trim().ToUpper())
+                .ToList();
+
+            var groups = await _db.StudentGroups
+                .Include(g => g.FypCall)
+                .Include(g => g.Supervisor)
+                .Where(g => g.CurrentStage == FypStage.Fyp1)
+                .Where(g => !string.IsNullOrWhiteSpace(g.ProgramCode) &&
+                            programCodes.Contains(g.ProgramCode.ToUpper()))
+                .OrderBy(g => g.Id)
+                .ToListAsync();
+
+            return View(groups);
+        }
     }
 
     public class CoordinatorChaptersVm

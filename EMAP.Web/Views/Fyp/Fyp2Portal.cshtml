@@ -1,0 +1,59 @@
+﻿@model EMAP.Domain.Fyp.StudentGroup
+
+@{
+    ViewData["Title"] = "FYP-2 Portal";
+}
+
+<div class="mb-4">
+    <div class="text-uppercase text-muted fw-semibold small">Student Portal</div>
+    <h2 class="mb-1">FYP-2 Portal</h2>
+    <p class="text-muted mb-0">
+        Welcome to the second phase of your Final Year Project.
+    </p>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="alert alert-info mb-0">
+            <strong>Group promoted successfully.</strong>
+            You are now working in <strong>FYP-2</strong>.
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="fw-semibold text-dark">Project Title</div>
+                <div>@Model.TentativeProjectTitle</div>
+            </div>
+            <div class="col-md-2">
+                <div class="fw-semibold text-dark">Group ID</div>
+                <div>@Model.Id</div>
+            </div>
+            <div class="col-md-2">
+                <div class="fw-semibold text-dark">Program</div>
+                <div>@Model.ProgramCode</div>
+            </div>
+            <div class="col-md-2">
+                <div class="fw-semibold text-dark">Stage</div>
+                <div>@Model.CurrentStage</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h4 class="mb-3">FYP-2 Workflow</h4>
+        <ul class="mb-0">
+            <li>System Implementation</li>
+            <li>System Testing and Development</li>
+            <li>Result and Discussion</li>
+            <li>Mid Evaluation</li>
+            <li>Pre-Final Evaluation</li>
+            <li>Final Evaluation</li>
+        </ul>
+    </div>
+</div>

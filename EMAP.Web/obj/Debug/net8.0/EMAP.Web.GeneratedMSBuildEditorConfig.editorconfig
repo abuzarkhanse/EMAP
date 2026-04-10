@@ -122,6 +122,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ29vcmRpbmF0b3JcRWRpdENoYXB0ZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Dev/abuzarkhanse/EMAP/EMAP.Web/Views/FypCoordinator/FinalizeFyp1Groups.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ29vcmRpbmF0b3JcRmluYWxpemVGeXAxR3JvdXBzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Dev/abuzarkhanse/EMAP/EMAP.Web/Views/FypCoordinator/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ29vcmRpbmF0b3JcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -180,6 +184,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Dev/abuzarkhanse/EMAP/EMAP.Web/Views/Fyp/CreateGroup.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwXENyZWF0ZUdyb3VwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Dev/abuzarkhanse/EMAP/EMAP.Web/Views/Fyp/Fyp2Portal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwXEZ5cDJQb3J0YWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Dev/abuzarkhanse/EMAP/EMAP.Web/Views/Fyp/Index.cshtml]

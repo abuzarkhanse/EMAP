@@ -1,50 +1,93 @@
 ﻿@model IEnumerable<EMAP.Domain.Fyp.FypEvaluation>
+@using EMAP.Domain.Fyp
 
 @{
-    ViewData["Title"] = "My Mid Evaluations";
+    ViewData["Title"] = "Conduct Evaluations";
 }
 
-<h2 class="mb-4">My Mid Evaluations</h2>
+<div class="mb-4">
+    <div class="text-uppercase text-muted fw-semibold small">Coordinator Panel</div>
+    <h2 class="mb-1">Conduct Evaluations</h2>
+    <p class="text-muted mb-0">
+        Open Mid, Pre-Final, and Final evaluations assigned to your committee programs.
+    </p>
+</div>
 
 <div class="card shadow-sm border-0">
     <div class="card-body">
-        <table class="table table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>Group</th>
-                    <th>Program</th>
-                    <th>Batch</th>
-                    <th>Scheduled</th>
-                    <th>Venue</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
                     <tr>
-                        <td>@item.StudentGroup?.TentativeProjectTitle</td>
-                        <td>@item.StudentGroup?.ProgramCode</td>
-                        <td>@item.StudentGroup?.FypCall?.Batch</td>
-                        <td>@(item.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")</td>
-                        <td>@item.Venue</td>
-                        <td>
-                            @if (item.IsSubmitted)
-                            {
-                                <span class="badge bg-success">Submitted</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning text-dark">Pending</span>
-                            }
-                        </td>
-                        <td>
-                            <a asp-action="Evaluate" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Evaluate</a>
-                        </td>
+                        <th>Type</th>
+                        <th>Group</th>
+                        <th>Program</th>
+                        <th>Batch</th>
+                        <th>Scheduled</th>
+                        <th>Venue</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                No evaluations available for your committee.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            var typeLabel = item.Milestone?.Type switch
+                            {
+                                FypMilestoneType.MidEvaluation => "Mid Evaluation",
+                                FypMilestoneType.PreFinalEvaluation => "Pre-Final Evaluation",
+                                FypMilestoneType.FinalEvaluation => "Final Evaluation",
+                                _ => "Evaluation"
+                            };
+
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@typeLabel</div>
+                                    <div class="text-muted small">@item.Milestone?.Title</div>
+                                </td>
+                                <td>@item.StudentGroup?.TentativeProjectTitle</td>
+                                <td>@item.StudentGroup?.ProgramCode</td>
+                                <td>@item.StudentGroup?.FypCall?.Batch</td>
+                                <td>@(item.ScheduledAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")</td>
+                                <td>@item.Venue</td>
+                                <td>
+                                    @if (item.Status == FypEvaluationStatus.Draft)
+                                    {
+                                        <span class="badge bg-secondary">Draft</span>
+                                    }
+                                    else if (item.Status == FypEvaluationStatus.Scheduled)
+                                    {
+                                        <span class="badge bg-info text-dark">Scheduled</span>
+                                    }
+                                    else if (item.Status == FypEvaluationStatus.Completed)
+                                    {
+                                        <span class="badge bg-success">Completed</span>
+                                    }
+                                    else if (item.Status == FypEvaluationStatus.Published)
+                                    {
+                                        <span class="badge bg-primary">Published</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Evaluate" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                        Conduct
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

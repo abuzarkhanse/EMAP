@@ -60,21 +60,21 @@
             <div class="coord-card-body">
                 <h3>Evaluation Management</h3>
                 <p>
-                    Create evaluation events, conduct rubric-based assessment, save results as completed, and publish them later for students when required.
+                    Create, conduct, complete, and publish Mid, Pre-Final, and Final evaluations using rubric-based assessment.
                 </p>
 
                 <div class="coord-badges">
-                    <span class="coord-badge">Mid / Final / Pre-Final</span>
-                    <span class="coord-badge">Rubric Based</span>
+                    <span class="coord-badge">Mid / Pre-Final / Final</span>
+                    <span class="coord-badge">Per Member Rubric</span>
                     <span class="coord-badge">Publish Later</span>
                 </div>
             </div>
             <div class="coord-actions">
-                <a asp-controller="FypEvaluation" asp-action="Index" class="btn btn-primary">
+                <a asp-controller="FypMidEvaluation" asp-action="Index" class="btn btn-primary">
                     Manage Evaluations
                 </a>
                 <a asp-controller="FypMidEvaluation" asp-action="MyAssigned" class="btn btn-outline-primary">
-                    Conduct Evaluation
+                    Conduct Evaluations
                 </a>
             </div>
         </section>
@@ -107,6 +107,22 @@
             <div class="coord-actions">
                 <a asp-controller="FypCoordinator" asp-action="ChapterApprovals" class="btn btn-outline-primary">
                     Review Approvals
+                </a>
+            </div>
+        </section>
+
+        <!-- Finalizing FYP-1 -->
+        <section class="coord-card">
+            <div class="coord-card-icon">🚀</div>
+            <div class="coord-card-body">
+                <h3>FYP-1 Finalization</h3>
+                <p>
+                    Finalize completed FYP-1 groups and promote them to FYP-2 for the next phase of the project.
+                </p>
+            </div>
+            <div class="coord-actions">
+                <a asp-controller="FypCoordinator" asp-action="FinalizeFyp1Groups" class="btn btn-primary">
+                    Finalize FYP-1
                 </a>
             </div>
         </section>

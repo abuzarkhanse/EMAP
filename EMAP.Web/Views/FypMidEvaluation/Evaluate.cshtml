@@ -1,16 +1,18 @@
 ﻿@model EMAP.Web.ViewModels.Fyp.FypMidEvaluationFormViewModel
 
 @{
-    ViewData["Title"] = "Per Member Mid Evaluation";
+    ViewData["Title"] = "Conduct Evaluation";
     var totalMax = Model.Criteria.Sum(x => x.MaxMarks);
+    var typeLabel = ViewBag.EvaluationTypeLabel as string ?? "Evaluation";
+    var evaluationTitle = ViewBag.EvaluationTitle as string ?? "Evaluation";
 }
 
 <div class="container py-4">
     <div class="mb-4">
         <div class="text-uppercase text-muted fw-semibold small">Coordinator Assessment Panel</div>
-        <h2 class="mb-2">Mid Evaluation — Per Member Rubric</h2>
+        <h2 class="mb-2">@typeLabel — Per Member Rubric</h2>
         <p class="text-muted mb-0">
-            Each student is evaluated separately under the same group evaluation session.
+            @evaluationTitle
         </p>
     </div>
 

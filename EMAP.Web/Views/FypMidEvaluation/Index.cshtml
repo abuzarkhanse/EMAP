@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<EMAP.Domain.Fyp.FypEvaluation>
+@using EMAP.Domain.Fyp
 
 @{
     ViewData["Title"] = "Evaluation Management";
@@ -9,7 +10,7 @@
         <div class="text-uppercase text-muted fw-semibold small">Coordinator Panel</div>
         <h2 class="mb-1">Evaluation Management</h2>
         <p class="text-muted mb-0">
-            Create evaluation sessions, assess each group member separately, save results, and publish later when needed.
+            Create, conduct, complete, and publish Mid, Pre-Final, and Final evaluations.
         </p>
     </div>
 
@@ -24,6 +25,7 @@
             <table class="table align-middle table-hover">
                 <thead class="table-light">
                     <tr>
+                        <th>Type</th>
                         <th>Group</th>
                         <th>Program</th>
                         <th>Batch</th>
@@ -39,7 +41,7 @@
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="9" class="text-center text-muted py-4">
+                            <td colspan="10" class="text-center text-muted py-4">
                                 No evaluations found.
                             </td>
                         </tr>
@@ -48,7 +50,19 @@
                     {
                         foreach (var item in Model)
                         {
+                            var typeLabel = item.Milestone?.Type switch
+                            {
+                                FypMilestoneType.MidEvaluation => "Mid Evaluation",
+                                FypMilestoneType.PreFinalEvaluation => "Pre-Final Evaluation",
+                                FypMilestoneType.FinalEvaluation => "Final Evaluation",
+                                _ => "Evaluation"
+                            };
+
                             <tr>
+                                <td>
+                                    <div class="fw-semibold">@typeLabel</div>
+                                    <div class="text-muted small">@item.Milestone?.Title</div>
+                                </td>
                                 <td>
                                     <div class="fw-semibold">@item.StudentGroup?.TentativeProjectTitle</div>
                                     <div class="text-muted small">Group #@item.StudentGroupId</div>
@@ -60,19 +74,19 @@
                                 <td>@item.TotalMarks</td>
                                 <td>@item.WeightagePercent %</td>
                                 <td>
-                                    @if (item.Status == EMAP.Domain.Fyp.FypEvaluationStatus.Draft)
+                                    @if (item.Status == FypEvaluationStatus.Draft)
                                     {
                                         <span class="badge bg-secondary">Draft</span>
                                     }
-                                    else if (item.Status == EMAP.Domain.Fyp.FypEvaluationStatus.Scheduled)
+                                    else if (item.Status == FypEvaluationStatus.Scheduled)
                                     {
                                         <span class="badge bg-info text-dark">Scheduled</span>
                                     }
-                                    else if (item.Status == EMAP.Domain.Fyp.FypEvaluationStatus.Completed)
+                                    else if (item.Status == FypEvaluationStatus.Completed)
                                     {
                                         <span class="badge bg-success">Completed</span>
                                     }
-                                    else if (item.Status == EMAP.Domain.Fyp.FypEvaluationStatus.Published)
+                                    else if (item.Status == FypEvaluationStatus.Published)
                                     {
                                         <span class="badge bg-primary">Published</span>
                                     }
@@ -83,7 +97,7 @@
                                             Conduct
                                         </a>
 
-                                        @if (item.Status == EMAP.Domain.Fyp.FypEvaluationStatus.Completed && !item.IsPublishedToStudent)
+                                        @if (item.Status == FypEvaluationStatus.Completed && !item.IsPublishedToStudent)
                                         {
                                             <form asp-action="Publish" method="post" class="d-inline">
                                                 @Html.AntiForgeryToken()
@@ -96,7 +110,9 @@
 
                                         @if (item.IsPublishedToStudent)
                                         {
-                                            <span class="badge bg-light text-dark border align-self-center">Visible to Student</span>
+                                            <span class="badge bg-light text-dark border align-self-center">
+                                                Visible to Student
+                                            </span>
                                         }
                                     </div>
                                 </td>
