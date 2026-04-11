@@ -40,7 +40,13 @@ namespace EMAP.Web.Controllers
 
             var pendingProposals = proposals.Count(p => p == ProposalStatus.PendingReview);
             var changesRequested = proposals.Count(p => p == ProposalStatus.ChangesRequested);
-            var approvedForDefense = proposals.Count(p => p == ProposalStatus.ApprovedForDefense);
+            var approvedForDefense = proposals.Count(p =>
+                p == ProposalStatus.ApprovedForDefense ||
+                p == ProposalStatus.ProposalAccepted ||
+                p == ProposalStatus.DefenseScheduled);
+
+            var totalCommittees = await _db.FypCommittees.CountAsync();
+            var activeCommittees = await _db.FypCommittees.CountAsync(c => c.IsActive);
 
             var vm = new AdminDashboardViewModel
             {
@@ -54,7 +60,9 @@ namespace EMAP.Web.Controllers
                 PendingSupervisorRequests = pendingRequests,
                 PendingProposals = pendingProposals,
                 ChangesRequestedProposals = changesRequested,
-                ApprovedProposals = approvedForDefense
+                ApprovedProposals = approvedForDefense,
+                TotalCommittees = totalCommittees,
+                ActiveCommittees = activeCommittees
             };
 
             return View(vm);
@@ -77,5 +85,8 @@ namespace EMAP.Web.Controllers
         public int PendingProposals { get; set; }
         public int ChangesRequestedProposals { get; set; }
         public int ApprovedProposals { get; set; }
+
+        public int TotalCommittees { get; set; }
+        public int ActiveCommittees { get; set; }
     }
 }

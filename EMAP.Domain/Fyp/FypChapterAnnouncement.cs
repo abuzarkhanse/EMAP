@@ -1,17 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
 namespace EMAP.Domain.Fyp
 {
     public enum FypChapterType
     {
+        // FYP-1
         VisionAndScope = 1,
         Srs = 2,
-        SystemOverview = 3
+        SystemOverview = 3,
+
+        // FYP-2
+        SystemImplementation = 4,
+        SystemTestingAndDevelopment = 5,
+        ResultsAndDiscussion = 6
     }
 
     public class FypChapterAnnouncement
@@ -24,6 +26,9 @@ namespace EMAP.Domain.Fyp
 
         [Required]
         public FypChapterType ChapterType { get; set; }
+
+        [Required]
+        public FypStage Stage { get; set; } = FypStage.Fyp1;
 
         public bool IsOpen { get; set; } = false;
 

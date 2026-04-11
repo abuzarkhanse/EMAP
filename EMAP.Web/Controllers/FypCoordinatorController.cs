@@ -488,7 +488,7 @@ namespace EMAP.Web.Controllers
 
         // ===================== CHAPTER MANAGEMENT (COORDINATOR) =====================
 
-        public async Task<IActionResult> Chapters()
+        public async Task<IActionResult> Chapters(FypStage stage = FypStage.Fyp1)
         {
             var activeCall = await _db.FypCalls
                 .Where(x => x.IsActive)
@@ -504,7 +504,7 @@ namespace EMAP.Web.Controllers
             await EnsureChapterRowsAsync(activeCall.Id);
 
             var list = await _db.FypChapterAnnouncements
-                .Where(x => x.FypCallId == activeCall.Id)
+                .Where(x => x.FypCallId == activeCall.Id && x.Stage == stage)
                 .OrderBy(x => x.ChapterType)
                 .ToListAsync();
 
@@ -513,6 +513,7 @@ namespace EMAP.Web.Controllers
                 ActiveCallId = activeCall.Id,
                 ActiveCallTitle = activeCall.Title,
                 ActiveCallBatch = activeCall.Batch,
+                SelectedStage = stage,
                 Items = list
             };
 
@@ -529,6 +530,7 @@ namespace EMAP.Web.Controllers
             {
                 Id = item.Id,
                 ChapterType = item.ChapterType,
+                Stage = item.Stage,
                 IsOpen = item.IsOpen,
                 Deadline = item.Deadline,
                 Instructions = item.Instructions
@@ -552,7 +554,10 @@ namespace EMAP.Web.Controllers
             if (vm.IsOpen)
             {
                 var others = await _db.FypChapterAnnouncements
-                    .Where(x => x.FypCallId == item.FypCallId && x.Id != item.Id && x.IsOpen)
+                    .Where(x => x.FypCallId == item.FypCallId &&
+                                x.Stage == item.Stage &&
+                                x.Id != item.Id &&
+                                x.IsOpen)
                     .ToListAsync();
 
                 foreach (var o in others)
@@ -567,7 +572,7 @@ namespace EMAP.Web.Controllers
 
             await _db.SaveChangesAsync();
             TempData["Success"] = "Chapter updated successfully.";
-            return RedirectToAction(nameof(Chapters));
+            return RedirectToAction(nameof(Chapters), new { stage = item.Stage });
         }
 
         [HttpPost]
@@ -578,7 +583,10 @@ namespace EMAP.Web.Controllers
             if (item == null) return NotFound();
 
             var others = await _db.FypChapterAnnouncements
-                .Where(x => x.FypCallId == item.FypCallId && x.Id != item.Id && x.IsOpen)
+                .Where(x => x.FypCallId == item.FypCallId &&
+                            x.Stage == item.Stage &&
+                            x.Id != item.Id &&
+                            x.IsOpen)
                 .ToListAsync();
 
             foreach (var o in others)
@@ -588,7 +596,7 @@ namespace EMAP.Web.Controllers
 
             await _db.SaveChangesAsync();
             TempData["Success"] = "Chapter opened. Students can now submit.";
-            return RedirectToAction(nameof(Chapters));
+            return RedirectToAction(nameof(Chapters), new { stage = item.Stage });
         }
 
         [HttpPost]
@@ -602,7 +610,7 @@ namespace EMAP.Web.Controllers
             await _db.SaveChangesAsync();
 
             TempData["Success"] = "Chapter closed.";
-            return RedirectToAction(nameof(Chapters));
+            return RedirectToAction(nameof(Chapters), new { stage = item.Stage });
         }
 
         private async Task EnsureChapterRowsAsync(int fypCallId)
@@ -611,13 +619,37 @@ namespace EMAP.Web.Controllers
                 .Where(x => x.FypCallId == fypCallId)
                 .ToListAsync();
 
-            if (existing.Any()) return;
+            var required = new List<(FypStage Stage, FypChapterType ChapterType)>
+    {
+        // FYP-1
+        (FypStage.Fyp1, FypChapterType.VisionAndScope),
+        (FypStage.Fyp1, FypChapterType.Srs),
+        (FypStage.Fyp1, FypChapterType.SystemOverview),
 
-            _db.FypChapterAnnouncements.AddRange(
-                new FypChapterAnnouncement { FypCallId = fypCallId, ChapterType = FypChapterType.VisionAndScope },
-                new FypChapterAnnouncement { FypCallId = fypCallId, ChapterType = FypChapterType.Srs },
-                new FypChapterAnnouncement { FypCallId = fypCallId, ChapterType = FypChapterType.SystemOverview }
-            );
+        // FYP-2
+        (FypStage.Fyp2, FypChapterType.SystemImplementation),
+        (FypStage.Fyp2, FypChapterType.SystemTestingAndDevelopment),
+        (FypStage.Fyp2, FypChapterType.ResultsAndDiscussion)
+    };
+
+            foreach (var item in required)
+            {
+                var exists = existing.Any(x =>
+                    x.FypCallId == fypCallId &&
+                    x.Stage == item.Stage &&
+                    x.ChapterType == item.ChapterType);
+
+                if (!exists)
+                {
+                    _db.FypChapterAnnouncements.Add(new FypChapterAnnouncement
+                    {
+                        FypCallId = fypCallId,
+                        Stage = item.Stage,
+                        ChapterType = item.ChapterType,
+                        IsOpen = false
+                    });
+                }
+            }
 
             await _db.SaveChangesAsync();
         }
@@ -771,6 +803,9 @@ namespace EMAP.Web.Controllers
         public int ActiveCallId { get; set; }
         public string? ActiveCallTitle { get; set; }
         public string? ActiveCallBatch { get; set; }
+
+        public FypStage SelectedStage { get; set; } = FypStage.Fyp1;
+
         public List<FypChapterAnnouncement> Items { get; set; } = new();
     }
 
@@ -778,6 +813,7 @@ namespace EMAP.Web.Controllers
     {
         public int Id { get; set; }
         public FypChapterType ChapterType { get; set; }
+        public FypStage Stage { get; set; }
         public bool IsOpen { get; set; }
         public DateTime? Deadline { get; set; }
         public string? Instructions { get; set; }

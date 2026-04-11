@@ -54,7 +54,7 @@ namespace EMAP.Web.Controllers
             IList<FypChapterAnnouncement> chapters = new List<FypChapterAnnouncement>();
             FypChapterAnnouncement? openChapter = null;
 
-            var chapterBoxes = new List<EMAP.Web.ViewModels.Fyp.ChapterBoxViewModel>();
+            var chapterBoxes = new List<ChapterBoxViewModel>();
             var evaluationMilestones = new List<FypMilestone>();
             var publishedEvaluations = new List<FypEvaluation>();
             var publishedMemberEvaluations = new List<StudentPublishedEvaluationCardViewModel>();
@@ -92,9 +92,8 @@ namespace EMAP.Web.Controllers
                     }
                 }
 
-                // Load all chapter announcements
                 chapters = await _db.FypChapterAnnouncements
-                    .Where(x => x.FypCallId == activeCall.Id)
+                    .Where(x => x.FypCallId == activeCall.Id && x.Stage == currentStage)
                     .OrderBy(x => x.ChapterType)
                     .ToListAsync();
 
@@ -127,7 +126,7 @@ namespace EMAP.Web.Controllers
                             status != ChapterSubmissionStatus.ChangesRequested &&
                             status != ChapterSubmissionStatus.CoordinatorApproved;
 
-                        var box = new EMAP.Web.ViewModels.Fyp.ChapterBoxViewModel
+                        var box = new ChapterBoxViewModel
                         {
                             ChapterAnnouncementId = ch.Id,
                             ChapterType = ch.ChapterType,
@@ -155,12 +154,10 @@ namespace EMAP.Web.Controllers
                         };
 
                         chapterBoxes.Add(box);
-
                         previousChapterCompleted = isCompleted;
                     }
                 }
 
-                // New stage-aware milestone roadmap
                 if (group != null)
                 {
                     evaluationMilestones = await _db.FypMilestones
@@ -176,7 +173,8 @@ namespace EMAP.Web.Controllers
                         .Include(x => x.Members)
                             .ThenInclude(m => m.Scores)
                         .Where(x => x.StudentGroupId == group.Id
-                                && x.IsPublishedToStudent)
+                                 && x.IsPublishedToStudent
+                                 && x.Milestone.Stage == currentStage)
                         .OrderBy(x => x.ScheduledAt)
                         .ThenBy(x => x.Id)
                         .ToListAsync();
@@ -231,7 +229,6 @@ namespace EMAP.Web.Controllers
                         publishedMemberEvaluations.Add(card);
                     }
                 }
-
             }
 
             var supervisors = await _db.FypSupervisors
@@ -252,6 +249,7 @@ namespace EMAP.Web.Controllers
                 IsGroupLeader = group != null && group.LeaderId == userId,
                 OpenChapter = openChapter,
                 ChapterSubmission = null,
+                ChapterAnnouncements = chapters.ToList(),
                 ChapterBoxes = chapterBoxes,
                 CurrentStage = currentStage,
                 EvaluationMilestones = evaluationMilestones,
@@ -610,7 +608,7 @@ namespace EMAP.Web.Controllers
         // ===================== SUBMIT CHAPTER (GET) =====================
 
         [HttpGet]
-        public async Task<IActionResult> SubmitChapter()
+        public async Task<IActionResult> SubmitChapter(int chapterAnnouncementId)
         {
             var userId = GetCurrentUserId();
 
@@ -633,14 +631,21 @@ namespace EMAP.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var openChapter = await _db.FypChapterAnnouncements
-                .Where(c => c.FypCallId == currentCall.Id && c.IsOpen)
-                .OrderByDescending(c => c.CreatedAt)
-                .FirstOrDefaultAsync();
+            var chapter = await _db.FypChapterAnnouncements
+                .FirstOrDefaultAsync(c =>
+                    c.Id == chapterAnnouncementId &&
+                    c.FypCallId == currentCall.Id &&
+                    c.Stage == group.CurrentStage);
 
-            if (openChapter == null)
+            if (chapter == null)
             {
-                TempData["Error"] = "Chapter is not open.";
+                TempData["Error"] = "Chapter not found for your current stage.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!chapter.IsOpen)
+            {
+                TempData["Error"] = "This chapter is currently closed.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -653,25 +658,12 @@ namespace EMAP.Web.Controllers
                 .OrderByDescending(x => x.SubmittedAt)
                 .ToListAsync();
 
-            var completedChapters = new List<FypChapterSubmission>();
-
-            if (group != null)
-            {
-                completedChapters = await _db.FypChapterSubmissions
-                    .Include(x => x.ChapterAnnouncement)
-                    .Where(x =>
-                        x.GroupId == group.Id &&
-                        x.Status == ChapterSubmissionStatus.CoordinatorApproved)
-                    .OrderBy(x => x.ChapterAnnouncement.ChapterType)
-                    .ToListAsync();
-            }
-
             return View(new SubmitChapterViewModel
             {
-                ChapterAnnouncementId = openChapter.Id,
-                ChapterType = openChapter.ChapterType,
-                Deadline = openChapter.Deadline,
-                Instructions = openChapter.Instructions,
+                ChapterAnnouncementId = chapter.Id,
+                ChapterType = chapter.ChapterType,
+                Deadline = chapter.Deadline,
+                Instructions = chapter.Instructions,
                 MyChapters = myChapters
             });
         }
@@ -716,7 +708,22 @@ namespace EMAP.Web.Controllers
             }
 
             var openChapter = await _db.FypChapterAnnouncements
-                .FirstOrDefaultAsync(c => c.FypCallId == currentCall.Id && c.IsOpen);
+                .FirstOrDefaultAsync(c =>
+                    c.Id == vm.ChapterAnnouncementId &&
+                    c.FypCallId == currentCall.Id &&
+                    c.Stage == group.CurrentStage);
+
+            if (openChapter == null)
+            {
+                TempData["Error"] = "Chapter not found for your current stage.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!openChapter.IsOpen)
+            {
+                TempData["Error"] = "This chapter is currently closed.";
+                return RedirectToAction(nameof(Index));
+            }
 
             if (openChapter == null)
             {

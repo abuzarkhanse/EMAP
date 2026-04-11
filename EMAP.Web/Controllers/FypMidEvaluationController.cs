@@ -143,6 +143,122 @@ namespace EMAP.Web.Controllers
             return criteria;
         }
 
+        private async Task<List<StudentGroup>> GetEligibleGroupsForMilestoneAsync(FypMilestone milestone, List<string> programCodes)
+        {
+            var groups = await _db.StudentGroups
+                .Include(g => g.FypCall)
+                .Include(g => g.Supervisor)
+                .Where(g => g.Status == GroupStatus.Approved)
+                .Where(g => !string.IsNullOrWhiteSpace(g.ProgramCode) &&
+                            programCodes.Contains(g.ProgramCode.ToUpper()))
+                .Where(g => g.CurrentStage == milestone.Stage)
+                .OrderBy(g => g.Id)
+                .ToListAsync();
+
+            var eligible = new List<StudentGroup>();
+
+            foreach (var group in groups)
+            {
+                var alreadyExists = await _db.FypEvaluations.AnyAsync(e =>
+                    e.StudentGroupId == group.Id &&
+                    e.MilestoneId == milestone.Id);
+
+                if (alreadyExists)
+                    continue;
+
+                if (await IsGroupEligibleForMilestoneAsync(group, milestone))
+                {
+                    eligible.Add(group);
+                }
+            }
+
+            return eligible;
+        }
+
+        private async Task<bool> IsGroupEligibleForMilestoneAsync(StudentGroup group, FypMilestone milestone)
+        {
+            if (milestone.Stage == FypStage.Fyp1)
+            {
+                if (milestone.Type == FypMilestoneType.MidEvaluation)
+                {
+                    var proposalAccepted = await _db.ProposalSubmissions.AnyAsync(p =>
+                        p.GroupId == group.Id &&
+                        (p.Status == ProposalStatus.ApprovedForDefense ||
+                         p.Status == ProposalStatus.ProposalAccepted ||
+                         p.Status == ProposalStatus.DefenseScheduled));
+
+                    return proposalAccepted;
+                }
+
+                if (milestone.Type == FypMilestoneType.FinalEvaluation)
+                {
+                    var allFyp1ChaptersDone = await _db.FypChapterSubmissions
+                        .Include(x => x.ChapterAnnouncement)
+                        .Where(x => x.GroupId == group.Id)
+                        .Where(x => x.ChapterAnnouncement.Stage == FypStage.Fyp1)
+                        .CountAsync(x => x.Status == ChapterSubmissionStatus.CoordinatorApproved);
+
+                    return allFyp1ChaptersDone >= 3;
+                }
+
+                return true;
+            }
+
+            if (milestone.Stage == FypStage.Fyp2)
+            {
+                if (milestone.Type == FypMilestoneType.MidEvaluation)
+                {
+                    return group.CurrentStage == FypStage.Fyp2;
+                }
+
+                if (milestone.Type == FypMilestoneType.PreFinalEvaluation)
+                {
+                    var completedFyp2Chapters = await _db.FypChapterSubmissions
+                        .Include(x => x.ChapterAnnouncement)
+                        .Where(x => x.GroupId == group.Id)
+                        .Where(x => x.ChapterAnnouncement.Stage == FypStage.Fyp2)
+                        .CountAsync(x => x.Status == ChapterSubmissionStatus.CoordinatorApproved);
+
+                    return completedFyp2Chapters >= 2;
+                }
+
+                if (milestone.Type == FypMilestoneType.FinalEvaluation)
+                {
+                    var completedFyp2Chapters = await _db.FypChapterSubmissions
+                        .Include(x => x.ChapterAnnouncement)
+                        .Where(x => x.GroupId == group.Id)
+                        .Where(x => x.ChapterAnnouncement.Stage == FypStage.Fyp2)
+                        .CountAsync(x => x.Status == ChapterSubmissionStatus.CoordinatorApproved);
+
+                    return completedFyp2Chapters >= 3;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private async Task<string> GetGroupReadinessTextAsync(StudentGroup group, FypMilestone milestone)
+        {
+            if (milestone.Stage == FypStage.Fyp1 && milestone.Type == FypMilestoneType.MidEvaluation)
+                return "Proposal accepted / defense-ready";
+
+            if (milestone.Stage == FypStage.Fyp1 && milestone.Type == FypMilestoneType.FinalEvaluation)
+                return "All FYP-1 chapters completed";
+
+            if (milestone.Stage == FypStage.Fyp2 && milestone.Type == FypMilestoneType.MidEvaluation)
+                return "Promoted to FYP-2";
+
+            if (milestone.Stage == FypStage.Fyp2 && milestone.Type == FypMilestoneType.PreFinalEvaluation)
+                return "At least 2 FYP-2 chapters completed";
+
+            if (milestone.Stage == FypStage.Fyp2 && milestone.Type == FypMilestoneType.FinalEvaluation)
+                return "All FYP-2 chapters completed";
+
+            return "Eligible";
+        }
+
         public async Task<IActionResult> Index()
         {
             var currentEmail = GetCurrentUserEmail();
@@ -184,7 +300,7 @@ namespace EMAP.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? milestoneId)
         {
             var currentEmail = GetCurrentUserEmail();
 
@@ -208,37 +324,52 @@ namespace EMAP.Web.Controllers
 
             var milestones = await _db.FypMilestones
                 .Where(m => allowedTypes.Contains(m.Type) && m.IsActive)
-                .OrderBy(m => m.Type)
+                .OrderBy(m => m.Stage)
+                .ThenBy(m => m.Type)
                 .ThenBy(m => m.Title)
-                .ToListAsync();
-
-            var groups = await _db.StudentGroups
-                .Include(g => g.FypCall)
-                .Include(g => g.Supervisor)
-                .Where(g => g.Status == GroupStatus.Approved)
-                .Where(g => !string.IsNullOrWhiteSpace(g.ProgramCode) &&
-                            programCodes.Contains(g.ProgramCode.ToUpper()))
-                .OrderBy(g => g.Id)
                 .ToListAsync();
 
             ViewBag.Milestones = new SelectList(milestones.Select(m => new
             {
                 m.Id,
-                Text = $"{GetTypeLabel(m.Type)} - {m.Title}"
-            }), "Id", "Text");
+                Text = $"{m.Stage} - {GetTypeLabel(m.Type)} - {m.Title}"
+            }), "Id", "Text", milestoneId);
 
-            ViewBag.Groups = new SelectList(groups.Select(g => new
+            var vm = new EvaluationBulkCreateViewModel
             {
-                g.Id,
-                Text = $"Group #{g.Id} - {g.TentativeProjectTitle} ({g.ProgramCode})"
-            }), "Id", "Text");
+                MilestoneId = milestoneId ?? 0,
+                WeightagePercent = 20
+            };
 
-            return View();
+            if (milestoneId.HasValue)
+            {
+                var milestone = milestones.FirstOrDefault(x => x.Id == milestoneId.Value);
+                if (milestone != null)
+                {
+                    var eligibleGroups = await GetEligibleGroupsForMilestoneAsync(milestone, programCodes);
+
+                    foreach (var g in eligibleGroups)
+                    {
+                        vm.EligibleGroups.Add(new EvaluationEligibleGroupItemViewModel
+                        {
+                            GroupId = g.Id,
+                            ProjectTitle = g.TentativeProjectTitle,
+                            ProgramCode = g.ProgramCode,
+                            Batch = g.FypCall?.Batch ?? "-",
+                            SupervisorName = g.Supervisor?.Name ?? "-",
+                            Stage = g.CurrentStage,
+                            ReadinessText = await GetGroupReadinessTextAsync(g, milestone)
+                        });
+                    }
+                }
+            }
+
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int studentGroupId, int milestoneId, DateTime? scheduledAt, string? venue, string? instructions, string? committeeMembers, decimal weightagePercent)
+        public async Task<IActionResult> Create(EvaluationBulkCreateViewModel vm)
         {
             var currentUserId = GetCurrentUserId();
             var currentEmail = GetCurrentUserEmail();
@@ -255,94 +386,104 @@ namespace EMAP.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            if (vm.MilestoneId <= 0)
+            {
+                TempData["Error"] = "Please select an evaluation milestone.";
+                return RedirectToAction(nameof(Create));
+            }
+
+            if (vm.SelectedGroupIds == null || !vm.SelectedGroupIds.Any())
+            {
+                TempData["Error"] = "Please select at least one eligible group.";
+                return RedirectToAction(nameof(Create), new { milestoneId = vm.MilestoneId });
+            }
+
+            if (vm.WeightagePercent < 0 || vm.WeightagePercent > 100)
+            {
+                TempData["Error"] = "Weightage must be between 0 and 100.";
+                return RedirectToAction(nameof(Create), new { milestoneId = vm.MilestoneId });
+            }
+
+            var milestone = await _db.FypMilestones.FirstOrDefaultAsync(m => m.Id == vm.MilestoneId && m.IsActive);
+            if (milestone == null || !SupportedEvaluationTypes().Contains(milestone.Type))
+            {
+                TempData["Error"] = "Invalid evaluation milestone selected.";
+                return RedirectToAction(nameof(Create));
+            }
+
             var programCodes = committee.CommitteePrograms
                 .Select(x => x.ProgramCode.Trim().ToUpper())
                 .ToList();
 
-            var group = await _db.StudentGroups
-                .FirstOrDefaultAsync(g =>
-                    g.Id == studentGroupId &&
-                    !string.IsNullOrWhiteSpace(g.ProgramCode) &&
-                    programCodes.Contains(g.ProgramCode.ToUpper()));
+            var eligibleGroups = await GetEligibleGroupsForMilestoneAsync(milestone, programCodes);
+            var eligibleGroupIds = eligibleGroups.Select(x => x.Id).ToHashSet();
 
-            if (group == null || milestoneId <= 0)
-            {
-                TempData["Error"] = "Invalid group or milestone selection.";
-                return RedirectToAction(nameof(Create));
-            }
-
-            if (weightagePercent < 0 || weightagePercent > 100)
-            {
-                TempData["Error"] = "Weightage must be between 0 and 100.";
-                return RedirectToAction(nameof(Create));
-            }
-
-            var milestone = await _db.FypMilestones.FirstOrDefaultAsync(m => m.Id == milestoneId && m.IsActive);
-            if (milestone == null || !SupportedEvaluationTypes().Contains(milestone.Type))
-            {
-                TempData["Error"] = "Invalid evaluation type selected.";
-                return RedirectToAction(nameof(Create));
-            }
-
-            var exists = await _db.FypEvaluations.AnyAsync(e =>
-                e.StudentGroupId == studentGroupId &&
-                e.MilestoneId == milestoneId &&
-                e.EvaluatorUserId == currentUserId);
-
-            if (exists)
-            {
-                TempData["Error"] = "This evaluation already exists for the selected group.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            var evaluatorName = await GetCurrentUserDisplayNameAsync();
-
-            var evaluation = new FypEvaluation
-            {
-                StudentGroupId = studentGroupId,
-                MilestoneId = milestoneId,
-                EvaluatorUserId = currentUserId,
-                EvaluatorName = evaluatorName,
-                ScheduledAt = scheduledAt,
-                Venue = venue,
-                Instructions = instructions,
-                CommitteeMembers = string.IsNullOrWhiteSpace(committeeMembers) ? evaluatorName : committeeMembers,
-                WeightagePercent = weightagePercent,
-                WeightedMarks = 0,
-                Status = FypEvaluationStatus.Scheduled,
-                IsSubmitted = false,
-                TotalMarks = 0
-            };
-
-            _db.FypEvaluations.Add(evaluation);
-            await _db.SaveChangesAsync();
-
-            var memberUserIds = new List<string?> { group.LeaderId, group.Member2Id, group.Member3Id }
-                .Where(x => !string.IsNullOrWhiteSpace(x))
+            var finalGroupIds = vm.SelectedGroupIds
+                .Where(id => eligibleGroupIds.Contains(id))
                 .Distinct()
                 .ToList();
 
-            foreach (var userId in memberUserIds)
+            if (!finalGroupIds.Any())
             {
-                var user = await _userManager.FindByIdAsync(userId!);
-                if (user == null) continue;
-
-                _db.FypEvaluationMembers.Add(new FypEvaluationMember
-                {
-                    EvaluationId = evaluation.Id,
-                    StudentUserId = user.Id,
-                    StudentName = !string.IsNullOrWhiteSpace(user.FullName)
-                        ? user.FullName
-                        : (user.UserName ?? user.Email ?? "Student"),
-                    RegistrationNo = user.UserName,
-                    TotalMarks = 0,
-                    WeightedMarks = 0
-                });
+                TempData["Error"] = "None of the selected groups are eligible for this evaluation.";
+                return RedirectToAction(nameof(Create), new { milestoneId = vm.MilestoneId });
             }
 
-            await _db.SaveChangesAsync();
+            var evaluatorName = await GetCurrentUserDisplayNameAsync();
+            var createdCount = 0;
 
-            TempData["Success"] = $"{GetTypeLabel(milestone.Type)} created successfully.";
+            foreach (var groupId in finalGroupIds)
+            {
+                var group = eligibleGroups.First(x => x.Id == groupId);
+
+                var evaluation = new FypEvaluation
+                {
+                    StudentGroupId = groupId,
+                    MilestoneId = milestone.Id,
+                    EvaluatorUserId = currentUserId,
+                    EvaluatorName = evaluatorName,
+                    ScheduledAt = vm.ScheduledAt,
+                    Venue = vm.Venue,
+                    Instructions = vm.Instructions,
+                    CommitteeMembers = string.IsNullOrWhiteSpace(vm.CommitteeMembers) ? evaluatorName : vm.CommitteeMembers,
+                    WeightagePercent = vm.WeightagePercent,
+                    WeightedMarks = 0,
+                    Status = FypEvaluationStatus.Scheduled,
+                    IsSubmitted = false,
+                    TotalMarks = 0
+                };
+
+                _db.FypEvaluations.Add(evaluation);
+                await _db.SaveChangesAsync();
+
+                var memberUserIds = new List<string?> { group.LeaderId, group.Member2Id, group.Member3Id }
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Distinct()
+                    .ToList();
+
+                foreach (var userId in memberUserIds)
+                {
+                    var user = await _userManager.FindByIdAsync(userId!);
+                    if (user == null) continue;
+
+                    _db.FypEvaluationMembers.Add(new FypEvaluationMember
+                    {
+                        EvaluationId = evaluation.Id,
+                        StudentUserId = user.Id,
+                        StudentName = !string.IsNullOrWhiteSpace(user.FullName)
+                            ? user.FullName
+                            : (user.UserName ?? user.Email ?? "Student"),
+                        RegistrationNo = user.UserName,
+                        TotalMarks = 0,
+                        WeightedMarks = 0
+                    });
+                }
+
+                await _db.SaveChangesAsync();
+                createdCount++;
+            }
+
+            TempData["Success"] = $"{createdCount} {GetTypeLabel(milestone.Type)} evaluation(s) created successfully.";
             return RedirectToAction(nameof(Index));
         }
 

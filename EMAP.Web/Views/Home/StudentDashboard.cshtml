@@ -1,163 +1,267 @@
-﻿@{
+﻿@model EMAP.Web.ViewModels.Fyp.StudentDashboardViewModel
+@using EMAP.Domain.Fyp
+
+@{
     ViewData["Title"] = "Student Dashboard";
 }
 
-<div class="student-dashboard">
 <div class="container py-4 student-dashboard-page">
 
-    <!-- Header -->
-    <div class="dashboard-topbar mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h1 class="dashboard-heading mb-1">Student Dashboard</h1>
-            <p class="dashboard-subheading mb-0">
-                Access your academic project workspace and follow your current progress.
+            <p class="text-muted mb-0">
+                Track your FYP progress, current academic stage, deadlines, and required next action.
             </p>
         </div>
 
         <div class="dashboard-user-pill">
             <i class="bi bi-person-circle me-2"></i>
-            @User.Identity?.Name
+            @Model.StudentName
         </div>
     </div>
 
-    <!-- Main hero -->
+    <!-- HERO SUMMARY -->
     <section class="student-hero-card mb-4">
         <div class="student-hero-content">
             <div class="student-hero-left">
                 <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
                     <h2 class="mb-0">Final Year Project</h2>
-                    <span class="dashboard-status-pill">Active</span>
+                    <span class="dashboard-status-pill">@Model.CurrentStageLabel</span>
+                    <span class="badge bg-info text-dark">@Model.CurrentStatusLabel</span>
                 </div>
 
-                <p class="student-hero-text">
-                    Use your FYP workspace to manage group formation, supervisor selection,
-                    proposal progress, defense workflow, and chapter submissions.
-                </p>
-
-                <div class="dashboard-feature-tags">
-                    <span>Group & supervisor</span>
-                    <span>Proposal progress</span>
-                    <span>Defense workflow</span>
-                    <span>Chapter submissions</span>
-                </div>
+                @if (Model.HasGroup)
+                {
+                    <div class="row g-3 small mt-1">
+                        <div class="col-md-4">
+                            <div class="text-muted">Project Title</div>
+                            <div class="fw-semibold">@Model.Group!.TentativeProjectTitle</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-muted">Group</div>
+                            <div class="fw-semibold">#@Model.Group!.Id</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-muted">Program</div>
+                            <div class="fw-semibold">@Model.Group!.ProgramCode</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-muted">Batch</div>
+                            <div class="fw-semibold">@Model.ActiveBatch</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-muted">Supervisor</div>
+                            <div class="fw-semibold">@(Model.Group!.Supervisor?.Name ?? "-")</div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p class="student-hero-text mb-0">
+                        You are not yet part of an FYP group. Create a group to begin your academic workflow.
+                    </p>
+                }
             </div>
 
             <div class="student-hero-actions">
-                <a asp-controller="Fyp" asp-action="Index"
-                   class="btn btn-primary student-main-btn">
-                    Open FYP Portal
+                <a asp-controller="@Model.NextActionController"
+                       asp-action="@Model.NextActionAction"
+                       class="btn btn-primary student-main-btn">
+                    @Model.NextActionButtonText
                 </a>
 
-                <a href="/templates/SRS%20Template.docx"
-                   class="btn btn-light student-secondary-btn"
-                   download>
-                    View Guidelines
+                <a asp-controller="Fyp"
+                       asp-action="Index"
+                       class="btn btn-light student-secondary-btn">
+                    Open FYP Portal
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Secondary grid -->
-    <div class="dashboard-grid-student">
+    <div class="row g-4">
 
-        <!-- Next Step -->
-        <section class="student-card student-card-highlight">
-            <div class="student-card-icon">
-                <i class="bi bi-lightning-charge"></i>
-            </div>
+        <!-- LEFT SIDE -->
+        <div class="col-lg-8">
 
-            <div class="student-card-body">
-                <h3>Your Next Step</h3>
-                <p class="student-card-text">
-                    Continue your FYP work from the portal and complete the next required task.
-                </p>
-
-                <div class="student-next-step-box">
-                    <div class="student-next-step-label">Recommended action</div>
-                    <div class="student-next-step-title">Go to FYP Portal</div>
+            <!-- NEXT ACTION -->
+            <section class="student-card student-card-highlight mb-4">
+                <div class="student-card-icon">
+                    <i class="bi bi-lightning-charge"></i>
                 </div>
 
-                <div class="student-link-list">
-                    <a href="#">View My Submissions</a>
-                    <a href="#">Supervisor Feedback</a>
-                    <a href="/templates/SRS%20Template.docx" download>Download Templates</a>
-                </div>
-            </div>
+                <div class="student-card-body">
+                    <h3>Your Next Required Action</h3>
+                    <p class="student-card-text">@Model.NextActionDescription</p>
 
-            <div class="student-card-footer">
-                <a asp-controller="Fyp" asp-action="Index"
-                   class="btn btn-sm btn-outline-primary admin-action-btn">
-                    Continue
-                </a>
-            </div>
-        </section>
-
-        <!-- Deadlines -->
-        <section class="student-card">
-            <div class="student-card-icon">
-                <i class="bi bi-calendar-event"></i>
-            </div>
-
-            <div class="student-card-body">
-                <h3>Upcoming Deadlines</h3>
-
-                <div class="student-info-list">
-                    <div class="student-info-item">
-                        <div class="student-info-title">FYP Proposal Submission</div>
-                        <div class="student-info-meta">Due: 15 Dec 2025</div>
-                        <span class="student-warning-chip">5 days remaining</span>
-                    </div>
-
-                    <div class="student-info-item">
-                        <div class="student-info-title">Supervisor Approval</div>
-                        <div class="student-info-meta">Due: 22 Dec 2025</div>
-                    </div>
-
-                    <div class="student-info-item">
-                        <div class="student-info-title">Progress Presentation</div>
-                        <div class="student-info-meta">Tentative: Jan 2026</div>
+                    <div class="student-next-step-box">
+                        <div class="student-next-step-label">Recommended action</div>
+                        <div class="student-next-step-title">@Model.NextActionTitle</div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- Activity -->
-        <section class="student-card">
-            <div class="student-card-icon">
-                <i class="bi bi-clock-history"></i>
-            </div>
+                <div class="student-card-footer">
+                    <a asp-controller="@Model.NextActionController"
+                           asp-action="@Model.NextActionAction"
+                           class="btn btn-sm btn-outline-primary admin-action-btn">
+                        @Model.NextActionButtonText
+                    </a>
+                </div>
+            </section>
 
-            <div class="student-card-body">
-                <h3>Recent Activity</h3>
+            <!-- CURRENT ACADEMIC STATUS -->
+            <section class="student-card mb-4">
+                <div class="student-card-icon">
+                    <i class="bi bi-mortarboard"></i>
+                </div>
 
-                <div class="student-activity-list">
-                    <div class="student-activity-item">
-                        <span class="activity-dot success"></span>
-                        <div>
-                            <div class="student-info-title">Proposal draft saved</div>
-                            <div class="student-info-meta">Today, 10:45 AM</div>
+                <div class="student-card-body">
+                    <h3>Current Academic Status</h3>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <div class="student-info-item">
+                                <div class="student-info-title">Group Status</div>
+                                <div class="student-info-meta">@(Model.Group?.Status.ToString() ?? "Not Created")</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="student-info-item">
+                                <div class="student-info-title">Proposal Status</div>
+                                <div class="student-info-meta">@(Model.Proposal?.Status.ToString() ?? "Not Submitted")</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="student-info-item">
+                                <div class="student-info-title">Defense</div>
+                                <div class="student-info-meta">
+                                    @if (Model.DefenseEvaluation != null)
+                                    {
+                                        <span>Completed</span>
+                                    }
+                                    else if (Model.DefenseSchedule != null)
+                                    {
+                                        <span>Scheduled</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Pending</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="student-info-item">
+                                <div class="student-info-title">Chapter Progress</div>
+                                <div class="student-info-meta">@Model.CompletedChaptersCount / @Model.TotalStageChapters completed</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="student-info-item">
+                                <div class="student-info-title">Published Evaluations</div>
+                                <div class="student-info-meta">@Model.PublishedEvaluationsCount available</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="student-info-item">
+                                <div class="student-info-title">Current Stage</div>
+                                <div class="student-info-meta">@Model.CurrentStageLabel</div>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </section>
 
-                    <div class="student-activity-item">
-                        <span class="activity-dot info"></span>
-                        <div>
-                            <div class="student-info-title">Supervisor notification received</div>
-                            <div class="student-info-meta">Yesterday</div>
-                        </div>
-                    </div>
+            <!-- QUICK LINKS -->
+            <section class="student-card">
+                <div class="student-card-icon">
+                    <i class="bi bi-link-45deg"></i>
+                </div>
 
-                    <div class="student-activity-item">
-                        <span class="activity-dot muted"></span>
-                        <div>
-                            <div class="student-info-title">Template downloaded</div>
-                            <div class="student-info-meta">2 days ago</div>
-                        </div>
+                <div class="student-card-body">
+                    <h3>Quick Actions</h3>
+
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <a asp-controller="Fyp" asp-action="Index" class="btn btn-outline-primary btn-sm">Open FYP Portal</a>
+
+                        @if (Model.HasProposal)
+                        {
+                            <a asp-controller="Fyp" asp-action="SubmitProposal" class="btn btn-outline-secondary btn-sm">View Proposal</a>
+                        }
+
+                        @if (Model.DefenseSchedule != null)
+                        {
+                            <a asp-controller="Fyp" asp-action="Index" asp-route-showDefense="1" class="btn btn-outline-secondary btn-sm">View Defense Slot</a>
+                        }
+
+                        <a href="/templates/SRS%20Template.docx" class="btn btn-outline-secondary btn-sm" download>
+                            Download Template
+                        </a>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
 
+        <!-- RIGHT SIDE -->
+        <div class="col-lg-4">
+
+            <!-- UPCOMING -->
+            <section class="student-card mb-4">
+                <div class="student-card-icon">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+
+                <div class="student-card-body">
+                    <h3>Upcoming Important Item</h3>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.UpcomingTitle))
+                    {
+                        <div class="student-info-list">
+                            <div class="student-info-item">
+                                <div class="student-info-title">@Model.UpcomingTitle</div>
+                                <div class="student-info-meta">@Model.UpcomingDateText</div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.UpcomingSecondaryTitle))
+                            {
+                                <div class="student-info-item">
+                                    <div class="student-info-title">@Model.UpcomingSecondaryTitle</div>
+                                    <div class="student-info-meta">@Model.UpcomingSecondaryDateText</div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No immediate academic deadline or scheduled event is available right now.</p>
+                    }
+                </div>
+            </section>
+
+            <!-- HELP / INFORMATION -->
+            <section class="student-card">
+                <div class="student-card-icon">
+                    <i class="bi bi-info-circle"></i>
+                </div>
+
+                <div class="student-card-body">
+                    <h3>Information</h3>
+                    <p class="student-card-text">
+                        This dashboard shows your real FYP progress, academic stage, and the next action required in the official workflow.
+                    </p>
+
+                    <div class="student-link-list">
+                        <a asp-controller="Fyp" asp-action="Index">Open Full FYP Workspace</a>
+                        <a href="/templates/SRS%20Template.docx" download>Download Templates</a>
+                    </div>
+                </div>
+            </section>
+        </div>
     </div>
-</div>
 </div>

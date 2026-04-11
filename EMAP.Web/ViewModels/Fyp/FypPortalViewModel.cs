@@ -1,40 +1,33 @@
 ﻿using System.Collections.Generic;
 using EMAP.Domain.Fyp;
-using EMAP.Web.ViewModels.Fyp;
 
 namespace EMAP.Web.ViewModels.Fyp
 {
     public class FypPortalViewModel
     {
-        // ===== Calls =====
         public List<FypCall> ActiveCalls { get; set; } = new();
         public FypCall? ActiveCall { get; set; }
 
-        // ===== Group =====
         public StudentGroup? Group { get; set; }
         public bool HasGroup => Group != null;
         public bool HasSupervisor => Group?.SupervisorId != null;
         public bool IsGroupLeader { get; set; }
 
-        // ===== Proposal =====
         public ProposalSubmission? Proposal { get; set; }
         public bool HasProposal => Proposal != null;
+
         public bool CanSubmitProposal =>
             HasGroup &&
             HasSupervisor &&
             Group?.Status == GroupStatus.Approved &&
             !HasProposal;
 
-
-        // ===== Defense =====
         public ProposalDefenseSchedule? DefenseSchedule { get; set; }
         public ProposalDefenseEvaluation? DefenseEvaluation { get; set; }
 
-        // ===== Supervisors =====
         public bool ShowSupervisorList => HasGroup && !HasSupervisor;
         public List<FypSupervisor> AvailableSupervisors { get; set; } = new();
 
-        // ===== Chapters =====
         public List<FypChapterAnnouncement> ChapterAnnouncements { get; set; } = new();
         public FypChapterAnnouncement? OpenChapter { get; set; }
         public FypChapterSubmission? ChapterSubmission { get; set; }
@@ -45,12 +38,13 @@ namespace EMAP.Web.ViewModels.Fyp
         public List<ChapterBoxViewModel> ChapterBoxes { get; set; } = new();
 
         public FypStage CurrentStage { get; set; } = FypStage.Fyp1;
+
+        public bool IsFyp1Completed => CurrentStage == FypStage.Fyp2;
+        public bool IsFyp2Active => CurrentStage == FypStage.Fyp2;
+
         public List<FypStudentMilestoneViewModel> StageMilestones { get; set; } = new();
-
-        public List<EMAP.Domain.Fyp.FypMilestone> EvaluationMilestones { get; set; } = new();
-        public List<EMAP.Domain.Fyp.FypEvaluation> PublishedEvaluations { get; set; } = new();
-
+        public List<FypMilestone> EvaluationMilestones { get; set; } = new();
+        public List<FypEvaluation> PublishedEvaluations { get; set; } = new();
         public List<StudentPublishedEvaluationCardViewModel> PublishedMemberEvaluations { get; set; } = new();
-
     }
 }

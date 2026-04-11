@@ -1,37 +1,57 @@
 ﻿@using EMAP.Domain.Fyp
+@using Humanizer
 @using System
 @model EMAP.Web.ViewModels.Fyp.FypPortalViewModel
 
 @{
     ViewData["Title"] = "FYP Portal";
 
-    // ===== Proposal status helpers (define ONCE, reuse everywhere) =====
     var pStatus = Model.Proposal?.Status.ToString() ?? "";
 
     var hasProposal = Model.HasProposal;
     var isPending = pStatus == "PendingReview";
     var isChanges = pStatus == "ChangesRequested";
 
-    // Proposal accepted (move forward)
     var isAccepted =
         pStatus == "ApprovedForDefense" ||
         pStatus == "ProposalAccepted" ||
         pStatus == "DefenseScheduled" ||
         pStatus == "DefenseChangesRequired";
 
-    // Defense helpers
     var isDefenseScheduled = pStatus == "DefenseScheduled";
     var isDefensePendingSlot = (pStatus == "ApprovedForDefense" || pStatus == "ProposalAccepted");
 
-    // Flow status
     var step1Done = Model.HasGroup;
     var step2Done = Model.HasSupervisor;
     var step3Done = (Model.Group?.Status == GroupStatus.Approved);
     var step4Done = Model.HasProposal;
 
-    // Defense step state
     var defenseHasResult = Model.DefenseEvaluation != null;
     var defenseHasSlot = Model.DefenseSchedule != null;
+
+    var orderedChapterBoxes = (Model.ChapterBoxes ?? new List<EMAP.Web.ViewModels.Fyp.ChapterBoxViewModel>())
+        .OrderBy(x => x.ChapterAnnouncementId)
+        .ToList();
+
+    bool chapter1Done = orderedChapterBoxes.Count > 0 &&
+                        orderedChapterBoxes[0].Status == ChapterSubmissionStatus.CoordinatorApproved;
+
+    bool chapter2Done = orderedChapterBoxes.Count > 1 &&
+                        orderedChapterBoxes[1].Status == ChapterSubmissionStatus.CoordinatorApproved;
+
+    bool chapter3Done = orderedChapterBoxes.Count > 2 &&
+                        orderedChapterBoxes[2].Status == ChapterSubmissionStatus.CoordinatorApproved;
+
+    bool allChaptersDone = orderedChapterBoxes.Any() &&
+                           orderedChapterBoxes.All(x => x.Status == ChapterSubmissionStatus.CoordinatorApproved);
+
+    var currentStageEvaluations = (Model.PublishedEvaluations ?? new List<FypEvaluation>())
+        .Where(x => x.Milestone != null && x.Milestone.Stage == Model.CurrentStage)
+        .ToList();
+
+    bool stageMidPublished = currentStageEvaluations.Any(x => x.Milestone?.Type == FypMilestoneType.MidEvaluation);
+    bool stagePreFinalPublished = currentStageEvaluations.Any(x => x.Milestone?.Type == FypMilestoneType.PreFinalEvaluation);
+    bool stageFinalPublished = currentStageEvaluations.Any(x => x.Milestone?.Type == FypMilestoneType.FinalEvaluation);
 }
 
 <div class="container py-4">
@@ -59,6 +79,33 @@
         </div>
     </div>
 
+    @if (Model.Group != null && Model.CurrentStage == EMAP.Domain.Fyp.FypStage.Fyp2)
+    {
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <div class="alert alert-success mb-3">
+                    <h5 class="mb-2">FYP-1 Completed</h5>
+                    <p class="mb-0">
+                        Your group has successfully completed <strong>FYP-1</strong> and is now working in <strong>FYP-2</strong>.
+                        FYP-1 records are now part of your completed academic history.
+                    </p>
+                </div>
+
+                <div class="alert alert-info mb-0">
+                    <strong>Current FYP-2 Workflow:</strong>
+                    System Implementation, System Testing and Development, Results and Discussion,
+                    followed by Mid Evaluation, Pre-Final Evaluation, and Final Evaluation.
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.Group != null && Model.CurrentStage == EMAP.Domain.Fyp.FypStage.Fyp1)
+    {
+        <div class="alert alert-secondary mb-4">
+            <strong>Current Stage:</strong> Your group is currently working in FYP-1.
+        </div>
+    }
+
     <!-- ===== FLASH MESSAGES ===== -->
     @if (TempData["Error"] != null)
     {
@@ -70,43 +117,105 @@
     }
 
     @{
-        string currentStepKey =
-        !Model.HasGroup ? "group" :
-        !Model.HasSupervisor ? "supervisor" :
-        (Model.Group?.Status != GroupStatus.Approved) ? "approval" :
-        !Model.HasProposal ? "proposal" :
-        !(defenseHasSlot || defenseHasResult) ? "defense" :
-        (Model.OpenChapter == null) ? "chapters" :
-                "chapters";
+        string currentStepKey;
+        string currentStepLabel;
+        dynamic[] steps;
+        int currentOrder;
 
-        string currentStepLabel =
-        currentStepKey == "group" ? "Create Group" :
-        currentStepKey == "supervisor" ? "Select Supervisor" :
-        currentStepKey == "approval" ? "Wait for Approval" :
-        currentStepKey == "proposal" ? "Submit Proposal" :
-        currentStepKey == "defense" ? "Defense" :
-                "Chapters";
-
-        var steps = new[]
+        if (Model.CurrentStage == FypStage.Fyp1)
         {
-        new { Order = 1, Key = "group", Title = "Group", Done = Model.HasGroup },
-        new { Order = 2, Key = "supervisor", Title = "Supervisor", Done = Model.HasSupervisor },
-        new { Order = 3, Key = "approval", Title = "Approval", Done = (Model.Group?.Status == GroupStatus.Approved) },
-        new { Order = 4, Key = "proposal", Title = "Proposal", Done = Model.HasProposal },
-        new { Order = 5, Key = "defense", Title = "Defense", Done = (defenseHasSlot || defenseHasResult) },
-        new { Order = 6, Key = "chapters", Title = "Chapters", Done = (Model.OpenChapter != null) }
-        };
+            currentStepKey =
+                !Model.HasGroup ? "group" :
+                !Model.HasSupervisor ? "supervisor" :
+                (Model.Group?.Status != GroupStatus.Approved) ? "approval" :
+                !Model.HasProposal ? "proposal" :
+                !(defenseHasSlot || defenseHasResult) ? "defense" :
+                !allChaptersDone ? "chapters" :
+                !stageMidPublished ? "mid" :
+                !stageFinalPublished ? "final" :
+                "fyp1complete";
 
-        int currentOrder = currentStepKey switch
-        {
+            currentStepLabel =
+                currentStepKey == "group" ? "Create Group" :
+                currentStepKey == "supervisor" ? "Select Supervisor" :
+                currentStepKey == "approval" ? "Wait for Approval" :
+                currentStepKey == "proposal" ? "Submit Proposal" :
+                currentStepKey == "defense" ? "Defense" :
+                currentStepKey == "chapters" ? "Complete Chapters" :
+                currentStepKey == "mid" ? "Mid Evaluation" :
+                currentStepKey == "final" ? "Final Evaluation" :
+                "FYP-1 Complete";
+
+            steps = new dynamic[]
+            {
+            new { Order = 1, Key = "group", Title = "Group", Done = Model.HasGroup },
+            new { Order = 2, Key = "supervisor", Title = "Supervisor", Done = Model.HasSupervisor },
+            new { Order = 3, Key = "approval", Title = "Approval", Done = (Model.Group?.Status == GroupStatus.Approved) },
+            new { Order = 4, Key = "proposal", Title = "Proposal", Done = Model.HasProposal },
+            new { Order = 5, Key = "defense", Title = "Defense", Done = (defenseHasSlot || defenseHasResult) },
+            new { Order = 6, Key = "chapters", Title = "Chapters", Done = allChaptersDone },
+            new { Order = 7, Key = "mid", Title = "Mid Eval", Done = stageMidPublished },
+            new { Order = 8, Key = "final", Title = "Final Eval", Done = stageFinalPublished },
+            new { Order = 9, Key = "fyp1complete", Title = "FYP-1 Complete", Done = Model.CurrentStage == FypStage.Fyp2 }
+            };
+
+            currentOrder = currentStepKey switch
+            {
                 "group" => 1,
                 "supervisor" => 2,
                 "approval" => 3,
                 "proposal" => 4,
                 "defense" => 5,
                 "chapters" => 6,
-            _ => 1
-        };
+                "mid" => 7,
+                "final" => 8,
+                "fyp1complete" => 9,
+                _ => 1
+            };
+        }
+        else
+        {
+            currentStepKey =
+                !chapter1Done ? "implementation" :
+                !chapter2Done ? "testing" :
+                !chapter3Done ? "results" :
+                !stageMidPublished ? "mid2" :
+                !stagePreFinalPublished ? "prefinal" :
+                !stageFinalPublished ? "final2" :
+                "complete";
+
+            currentStepLabel =
+                currentStepKey == "implementation" ? "System Implementation" :
+                currentStepKey == "testing" ? "System Testing & Development" :
+                currentStepKey == "results" ? "Results & Discussion" :
+                currentStepKey == "mid2" ? "FYP-2 Mid Evaluation" :
+                currentStepKey == "prefinal" ? "Pre-Final Evaluation" :
+                currentStepKey == "final2" ? "Final Evaluation" :
+                "Project Completion";
+
+            steps = new dynamic[]
+            {
+            new { Order = 1, Key = "implementation", Title = "Implementation", Done = chapter1Done },
+            new { Order = 2, Key = "testing", Title = "Testing & Dev", Done = chapter2Done },
+            new { Order = 3, Key = "results", Title = "Results", Done = chapter3Done },
+            new { Order = 4, Key = "mid2", Title = "Mid Eval", Done = stageMidPublished },
+            new { Order = 5, Key = "prefinal", Title = "Pre-Final", Done = stagePreFinalPublished },
+            new { Order = 6, Key = "final2", Title = "Final Eval", Done = stageFinalPublished },
+            new { Order = 7, Key = "complete", Title = "Complete", Done = false }
+            };
+
+            currentOrder = currentStepKey switch
+            {
+                "implementation" => 1,
+                "testing" => 2,
+                "results" => 3,
+                "mid2" => 4,
+                "prefinal" => 5,
+                "final2" => 6,
+                "complete" => 7,
+                _ => 1
+            };
+        }
     }
 
     <!-- ===== UNIFIED WORKFLOW NAVIGATION ===== -->
@@ -418,7 +527,9 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
                             <i class="bi bi-journal-text me-2 text-primary"></i>
-                            <h6 class="mb-0">Chapters</h6>
+                            <h6 class="mb-0">
+                                @(Model.CurrentStage == FypStage.Fyp1 ? "FYP-1 Chapters" : "FYP-2 Chapters")
+                            </h6>
                         </div>
 
                         <div class="text-center py-4">
@@ -446,8 +557,7 @@
                                     <div class="card-body d-flex flex-column">
                                         <h6 class="card-title mb-3">
                                             <i class="bi bi-journal-text me-1 text-primary"></i>
-                                            @ch.ChapterType
-                                        </h6>
+                                                @ch.ChapterType.ToString().Humanize(LetterCasing.Title)                                        </h6>
 
                                         @if (!ch.IsUnlocked)
                                         {
@@ -639,13 +749,15 @@
             } *@
 
             <!-- ===== EVALUATION SCHEDULE ===== -->
-            @if (Model.PublishedEvaluations.Any())
+            @if (currentStageEvaluations.Any())
             {
                 <div class="mt-4">
-                    <h5 class="mb-3">Evaluation Schedule & Instructions</h5>
+                    <h5 class="mb-3">
+                        @(Model.CurrentStage == FypStage.Fyp1 ? "FYP-1 Evaluation Schedule & Instructions" : "FYP-2 Evaluation Schedule & Instructions")
+                    </h5>
 
                     <div class="row g-3">
-                        @foreach (var eval in Model.PublishedEvaluations)
+                        @foreach (var eval in currentStageEvaluations)
                         {
                             <div class="col-md-6 col-xl-4">
                                 <div class="status-card p-3 h-100">
@@ -818,31 +930,6 @@
                 </div>
             }
 
-            <!-- ===== Completion and Finalizing ===== -->
-            @if (Model.Group != null && Model.Group.CurrentStage == EMAP.Domain.Fyp.FypStage.Fyp2)
-            {
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body">
-                        <div class="alert alert-success mb-3">
-                            <h5 class="mb-2">FYP-1 Completed</h5>
-                            <p class="mb-0">
-                                Your group has successfully completed FYP-1 and has been promoted to <strong>FYP-2</strong>.
-                                You may now continue your project in the next phase.
-                            </p>
-                        </div>
-
-                        <div class="d-flex flex-wrap gap-2">
-                            <a asp-controller="Fyp" asp-action="Fyp2Portal" class="btn btn-primary">
-                                Open FYP-2 Portal
-                            </a>
-                            <span class="text-muted align-self-center">
-                                FYP-1 records remain available as completed history.
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            }
-
             <!-- ===== SUPERVISOR LIST ===== -->
             @if (Model.ShowSupervisorList)
             {
@@ -920,13 +1007,30 @@
                     <h5 class="card-title mb-3">
                         <i class="bi bi-list-check me-2"></i>Next Steps
                     </h5>
-                    <ol class="small mb-0">
-                        <li>Create your FYP group</li>
-                        <li>Select a supervisor</li>
-                        <li>Wait for approval</li>
-                        <li>Submit proposal</li>
-                        <li>Follow committee announcements (chapters)</li>
-                    </ol>
+                    @if (Model.CurrentStage == FypStage.Fyp1)
+                    {
+                        <ol class="small mb-0">
+                            <li>Create your FYP group</li>
+                            <li>Select a supervisor</li>
+                            <li>Wait for approval</li>
+                            <li>Submit proposal</li>
+                            <li>Attend proposal defense</li>
+                            <li>Complete FYP-1 chapters</li>
+                            <li>Appear in Mid and Final evaluations</li>
+                        </ol>
+                    }
+                    else
+                    {
+                        <ol class="small mb-0">
+                            <li>Complete System Implementation</li>
+                            <li>Complete System Testing and Development</li>
+                            <li>Submit Results and Discussion</li>
+                            <li>Appear in Mid Evaluation</li>
+                            <li>Appear in Pre-Final Evaluation</li>
+                            <li>Appear in Final Evaluation</li>
+                            <li>Complete FYP successfully</li>
+                        </ol>
+                    }
                 </div>
             </div>
 
