@@ -660,6 +660,9 @@ namespace EMAP.Web.Controllers
         {
             var chapters = await _db.FypChapterSubmissions
                 .Include(x => x.Group)
+                    .ThenInclude(g => g.FypCall)
+                .Include(x => x.Group)
+                    .ThenInclude(g => g.Supervisor)
                 .Include(x => x.ChapterAnnouncement)
                 .Where(x => x.Status == ChapterSubmissionStatus.SupervisorApproved)
                 .OrderByDescending(x => x.SubmittedAt)

@@ -1,62 +1,167 @@
 ﻿@using EMAP.Domain.Fyp
 @model List<FypChapterSubmission>
 
-<h3 class="mb-3">Student Chapter Submissions</h3>
-
-@if (!Model.Any())
-{
-    <div class="alert alert-success">
-        🎉 No chapters pending review.
-    </div>
+@{
+    ViewData["Title"] = "Chapter Reviews";
 }
 
-<table class="table table-bordered align-middle">
+<div class="container py-4">
 
-    <thead class="table-light">
-        <tr>
-            <th>Group</th>
-            <th>Chapter</th>
-            <th>Title</th>
-            <th>Submitted At</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Chapter Reviews</h2>
+            <p class="text-muted mb-0">
+                Review student chapter submissions and either approve them or request revisions.
+            </p>
+        </div>
+        <a asp-controller="Supervisor"
+               asp-action="Dashboard"
+               class="btn btn-outline-secondary btn-sm">
+            Back to Dashboard
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <h5 class="mb-2">No Chapters Pending Review</h5>
+                <p class="text-muted mb-0">
+                    All assigned chapter submissions have already been reviewed.
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
         @foreach (var s in Model)
         {
-            <tr>
-                <td>Group #@s.GroupId</td>
-                <td>@s.ChapterAnnouncement.ChapterType</td>
-                <td>@s.Title</td>
-                <td>@s.SubmittedAt.ToString("dd MMM yyyy")</td>
-                <td>
-                    <span class="badge bg-info">@s.Status</span>
-                </td>
-                <td>
-                    <a href="@s.FilePath" target="_blank"
-                       class="btn btn-sm btn-outline-primary">
-                        View
-                    </a>
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Left: Submission Info -->
+                        <div class="col-lg-7">
+                            <div class="mb-3">
+                                <h5 class="mb-1">@s.Title</h5>
+                                <div class="text-muted small">
+                                    Chapter submission awaiting supervisor review
+                                </div>
+                            </div>
 
-                    <!-- ✅ ACCEPT -->
-                    <form asp-action="ReviewChapter" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="submissionId" value="@s.Id" />
-                        <input type="hidden" name="approve" value="true" />
-                        <button class="btn btn-sm btn-success">Accept</button>
-                    </form>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <div class="small text-muted">Group</div>
+                                    <div class="fw-semibold">
+                                        Group #@s.GroupId
+                                        @if (s.Group != null && !string.IsNullOrWhiteSpace(s.Group.TentativeProjectTitle))
+                                        {
+                                            <span>· @s.Group.TentativeProjectTitle</span>
+                                        }
+                                    </div>
+                                </div>
 
-                    <form asp-action="ReviewChapter" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="submissionId" value="@s.Id" />
-                        <input type="hidden" name="approve" value="false" />
-                        <input type="hidden" name="feedback" value="Need changes" />
-                        <button class="btn btn-sm btn-warning">Changes</button>
-                    </form>
+                                <div class="col-md-6">
+                                    <div class="small text-muted">Chapter</div>
+                                    <div class="fw-semibold">
+                                        @(s.ChapterAnnouncement?.ChapterType.ToString() ?? "-")
+                                    </div>
+                                </div>
 
-                </td>
-            </tr>
+                                <div class="col-md-6">
+                                    <div class="small text-muted">Batch</div>
+                                    <div class="fw-semibold">
+                                        @(s.Group?.FypCall?.Batch ?? "-")
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="small text-muted">Current Status</div>
+                                    <div>
+                                        <span class="badge bg-info text-dark">@s.Status</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="small text-muted">Submitted At</div>
+                                    <div class="fw-semibold">
+                                        @s.SubmittedAt.ToString("dd MMM yyyy, hh:mm tt")
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="small text-muted">Supervisor</div>
+                                    <div class="fw-semibold">
+                                        @(s.Group?.Supervisor?.Name ?? "-")
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <a asp-controller="FilePreview"
+                                       asp-action="Chapter"
+                                       asp-route-id="@s.Id"
+                                       class="btn btn-outline-primary btn-sm">
+                                    Preview File
+                                </a>
+
+                                <a href="@s.FilePath"
+                                       target="_blank"
+                                       class="btn btn-outline-secondary btn-sm">
+                                    Download
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Right: Review Form -->
+                        <div class="col-lg-5">
+                            <div class="border rounded-4 p-3 bg-light h-100">
+                                <h6 class="mb-3">Supervisor Decision</h6>
+
+                                <form asp-controller="ChapterReview" asp-action="Review" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@s.Id" />
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">
+                                            Feedback (required only if requesting changes)
+                                        </label>
+                                        <textarea name="feedback"
+                                                  class="form-control"
+                                                  rows="5"
+                                                  placeholder="Write clear academic feedback for revision if needed."></textarea>
+                                    </div>
+
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <button type="submit"
+                                                name="status"
+                                                value="SupervisorApproved"
+                                                class="btn btn-success">
+                                            Accept Chapter
+                                        </button>
+
+                                        <button type="submit"
+                                                name="status"
+                                                value="ChangesRequested"
+                                                class="btn btn-warning">
+                                            Request Changes
+                                        </button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    }
+</div>

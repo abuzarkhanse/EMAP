@@ -46,5 +46,7 @@ namespace EMAP.Web.ViewModels.Fyp
         public List<FypMilestone> EvaluationMilestones { get; set; } = new();
         public List<FypEvaluation> PublishedEvaluations { get; set; } = new();
         public List<StudentPublishedEvaluationCardViewModel> PublishedMemberEvaluations { get; set; } = new();
+
+        public List<EMAP.Domain.Fyp.FypEvaluation> ScheduledEvaluations { get; set; } = new();
     }
 }

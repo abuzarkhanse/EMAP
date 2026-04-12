@@ -761,15 +761,13 @@
             } *@
 
             <!-- ===== EVALUATION SCHEDULE ===== -->
-            @if (currentStageEvaluations.Any())
+            @if (Model.ScheduledEvaluations != null && Model.ScheduledEvaluations.Any())
             {
                 <div class="mt-4">
-                    <h5 class="mb-3">
-                        @(Model.CurrentStage == FypStage.Fyp1 ? "FYP-1 Evaluation Schedule & Instructions" : "FYP-2 Evaluation Schedule & Instructions")
-                    </h5>
+                    <h5 class="mb-3">Evaluation Schedule & Instructions</h5>
 
                     <div class="row g-3">
-                        @foreach (var eval in currentStageEvaluations)
+                        @foreach (var eval in Model.ScheduledEvaluations)
                         {
                             <div class="col-md-6 col-xl-4">
                                 <div class="status-card p-3 h-100">
@@ -781,7 +779,14 @@
                                             <small class="text-muted">@eval.Status</small>
                                         </div>
 
-                                        <span class="badge bg-info text-dark">Published</span>
+                                        @if (eval.IsPublishedToStudent)
+                                        {
+                                            <span class="badge bg-success">Result Published</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info text-dark">Scheduled</span>
+                                        }
                                     </div>
 
                                     <div class="small mb-2">
@@ -810,7 +815,7 @@
                                         <div class="small">
                                             <strong>Committee:</strong><br />
                                             @foreach (var line in eval.CommitteeMembers
-                                                                            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                                                                                                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                                             {
                                                 <div>@line</div>
                                             }

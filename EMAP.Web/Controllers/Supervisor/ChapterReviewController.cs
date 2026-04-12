@@ -24,6 +24,9 @@ namespace EMAP.Web.Controllers.Supervisor
 
             var items = await _db.FypChapterSubmissions
                 .Include(x => x.Group)
+                    .ThenInclude(g => g.FypCall)
+                .Include(x => x.Group)
+                    .ThenInclude(g => g.Supervisor)
                 .Include(x => x.ChapterAnnouncement)
                 .Where(x =>
                     x.SupervisorId == userId &&
@@ -32,7 +35,7 @@ namespace EMAP.Web.Controllers.Supervisor
                 .OrderByDescending(x => x.SubmittedAt)
                 .ToListAsync();
 
-            return View(items);
+            return View("~/Views/Supervisor/ChapterReviews.cshtml", items);
         }
 
         // ================= REVIEW =================
@@ -56,16 +59,27 @@ namespace EMAP.Web.Controllers.Supervisor
             if (status == ChapterSubmissionStatus.SupervisorApproved)
             {
                 sub.Status = ChapterSubmissionStatus.SupervisorApproved;
+                sub.Feedback = null;
             }
             else if (status == ChapterSubmissionStatus.ChangesRequested)
             {
+                if (string.IsNullOrWhiteSpace(feedback))
+                {
+                    TempData["Error"] = "Please provide feedback before requesting changes.";
+                    return RedirectToAction(nameof(Index));
+                }
+
                 sub.Status = ChapterSubmissionStatus.ChangesRequested;
-                sub.Feedback = feedback;
+                sub.Feedback = feedback.Trim();
             }
 
             sub.ReviewedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
+
+            TempData["Success"] = status == ChapterSubmissionStatus.SupervisorApproved
+                ? "Chapter approved successfully."
+                : "Feedback sent and changes requested successfully.";
 
             return RedirectToAction(nameof(Index));
         }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EMAP.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+415048a8fdc2f9cafd5d7efca4fc6f6bf034b90f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ed768931eff11a1742dc9b3edba0f73a39efac27")]
 [assembly: System.Reflection.AssemblyProductAttribute("EMAP.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EMAP.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

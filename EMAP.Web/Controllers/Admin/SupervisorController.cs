@@ -710,16 +710,28 @@ namespace EMAP.Web.Controllers.Admin
         }
 
         [Authorize(Roles = "Supervisor")]
+        [HttpGet]
         public async Task<IActionResult> Review(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var proposal = await _db.ProposalSubmissions
                 .Include(p => p.Group)
                     .ThenInclude(g => g.FypCall)
                 .Include(p => p.Group)
                     .ThenInclude(g => g.Supervisor)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .Include(p => p.DefenseSchedule)
+                .FirstOrDefaultAsync(p =>
+                    p.Id == id &&
+                    p.Group != null &&
+                    p.Group.Supervisor != null &&
+                    p.Group.Supervisor.UserId == userId);
 
-            if (proposal == null) return NotFound();
+            if (proposal == null)
+            {
+                TempData["Error"] = "Proposal not found or you are not allowed to review it.";
+                return RedirectToAction(nameof(Proposals));
+            }
 
             return View(proposal);
         }
@@ -868,5 +880,6 @@ namespace EMAP.Web.Controllers.Admin
 
             return RedirectToAction(nameof(ChapterReviews));
         }
+
     }
 }

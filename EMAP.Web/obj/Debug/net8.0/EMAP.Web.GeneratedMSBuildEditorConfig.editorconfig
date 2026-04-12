@@ -74,6 +74,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVmZW5zZUNvbW1pdHRlZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/abuzarkhanse/EMAP/EMAP.Web/Views/FilePreview/Preview.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmlsZVByZXZpZXdcUHJldmlldy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/abuzarkhanse/EMAP/EMAP.Web/Views/FypCall/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwQ2FsbFxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

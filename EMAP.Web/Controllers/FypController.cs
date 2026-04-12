@@ -58,6 +58,7 @@ namespace EMAP.Web.Controllers
             var evaluationMilestones = new List<FypMilestone>();
             var publishedEvaluations = new List<FypEvaluation>();
             var publishedMemberEvaluations = new List<StudentPublishedEvaluationCardViewModel>();
+            var scheduledEvaluations = new List<FypEvaluation>();
             var currentStage = FypStage.Fyp1;
 
             if (activeCall != null)
@@ -168,6 +169,14 @@ namespace EMAP.Web.Controllers
                         .ThenBy(x => x.Id)
                         .ToListAsync();
 
+                    scheduledEvaluations = await _db.FypEvaluations
+                        .Include(x => x.Milestone)
+                        .Where(x => x.StudentGroupId == group.Id)
+                        .Where(x => x.ScheduledAt != null)
+                        .OrderBy(x => x.ScheduledAt)
+                        .ThenBy(x => x.Id)
+                        .ToListAsync();
+
                     publishedEvaluations = await _db.FypEvaluations
                         .Include(x => x.Milestone)
                         .Include(x => x.Members)
@@ -254,7 +263,8 @@ namespace EMAP.Web.Controllers
                 CurrentStage = currentStage,
                 EvaluationMilestones = evaluationMilestones,
                 PublishedEvaluations = publishedEvaluations,
-                PublishedMemberEvaluations = publishedMemberEvaluations
+                PublishedMemberEvaluations = publishedMemberEvaluations,
+                ScheduledEvaluations = scheduledEvaluations
             };
 
             return View(model);
