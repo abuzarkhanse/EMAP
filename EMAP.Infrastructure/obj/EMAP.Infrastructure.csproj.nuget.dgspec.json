@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj": {}
+    "C:\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj": {}
   },
   "projects": {
-    "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
+    "C:\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+        "projectUniqueName": "C:\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
         "projectName": "EMAP.Domain",
-        "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
+        "projectPath": "C:\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj",
         "packagesPath": "C:\\nuget",
-        "outputPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\obj\\",
+        "outputPath": "C:\\abuzarkhanse\\EMAP\\EMAP.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -84,14 +84,14 @@
         }
       }
     },
-    "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj": {
+    "C:\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
+        "projectUniqueName": "C:\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
         "projectName": "EMAP.Infrastructure",
-        "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
+        "projectPath": "C:\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\EMAP.Infrastructure.csproj",
         "packagesPath": "C:\\nuget",
-        "outputPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\obj\\",
+        "outputPath": "C:\\abuzarkhanse\\EMAP\\EMAP.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -113,8 +113,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
-                "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj"
+              "C:\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj": {
+                "projectPath": "C:\\abuzarkhanse\\EMAP\\EMAP.Domain\\EMAP.Domain.csproj"
               }
             }
           }

@@ -116,6 +116,17 @@
         <div class="alert alert-success">@TempData["Success"]</div>
     }
 
+    @if (Model.Group != null && Model.Group.IsFypCompleted)
+    {
+        <div class="alert alert-success mb-4">
+            <h5 class="mb-2">Final Year Project Completed Successfully</h5>
+            <p class="mb-0">
+                Your group has completed all required academic phases of the Final Year Project.
+                The coordinator has finalized your project and the record is now ready for administrative processing.
+            </p>
+        </div>
+    }
+
     @{
         string currentStepKey;
         string currentStepLabel;
@@ -176,6 +187,7 @@
         else
         {
             currentStepKey =
+                Model.Group != null && Model.Group.IsFypCompleted ? "complete" :
                 !chapter1Done ? "implementation" :
                 !chapter2Done ? "testing" :
                 !chapter3Done ? "results" :
@@ -589,7 +601,7 @@
                                                 </div>
                                             }
 
-                                            @if (ch.CanSubmitNow)
+                                            @if (ch.CanSubmitNow && !(Model.Group?.IsFypCompleted ?? false))
                                             {
                                                 <a asp-controller="Fyp"
                                                    asp-action="SubmitChapter"
@@ -641,7 +653,7 @@
                                                 </div>
                                             }
 
-                                            @if (ch.CanResubmit)
+                                            @if (ch.CanResubmit && !(Model.Group?.IsFypCompleted ?? false))
                                             {
                                                 <a asp-controller="Fyp"
                                                    asp-action="SubmitChapter"

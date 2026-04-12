@@ -1,0 +1,81 @@
+﻿@model IEnumerable<EMAP.Domain.Fyp.StudentGroup>
+
+@{
+    ViewData["Title"] = "Finalize FYP-2";
+}
+
+<div class="mb-4">
+    <div class="text-uppercase text-muted fw-semibold small">Coordinator Panel</div>
+    <h2 class="mb-1">Finalize FYP-2</h2>
+    <p class="text-muted mb-0">
+        Finalize completed FYP-2 groups and mark them ready for admin visibility and LMS/CMS sync.
+    </p>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Group</th>
+                        <th>Program</th>
+                        <th>Batch</th>
+                        <th>Supervisor</th>
+                        <th>Current Stage</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                No FYP-2 groups are currently available for finalization.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var group in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@group.TentativeProjectTitle</div>
+                                    <div class="text-muted small">Group #@group.Id</div>
+                                </td>
+                                <td>@group.ProgramCode</td>
+                                <td>@group.FypCall?.Batch</td>
+                                <td>@group.Supervisor?.Name</td>
+                                <td>
+                                    <span class="badge bg-primary">@group.CurrentStage</span>
+                                </td>
+                                <td class="text-end">
+                                    <form asp-action="FinalizeFyp2" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="groupId" value="@group.Id" />
+                                        <input type="hidden" name="completionRemarks" value="FYP completed and finalized by coordinator." />
+                                        <button type="submit"
+                                                class="btn btn-success btn-sm"
+                                                onclick="return confirm('Finalize this FYP-2 group and mark it completed?');">
+                                            Finalize FYP-2
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

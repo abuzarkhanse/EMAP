@@ -71,6 +71,17 @@ namespace EMAP.Web.Controllers
 
             vm.Group = group;
 
+            if (group != null && group.IsFypCompleted)
+            {
+                vm.CurrentStageLabel = "FYP Completed";
+                vm.CurrentStatusLabel = "Final Year Project Completed";
+                vm.NextActionTitle = "View Final FYP Record";
+                vm.NextActionDescription = "Your Final Year Project has been completed successfully and finalized by the coordinator.";
+                vm.NextActionButtonText = "Open FYP Portal";
+                vm.NextActionController = "Fyp";
+                vm.NextActionAction = "Index";
+            }
+
             if (group == null)
             {
                 vm.CurrentStatusLabel = "Group Not Created";
@@ -125,16 +136,17 @@ namespace EMAP.Web.Controllers
                     x.Milestone.Stage == group.CurrentStage);
 
             // ===== Status + Next Action =====
-            if (group.Status == GroupStatus.PendingSupervisorSelection)
+            if (group.IsFypCompleted)
             {
-                vm.CurrentStatusLabel = "Supervisor Selection Pending";
-                vm.NextActionTitle = "Select a Supervisor";
-                vm.NextActionDescription = "Your group is created. Choose a supervisor to continue.";
-                vm.NextActionButtonText = "Select Supervisor";
+                vm.CurrentStatusLabel = "Final Year Project Completed";
+                vm.NextActionTitle = "View Final FYP Record";
+                vm.NextActionDescription = "All academic requirements have been completed successfully.";
+                vm.NextActionButtonText = "Open FYP Portal";
                 vm.NextActionController = "Fyp";
                 vm.NextActionAction = "Index";
             }
-            else if (group.Status == GroupStatus.PendingSupervisorApproval)
+
+            else if (group.Status == GroupStatus.PendingSupervisorSelection)
             {
                 vm.CurrentStatusLabel = "Waiting for Supervisor Approval";
                 vm.NextActionTitle = "Wait for Supervisor Approval";

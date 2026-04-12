@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace EMAP.Domain.Fyp
@@ -41,10 +42,23 @@ namespace EMAP.Domain.Fyp
         [StringLength(300)]
         public string TentativeProjectTitle { get; set; } = string.Empty;
 
-        // New academic stage support
+        // Academic stage support
         public FypStage CurrentStage { get; set; } = FypStage.Fyp1;
 
-        // New evaluations linked to this group
+        // Final academic completion
+        public bool IsFypCompleted { get; set; } = false;
+
+        public DateTime? CompletedAt { get; set; }
+
+        [StringLength(500)]
+        public string? CompletionRemarks { get; set; }
+
+        // LMS / CMS integration readiness
+        public bool ReadyForLmsSync { get; set; } = false;
+
+        public DateTime? LastStatusUpdatedAt { get; set; }
+
+        // Evaluations linked to this group
         public ICollection<FypEvaluation> Evaluations { get; set; } = new List<FypEvaluation>();
     }
 }

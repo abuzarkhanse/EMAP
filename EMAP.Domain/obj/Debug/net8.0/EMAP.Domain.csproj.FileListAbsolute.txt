@@ -11,3 +11,16 @@ C:\Dev\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.dll
 C:\Dev\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\refint\EMAP.Domain.dll
 C:\Dev\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.pdb
 C:\Dev\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\ref\EMAP.Domain.dll
+C:\abuzarkhanse\EMAP\EMAP.Domain\bin\Debug\net8.0\EMAP.Domain.deps.json
+C:\abuzarkhanse\EMAP\EMAP.Domain\bin\Debug\net8.0\EMAP.Domain.dll
+C:\abuzarkhanse\EMAP\EMAP.Domain\bin\Debug\net8.0\EMAP.Domain.pdb
+C:\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.csproj.AssemblyReference.cache
+C:\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.AssemblyInfoInputs.cache
+C:\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.AssemblyInfo.cs
+C:\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.csproj.CoreCompileInputs.cache
+C:\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.sourcelink.json
+C:\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.dll
+C:\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\refint\EMAP.Domain.dll
+C:\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\EMAP.Domain.pdb
+C:\abuzarkhanse\EMAP\EMAP.Domain\obj\Debug\net8.0\ref\EMAP.Domain.dll

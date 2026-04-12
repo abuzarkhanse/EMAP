@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "JGQ/l5rB0fw=",
+  "dgSpecHash": "89MKnYEW5Ag=",
   "success": true,
-  "projectFilePath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+  "projectFilePath": "C:\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
   "expectedPackageFiles": [
     "C:\\nuget\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\nuget\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
@@ -194,9 +194,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'Microsoft.Build' 17.8.3 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3q9-fxm7-j8fq",
-      "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+      "projectPath": "C:\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+      "filePath": "C:\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
       "libraryId": "Microsoft.Build",
       "targetGraphs": [
         "net8.0"
@@ -206,9 +206,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'System.Text.Json' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-8g4q-xg66-9fp4",
-      "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+      "projectPath": "C:\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+      "filePath": "C:\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
       "libraryId": "System.Text.Json",
       "targetGraphs": [
         "net8.0"
@@ -218,9 +218,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'System.Text.Json' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-hh2w-p6rv-4g7w",
-      "projectPath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+      "projectPath": "C:\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Dev\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+      "filePath": "C:\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
       "libraryId": "System.Text.Json",
       "targetGraphs": [
         "net8.0"

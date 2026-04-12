@@ -21,6 +21,17 @@
         </div>
     </div>
 
+    @if (Model.Group != null && Model.Group.IsFypCompleted)
+    {
+        <div class="alert alert-success border-0 shadow-sm mb-4">
+            <h5 class="mb-2">Final Year Project Completed Successfully</h5>
+            <p class="mb-0">
+                Your group has successfully completed all FYP academic requirements.
+                The project has been finalized by the coordinator and is now ready for administrative record processing.
+            </p>
+        </div>
+    }
+
     <!-- HERO SUMMARY -->
     <section class="student-hero-card mb-4">
         <div class="student-hero-content">
@@ -107,6 +118,10 @@
                            class="btn btn-sm btn-outline-primary admin-action-btn">
                         @Model.NextActionButtonText
                     </a>
+
+                    <a href="/templates/SRS%20Template.docx" class="btn btn-outline-secondary btn-sm" download>
+                        Download Template
+                    </a>
                 </div>
             </section>
 
@@ -174,35 +189,6 @@
                                 <div class="student-info-meta">@Model.CurrentStageLabel</div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- QUICK LINKS -->
-            <section class="student-card">
-                <div class="student-card-icon">
-                    <i class="bi bi-link-45deg"></i>
-                </div>
-
-                <div class="student-card-body">
-                    <h3>Quick Actions</h3>
-
-                    <div class="d-flex flex-wrap gap-2 mt-3">
-                        <a asp-controller="Fyp" asp-action="Index" class="btn btn-outline-primary btn-sm">Open FYP Portal</a>
-
-                        @if (Model.HasProposal)
-                        {
-                            <a asp-controller="Fyp" asp-action="SubmitProposal" class="btn btn-outline-secondary btn-sm">View Proposal</a>
-                        }
-
-                        @if (Model.DefenseSchedule != null)
-                        {
-                            <a asp-controller="Fyp" asp-action="Index" asp-route-showDefense="1" class="btn btn-outline-secondary btn-sm">View Defense Slot</a>
-                        }
-
-                        <a href="/templates/SRS%20Template.docx" class="btn btn-outline-secondary btn-sm" download>
-                            Download Template
-                        </a>
                     </div>
                 </div>
             </section>

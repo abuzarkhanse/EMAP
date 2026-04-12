@@ -1,0 +1,172 @@
+﻿@model EMAP.Web.Controllers.FypFinalizationCenterVm
+
+@{
+    ViewData["Title"] = "FYP Finalization";
+}
+
+<div class="mb-4">
+    <div class="text-uppercase text-muted fw-semibold small">Coordinator Panel</div>
+    <h2 class="mb-1">FYP Finalization</h2>
+    <p class="text-muted mb-0">
+        Finalize ready groups for FYP-1 promotion and FYP-2 academic completion.
+    </p>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="row g-4">
+
+    <!-- FYP-1 -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div>
+                        <h4 class="mb-1">FYP-1 Ready Groups</h4>
+                        <div class="text-muted small">
+                            Ready to be promoted to FYP-2
+                        </div>
+                    </div>
+
+                    <form asp-action="FinalizeAllReadyFyp1" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"
+                                class="btn btn-success btn-sm"
+                                onclick="return confirm('Finalize all ready FYP-1 groups?');">
+                            Finalize All FYP-1
+                        </button>
+                    </form>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Group</th>
+                                <th>Program</th>
+                                <th>Batch</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.ReadyForFyp1Finalization.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        No FYP-1 groups are currently ready.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var group in Model.ReadyForFyp1Finalization)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">@group.TentativeProjectTitle</div>
+                                            <div class="text-muted small">Group #@group.Id</div>
+                                        </td>
+                                        <td>@group.ProgramCode</td>
+                                        <td>@group.FypCall?.Batch</td>
+                                        <td class="text-end">
+                                            <form asp-action="FinalizeFyp1" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="groupId" value="@group.Id" />
+                                                <button type="submit"
+                                                        class="btn btn-outline-success btn-sm"
+                                                        onclick="return confirm('Finalize this FYP-1 group?');">
+                                                    Finalize
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FYP-2 -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div>
+                        <h4 class="mb-1">FYP-2 Ready Groups</h4>
+                        <div class="text-muted small">
+                            Ready for final academic completion
+                        </div>
+                    </div>
+
+                    <form asp-action="FinalizeAllReadyFyp2" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"
+                                class="btn btn-primary btn-sm"
+                                onclick="return confirm('Finalize all ready FYP-2 groups?');">
+                            Finalize All FYP-2
+                        </button>
+                    </form>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Group</th>
+                                <th>Program</th>
+                                <th>Batch</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.ReadyForFyp2Finalization.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        No FYP-2 groups are currently ready.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var group in Model.ReadyForFyp2Finalization)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">@group.TentativeProjectTitle</div>
+                                            <div class="text-muted small">Group #@group.Id</div>
+                                        </td>
+                                        <td>@group.ProgramCode</td>
+                                        <td>@group.FypCall?.Batch</td>
+                                        <td class="text-end">
+                                            <form asp-action="FinalizeFyp2" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="groupId" value="@group.Id" />
+                                                <input type="hidden" name="completionRemarks" value="FYP completed and finalized by coordinator." />
+                                                <button type="submit"
+                                                        class="btn btn-outline-primary btn-sm"
+                                                        onclick="return confirm('Finalize this FYP-2 group?');">
+                                                    Complete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
