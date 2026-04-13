@@ -17,6 +17,7 @@ namespace EMAP.Domain.Fyp
         [StringLength(150)]
         public string Email { get; set; } = string.Empty;
 
+        // Keep this for display / legacy compatibility
         [Required(ErrorMessage = "Department is required.")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Department must be between 2 and 100 characters.")]
         public string Department { get; set; } = string.Empty;
@@ -33,13 +34,16 @@ namespace EMAP.Domain.Fyp
 
         public bool IsActive { get; set; } = true;
 
-
-        // ✅ ONLY ONE FK to AspNetUsers
         [Required]
         public string UserId { get; set; } = "";
 
-        // ✅ Tell EF exactly which FK this navigation uses
         [ForeignKey(nameof(UserId))]
         public ApplicationUser? User { get; set; }
+
+        [Required(ErrorMessage = "Department is required.")]
+        public int DepartmentId { get; set; }
+
+        [ForeignKey(nameof(DepartmentId))]
+        public Department? DepartmentRef { get; set; }
     }
 }

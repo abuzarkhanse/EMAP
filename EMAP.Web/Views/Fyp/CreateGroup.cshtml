@@ -30,6 +30,13 @@
                 </div>
 
                 <div class="mb-3">
+                    <label asp-for="FypDescription" class="form-label"></label>
+                    <textarea asp-for="FypDescription" class="form-control" rows="5"
+                              placeholder="Write a short description of your FYP idea, problem, goals, and expected solution"></textarea>
+                    <span asp-validation-for="FypDescription" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
                     <label asp-for="ProgramCode" class="form-label"></label>
                     <input asp-for="ProgramCode" class="form-control" placeholder="SE / CS / AI / DS / CY" />
                     <span asp-validation-for="ProgramCode" class="text-danger"></span>

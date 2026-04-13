@@ -21,6 +21,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>Batch</th>
+                        <th>Department</th>
                         <th>Title</th>
                         <th>Announcement Date</th>
                         <th>Proposal Deadline</th>
@@ -33,6 +34,7 @@
                     {
                         <tr>
                             <td>@item.Batch</td>
+                            <td>@item.Department?.Name</td>
                             <td>@item.Title</td>
                             <td>@item.AnnouncementDate.ToString("dd MMM yyyy")</td>
                             <td>@item.ProposalDeadline.ToString("dd MMM yyyy")</td>

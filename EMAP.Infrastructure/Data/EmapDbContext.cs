@@ -12,6 +12,8 @@ namespace EMAP.Infrastructure.Data
         {
         }
 
+        public DbSet<Department> Departments { get; set; }
+
         public DbSet<FypCall> FypCalls => Set<FypCall>();
         public DbSet<FypProject> FypProjects => Set<FypProject>();
         public DbSet<StudentGroup> StudentGroups => Set<StudentGroup>();
@@ -35,6 +37,29 @@ namespace EMAP.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Department>()
+                .HasIndex(d => d.Code)
+                .IsUnique();
+
+            modelBuilder.Entity<FypCall>()
+                .HasOne(fc => fc.Department)
+                .WithMany(d => d.FypCalls)
+                .HasForeignKey(fc => fc.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StudentGroup>()
+                .HasOne(g => g.Department)
+                .WithMany(d => d.StudentGroups)
+                .HasForeignKey(g => g.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasOne(u => u.Department)
+                .WithMany()
+                .HasForeignKey(u => u.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             base.OnModelCreating(modelBuilder);
 
             // ProposalDefenseEvaluation 1-1 ProposalSubmission

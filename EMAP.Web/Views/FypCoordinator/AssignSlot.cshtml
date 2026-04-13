@@ -1,87 +1,347 @@
 ﻿@model EMAP.Web.ViewModels.Fyp.AssignSlotViewModel
 
 @{
-    ViewData["Title"] = "Assign Defense Slot";
+    ViewData["Title"] = "Schedule Proposal Defense";
 }
 
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
         <div>
-            <h2 class="mb-0">Assign Defense Slot</h2>
-            <small class="text-muted">Each slot is typically 10 minutes (can adjust if needed)</small>
+            <h2 class="mb-1">Schedule Proposal Defense</h2>
+            <p class="text-muted mb-0">
+                Choose a date, available slot, venue, and coordinator notes for this proposal defense.
+            </p>
         </div>
-        <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index", "FypCoordinator")">Back</a>
+
+        <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index", "FypCoordinator")">
+            Back
+        </a>
     </div>
 
-    <div class="mb-3">
-        <div><strong>Batch:</strong> @Model.Batch</div>
-        <div><strong>Title:</strong> @Model.Title</div>
-        <div><strong>Group Leader:</strong> @Model.GroupLeaderName</div>
+    @using (Html.BeginForm("AssignSlot", "FypCoordinator", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.ProposalId)
 
-        @if (!string.IsNullOrWhiteSpace(Model.Member2Name))
-        {
-            <div><strong>Member:</strong> @Model.Member2Name</div>
-        }
+        <div class="row g-4">
 
-        @if (!string.IsNullOrWhiteSpace(Model.Member3Name))
-        {
-            <div><strong>Member:</strong> @Model.Member3Name</div>
-        }
+            <!-- LEFT SIDE -->
+            <div class="col-lg-8">
 
-        <div><strong>Supervisor:</strong> @Model.SupervisorName</div>
-    </div>
+                <!-- GROUP / PROPOSAL SUMMARY -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                            <h5 class="mb-0">Proposal Summary</h5>
+                            <span class="badge bg-light text-dark border">Batch @Model.Batch</span>
+                        </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            @using (Html.BeginForm("AssignSlot", "FypCoordinator", FormMethod.Post))
-            {
-                @Html.AntiForgeryToken()
-                @Html.HiddenFor(m => m.ProposalId)
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="text-muted small">Project Title</div>
+                                <div class="fw-semibold">@Model.Title</div>
+                            </div>
 
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Defense Date</label>
-                        <input type="date" name="DefenseDate"
-                               value="@Model.DefenseDate.ToString("yyyy-MM-dd")"
-                               class="form-control" />
-                        <div class="form-text">
-                            Change date by editing and re-opening page if needed.
+                            <div class="col-md-6">
+                                <div class="text-muted small">Supervisor</div>
+                                <div class="fw-semibold">@Model.SupervisorName</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="text-muted small">Group Leader</div>
+                                <div>@Model.GroupLeaderName</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="text-muted small">Members</div>
+                                <div>
+                                    @if (!string.IsNullOrWhiteSpace(Model.Member2Name))
+                                    {
+                                        <div>@Model.Member2Name</div>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Model.Member3Name))
+                                    {
+                                        <div>@Model.Member3Name</div>
+                                    }
+                                    @if (string.IsNullOrWhiteSpace(Model.Member2Name) && string.IsNullOrWhiteSpace(Model.Member3Name))
+                                    {
+                                        <span class="text-muted">No additional members</span>
+                                    }
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Slot Time</label>
-                        @Html.DropDownListFor(m => m.SelectedSlot, Model.AvailableSlots, "-- Select Slot --",
-                        new { @class = "form-select" })
-                    @Html.ValidationMessageFor(m => m.SelectedSlot, "", new { @class = "text-danger small" })
-                    <div class="form-text">
-                        Disabled slots are already taken.
+                <!-- SCHEDULING FORM -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3">Defense Scheduling Details</h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Defense Date</label>
+                                <input type="date"
+                                       id="DefenseDate"
+                                       name="DefenseDate"
+                                       value="@Model.DefenseDate.ToString("yyyy-MM-dd")"
+                                       class="form-control" />
+                                <div class="form-text">
+                                    Select the official proposal defense date.
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Duration (minutes)</label>
+                                @Html.TextBoxFor(m => m.DurationMinutes, new { @class = "form-control", type = "number", min = "5", max = "120", id = "DurationMinutes" })
+                                <div class="form-text">
+                                    Default is 10 minutes.
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Venue / Room</label>
+                                @Html.TextBoxFor(m => m.Venue, new { @class = "form-control", placeholder = "e.g., Seminar Hall / Lab 2", id = "Venue" })
+                                <div class="form-text">
+                                    Optional, but recommended.
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Coordinator Notes</label>
+                                @Html.TextAreaFor(
+                                         m => m.Instructions,
+                                         5,
+                                         60,
+                                         new
+                                         {
+                                             @class = "form-control",
+                                             placeholder = "e.g., Students must bring presentation slides, problem statement summary, methodology, and demo plan.",
+                                             id = "Instructions"
+                                         })
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Duration (minutes)</label>
-                    @Html.TextBoxFor(m => m.DurationMinutes, new { @class = "form-control" })
-                    <div class="form-text">Default is 10 minutes.</div>
-                </div>
+                <!-- SLOT PICKER -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                            <div>
+                                <h5 class="mb-1">Available Time Slots</h5>
+                                <div class="text-muted small">
+                                    Select a slot for the chosen date. Unavailable slots remain disabled.
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Venue (optional)</label>
-                    @Html.TextBoxFor(m => m.Venue, new { @class = "form-control", placeholder = "e.g., Lab 2 / Seminar Hall" })
-                </div>
+                        <!-- keep real binding -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Slot Time</label>
+                            @Html.DropDownListFor(
+                                     m => m.SelectedSlot,
+                                     Model.AvailableSlots,
+                                     "-- Select Slot --",
+                                     new { @class = "form-select", id = "SelectedSlot" })
+                            @Html.ValidationMessageFor(m => m.SelectedSlot, "", new { @class = "text-danger small" })
+                        </div>
 
-                <div class="col-md-12">
-                    <label class="form-label fw-semibold">Instructions / Committee Comments</label>
-                    @Html.TextAreaFor(m => m.Instructions, 5, 60,
-                                        new { @class = "form-control", placeholder = "e.g., Presentation must be 10 minutes. Include problem statement, methodology, and demo plan..." })
+                        <!-- visual slot chips -->
+                        <div class="slot-grid" id="slotGrid">
+                            @foreach (var slot in Model.AvailableSlots)
+                            {
+                                var isDisabled = slot.Disabled;
+                                var isSelected = slot.Selected;
+
+                                <button type="button"
+                                        class="slot-chip @(isDisabled ? "slot-chip-disabled" : "slot-chip-available") @(isSelected ? "slot-chip-selected" : "")"
+                                        data-value="@slot.Value"
+                                    @(isDisabled ? "disabled" : "")>
+                                    @slot.Text
+                                </button>
+                            }
+                        </div>
+
+                        <div class="mt-3 text-muted small">
+                            <span class="me-3">
+                                <span class="slot-legend slot-legend-available"></span> Available
+                            </span>
+                            <span class="me-3">
+                                <span class="slot-legend slot-legend-selected"></span> Selected
+                            </span>
+                            <span>
+                                <span class="slot-legend slot-legend-disabled"></span> Unavailable
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <hr />
-            <button type="submit" class="btn btn-success">
-                Save Schedule
-            </button>
-                        }
+            <!-- RIGHT SIDE -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 sticky-top" style="top: 90px;">
+                    <div class="card-body">
+                        <h5 class="mb-3">Schedule Preview</h5>
+
+                        <div class="mb-3">
+                            <div class="text-muted small">Proposal</div>
+                            <div class="fw-semibold">@Model.Title</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="text-muted small">Defense Date</div>
+                            <div id="previewDate">
+                                @Model.DefenseDate.ToString("dd/MM/yyyy")
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="text-muted small">Selected Slot</div>
+                            <div id="previewSlot">
+                                @(string.IsNullOrWhiteSpace(Model.SelectedSlot) ? "Not selected yet" : Model.SelectedSlot)
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="text-muted small">Duration</div>
+                            <div id="previewDuration">@Model.DurationMinutes minutes</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="text-muted small">Venue</div>
+                            <div id="previewVenue">
+                                @(string.IsNullOrWhiteSpace(Model.Venue) ? "Not specified" : Model.Venue)
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="text-muted small">Supervisor</div>
+                            <div>@Model.SupervisorName</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">
+                            Confirm Defense Schedule
+                        </button>
+
+                        <div class="form-text mt-3">
+                            Please verify date, time, and venue before confirming the defense schedule.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    }
 </div>
+
+<style>
+    .slot-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+    }
+
+    .slot-chip {
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-weight: 600;
+        border: 1px solid #d0d7de;
+        background: #fff;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+
+    .slot-chip-available:hover {
+        border-color: #0d6efd;
+        background: #f8fbff;
+    }
+
+    .slot-chip-selected {
+        background: #e8f2ff !important;
+        border-color: #0d6efd !important;
+        color: #0d6efd;
+    }
+
+    .slot-chip-disabled {
+        background: #f3f4f6;
+        border-color: #e5e7eb;
+        color: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    .slot-legend {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        vertical-align: middle;
+        margin-right: 6px;
+    }
+
+    .slot-legend-available {
+        background: #ffffff;
+        border: 1px solid #d0d7de;
+    }
+
+    .slot-legend-selected {
+        background: #e8f2ff;
+        border: 1px solid #0d6efd;
+    }
+
+    .slot-legend-disabled {
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        (function () {
+            const slotSelect = document.getElementById("SelectedSlot");
+            const slotButtons = document.querySelectorAll(".slot-chip-available");
+            const previewSlot = document.getElementById("previewSlot");
+            const previewDate = document.getElementById("previewDate");
+            const previewDuration = document.getElementById("previewDuration");
+            const previewVenue = document.getElementById("previewVenue");
+
+            const defenseDate = document.getElementById("DefenseDate");
+            const durationInput = document.getElementById("DurationMinutes");
+            const venueInput = document.getElementById("Venue");
+
+            function refreshSlotSelection() {
+                slotButtons.forEach(btn => {
+                    btn.classList.remove("slot-chip-selected");
+                    if (btn.dataset.value === slotSelect.value) {
+                        btn.classList.add("slot-chip-selected");
+                    }
+                });
+
+                previewSlot.textContent = slotSelect.value ? slotSelect.value : "Not selected yet";
+            }
+
+            slotButtons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    slotSelect.value = this.dataset.value;
+                    refreshSlotSelection();
+                });
+            });
+
+            slotSelect.addEventListener("change", refreshSlotSelection);
+
+            defenseDate.addEventListener("change", function () {
+                previewDate.textContent = this.value ? this.value.split("-").reverse().join("/") : "Not selected";
+            });
+
+            durationInput.addEventListener("input", function () {
+                previewDuration.textContent = (this.value || "0") + " minutes";
+            });
+
+            venueInput.addEventListener("input", function () {
+                previewVenue.textContent = this.value.trim() ? this.value : "Not specified";
+            });
+
+            refreshSlotSelection();
+        })();
+    </script>
+}

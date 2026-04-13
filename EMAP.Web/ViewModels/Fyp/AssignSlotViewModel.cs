@@ -24,6 +24,10 @@ namespace EMAP.Web.ViewModels.Fyp
         public string? Venue { get; set; }
         public string? Instructions { get; set; }
 
+        public string? DepartmentName { get; set; }
+        public string? ProposalStatus { get; set; }
+        public List<string> BookedSlots { get; set; } = new();
+
         public List<SelectListItem> AvailableSlots { get; set; }
             = new List<SelectListItem>();
     }

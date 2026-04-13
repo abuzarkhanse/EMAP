@@ -42,6 +42,9 @@ namespace EMAP.Domain.Fyp
         [StringLength(300)]
         public string TentativeProjectTitle { get; set; } = string.Empty;
 
+        [Required]
+        public string? FypDescription { get; set; }
+
         // Academic stage support
         public FypStage CurrentStage { get; set; } = FypStage.Fyp1;
 
@@ -60,5 +63,8 @@ namespace EMAP.Domain.Fyp
 
         // Evaluations linked to this group
         public ICollection<FypEvaluation> Evaluations { get; set; } = new List<FypEvaluation>();
+
+        public int DepartmentId { get; set; }
+        public Department? Department { get; set; }
     }
 }

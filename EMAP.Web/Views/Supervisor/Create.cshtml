@@ -35,9 +35,18 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label asp-for="Department" class="form-label">Department</label>
-                        <input asp-for="Department" class="form-control" maxlength="100" />
-                        <span asp-validation-for="Department" class="text-danger"></span>
+                        <label asp-for="DepartmentId" class="form-label">Department</label>
+                        <select asp-for="DepartmentId" class="form-select">
+                            <option value="">-- Select Department --</option>
+                            @if (ViewBag.Departments != null)
+                            {
+                                foreach (var dept in ViewBag.Departments)
+                                {
+                                    <option value="@dept.Id">@dept.Name</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="DepartmentId" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-6 mb-3">

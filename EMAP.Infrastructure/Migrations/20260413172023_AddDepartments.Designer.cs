@@ -4,6 +4,7 @@ using EMAP.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMAP.Infrastructure.Migrations
 {
     [DbContext(typeof(EmapDbContext))]
-    partial class EmapDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260413172023_AddDepartments")]
+    partial class AddDepartments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1029,10 +1032,6 @@ namespace EMAP.Infrastructure.Migrations
 
                     b.Property<int>("FypCallId")
                         .HasColumnType("int");
-
-                    b.Property<string>("FypDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsFypCompleted")
                         .HasColumnType("bit");

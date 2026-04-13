@@ -2,6 +2,7 @@
 using EMAP.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace EMAP.Web.Controllers.Admin
@@ -16,14 +17,21 @@ namespace EMAP.Web.Controllers.Admin
             _db = db;
         }
 
+        // ===================== INDEX =====================
         public IActionResult Index()
         {
-            var calls = _db.FypCalls.ToList();
+            var calls = _db.FypCalls
+                .Include(x => x.Department)
+                .ToList();
+
             return View(calls);
         }
 
+        // ===================== CREATE (GET) =====================
         public IActionResult Create()
         {
+            LoadDepartments();
+
             return View(new FypCall
             {
                 Title = "FYP Call",
@@ -33,6 +41,7 @@ namespace EMAP.Web.Controllers.Admin
             });
         }
 
+        // ===================== CREATE (POST) =====================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(FypCall model)
@@ -41,40 +50,37 @@ namespace EMAP.Web.Controllers.Admin
 
             model.AnnouncementDate = model.AnnouncementDate.Date;
             model.ProposalDeadline = model.ProposalDeadline.Date;
+
             var today = DateTime.Today;
 
+            // 🔴 VALIDATIONS
             if (string.IsNullOrWhiteSpace(model.Batch))
-            {
                 ModelState.AddModelError("Batch", "Batch is required.");
-            }
 
             if (string.IsNullOrWhiteSpace(model.Session))
-            {
                 ModelState.AddModelError("Session", "Session is required.");
-            }
+
+            if (model.DepartmentId == 0)
+                ModelState.AddModelError("DepartmentId", "Department is required.");
 
             if (model.AnnouncementDate < today)
-            {
                 ModelState.AddModelError("AnnouncementDate", "Announcement date cannot be in the past.");
-            }
 
             if (model.ProposalDeadline <= model.AnnouncementDate)
-            {
                 ModelState.AddModelError("ProposalDeadline", "Proposal deadline must be after announcement date.");
-            }
 
             bool exists = _db.FypCalls.Any(x =>
                 x.Batch == model.Batch &&
                 x.Session == model.Session &&
+                x.DepartmentId == model.DepartmentId &&
                 x.IsActive);
 
             if (exists)
-            {
-                ModelState.AddModelError("", "An active FYP call already exists for this batch and session.");
-            }
+                ModelState.AddModelError("", "An active FYP call already exists for this department, batch and session.");
 
             if (!ModelState.IsValid)
             {
+                LoadDepartments();
                 return View(model);
             }
 
@@ -85,6 +91,7 @@ namespace EMAP.Web.Controllers.Admin
             return RedirectToAction(nameof(Index));
         }
 
+        // ===================== EDIT (GET) =====================
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -94,9 +101,12 @@ namespace EMAP.Web.Controllers.Admin
             if (call == null)
                 return NotFound();
 
+            LoadDepartments();
+
             return View(call);
         }
 
+        // ===================== EDIT (POST) =====================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, FypCall model)
@@ -114,48 +124,46 @@ namespace EMAP.Web.Controllers.Admin
 
             var today = DateTime.Today;
 
+            // 🔴 VALIDATIONS
             if (string.IsNullOrWhiteSpace(model.Batch))
-            {
                 ModelState.AddModelError("Batch", "Batch is required.");
-            }
 
             if (string.IsNullOrWhiteSpace(model.Session))
-            {
                 ModelState.AddModelError("Session", "Session is required.");
-            }
+
+            if (model.DepartmentId == 0)
+                ModelState.AddModelError("DepartmentId", "Department is required.");
 
             if (model.AnnouncementDate < today)
-            {
                 ModelState.AddModelError("AnnouncementDate", "Announcement date cannot be in the past.");
-            }
 
             if (model.ProposalDeadline <= model.AnnouncementDate)
-            {
                 ModelState.AddModelError("ProposalDeadline", "Proposal deadline must be after announcement date.");
-            }
 
             bool exists = _db.FypCalls.Any(x =>
                 x.Id != model.Id &&
                 x.Batch == model.Batch &&
                 x.Session == model.Session &&
+                x.DepartmentId == model.DepartmentId &&
                 x.IsActive);
 
             if (exists)
-            {
-                ModelState.AddModelError("", "Another active FYP call already exists for this batch and session.");
-            }
+                ModelState.AddModelError("", "Another active FYP call already exists for this department, batch and session.");
 
             if (!ModelState.IsValid)
             {
+                LoadDepartments();
                 return View(model);
             }
 
+            // 🔵 UPDATE
             existingCall.Batch = model.Batch;
             existingCall.Session = model.Session;
             existingCall.Title = "FYP Call";
             existingCall.AnnouncementDate = model.AnnouncementDate;
             existingCall.ProposalDeadline = model.ProposalDeadline;
             existingCall.IsActive = model.IsActive;
+            existingCall.DepartmentId = model.DepartmentId;
 
             await _db.SaveChangesAsync();
 
@@ -163,12 +171,16 @@ namespace EMAP.Web.Controllers.Admin
             return RedirectToAction(nameof(Index));
         }
 
+        // ===================== DELETE =====================
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
                 return NotFound();
 
-            var call = await _db.FypCalls.FirstOrDefaultAsync(x => x.Id == id);
+            var call = await _db.FypCalls
+                .Include(x => x.Department)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
             if (call == null)
                 return NotFound();
 
@@ -188,6 +200,19 @@ namespace EMAP.Web.Controllers.Admin
 
             TempData["Success"] = "FYP Call deleted successfully.";
             return RedirectToAction(nameof(Index));
+        }
+
+        // ===================== HELPER =====================
+        private void LoadDepartments()
+        {
+            ViewBag.Departments = new SelectList(
+                _db.Departments
+                    .Where(d => d.IsActive)
+                    .OrderBy(d => d.Name)
+                    .ToList(),
+                "Id",
+                "Name"
+            );
         }
     }
 }

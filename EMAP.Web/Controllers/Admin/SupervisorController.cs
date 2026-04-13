@@ -31,6 +31,14 @@ namespace EMAP.Web.Controllers.Admin
 
         // ===================== HELPERS =====================
 
+        private void LoadDepartments()
+        {
+            ViewBag.Departments = _db.Departments
+                .Where(d => d.IsActive)
+                .OrderBy(d => d.Name)
+                .ToList();
+        }
+
         /// <summary>
         /// Finds supervisor record for the logged-in supervisor.
         /// Prefer UserId link; fallback to Email match (legacy).
@@ -93,13 +101,9 @@ namespace EMAP.Web.Controllers.Admin
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(model.Department))
+            if (model.DepartmentId <= 0)
             {
-                ModelState.AddModelError(nameof(FypSupervisor.Department), "Department is required.");
-            }
-            else if (model.Department.Trim().Length < 2)
-            {
-                ModelState.AddModelError(nameof(FypSupervisor.Department), "Department must be at least 2 characters.");
+                ModelState.AddModelError(nameof(FypSupervisor.DepartmentId), "Please select a valid department.");
             }
 
             if (string.IsNullOrWhiteSpace(model.FieldOfExpertise))
@@ -139,6 +143,7 @@ namespace EMAP.Web.Controllers.Admin
                     Name = s.Name,
                     Email = s.Email ?? "",
                     Department = s.Department ?? "",
+                    DepartmentId = s.DepartmentId,
                     FieldOfExpertise = s.FieldOfExpertise ?? "",
                     MaxSlots = s.MaxSlots,
                     CurrentSlots = s.CurrentSlots,
@@ -155,6 +160,8 @@ namespace EMAP.Web.Controllers.Admin
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
+            LoadDepartments();
+
             return View(new FypSupervisor
             {
                 MaxSlots = 3,
@@ -166,25 +173,42 @@ namespace EMAP.Web.Controllers.Admin
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public IActionResult Create(FypSupervisor model)
+        public async Task<IActionResult> Create(FypSupervisor model)
         {
             ModelState.Remove(nameof(FypSupervisor.User));
             ModelState.Remove(nameof(FypSupervisor.UserId));
+            ModelState.Remove(nameof(FypSupervisor.Department));
+            ModelState.Remove(nameof(FypSupervisor.DepartmentRef));
+
+            var department = await _db.Departments
+                .FirstOrDefaultAsync(d => d.Id == model.DepartmentId && d.IsActive);
+
+            if (department == null)
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.DepartmentId), "Please select a valid department.");
+            }
+            else
+            {
+                model.Department = department.Name;
+            }
 
             ValidateSupervisorModel(model);
 
             if (!ModelState.IsValid)
+            {
+                LoadDepartments();
                 return View(model);
+            }
 
-            // Link supervisor to ASP.NET Identity user by Email
-            model.UserId = _db.Users
+            model.UserId = await _db.Users
                 .Where(u => u.Email == model.Email)
                 .Select(u => u.Id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             if (string.IsNullOrEmpty(model.UserId))
             {
                 ModelState.AddModelError(nameof(FypSupervisor.Email), "No ASP.NET user exists with this email.");
+                LoadDepartments();
                 return View(model);
             }
 
@@ -192,7 +216,7 @@ namespace EMAP.Web.Controllers.Admin
                 model.CurrentSlots = 0;
 
             _db.FypSupervisors.Add(model);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             TempData["Success"] = "Supervisor created successfully.";
             return RedirectToAction(nameof(Index));
@@ -204,6 +228,7 @@ namespace EMAP.Web.Controllers.Admin
             var supervisor = await _db.FypSupervisors.FindAsync(id);
             if (supervisor == null) return NotFound();
 
+            LoadDepartments();
             return View(supervisor);
         }
 
@@ -212,27 +237,43 @@ namespace EMAP.Web.Controllers.Admin
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(FypSupervisor model)
         {
-            // If you have navigation props in model, ignore them
             ModelState.Remove(nameof(FypSupervisor.User));
             ModelState.Remove(nameof(FypSupervisor.UserId));
+            ModelState.Remove(nameof(FypSupervisor.Department));
+            ModelState.Remove(nameof(FypSupervisor.DepartmentRef));
+
+            var department = await _db.Departments
+                .FirstOrDefaultAsync(d => d.Id == model.DepartmentId && d.IsActive);
+
+            if (department == null)
+            {
+                ModelState.AddModelError(nameof(FypSupervisor.DepartmentId), "Please select a valid department.");
+            }
+            else
+            {
+                model.Department = department.Name;
+            }
 
             ValidateSupervisorModel(model, true, model.Id);
 
             if (!ModelState.IsValid)
+            {
+                LoadDepartments();
                 return View(model);
+            }
 
             var supervisor = await _db.FypSupervisors.FindAsync(model.Id);
             if (supervisor == null) return NotFound();
 
             supervisor.Name = model.Name;
             supervisor.Email = model.Email;
+            supervisor.DepartmentId = model.DepartmentId;
             supervisor.Department = model.Department;
             supervisor.FieldOfExpertise = model.FieldOfExpertise;
             supervisor.MaxSlots = model.MaxSlots;
             supervisor.CurrentSlots = model.CurrentSlots;
             supervisor.IsActive = model.IsActive;
 
-            // Re-link UserId if email changed (important after DB reset)
             supervisor.UserId = await _db.Users
                 .Where(u => u.Email == supervisor.Email)
                 .Select(u => u.Id)
@@ -241,6 +282,7 @@ namespace EMAP.Web.Controllers.Admin
             if (string.IsNullOrEmpty(supervisor.UserId))
             {
                 ModelState.AddModelError(nameof(FypSupervisor.Email), "No ASP.NET user exists with this email.");
+                LoadDepartments();
                 return View(model);
             }
 
@@ -415,9 +457,14 @@ namespace EMAP.Web.Controllers.Admin
                             continue;
                         }
 
-                        if (department.Length < 2)
+                        var departmentEntity = await _db.Departments
+                            .FirstOrDefaultAsync(d =>
+                                d.Name.ToLower() == department.ToLower() ||
+                                d.Code.ToLower() == department.ToLower());
+
+                        if (departmentEntity == null)
                         {
-                            errors.Add($"Row {rowNumber}: Department must be at least 2 characters.");
+                            errors.Add($"Row {rowNumber}: Department '{department}' was not found.");
                             rowNumber++;
                             continue;
                         }
@@ -468,7 +515,8 @@ namespace EMAP.Web.Controllers.Admin
                         {
                             Name = name,
                             Email = email,
-                            Department = department,
+                            Department = departmentEntity.Name,
+                            DepartmentId = departmentEntity.Id,
                             FieldOfExpertise = fieldOfExpertise,
                             MaxSlots = maxSlots,
                             CurrentSlots = currentSlots,

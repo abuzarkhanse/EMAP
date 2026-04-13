@@ -12,6 +12,10 @@ namespace EMAP.Web.ViewModels.Fyp
         [StringLength(300)]
         public string TentativeProjectTitle { get; set; } = string.Empty;
 
+        [Display(Name = "FYP Description")]
+        [StringLength(1000)]
+        public string FypDescription { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Program code is required.")]
         [Display(Name = "Program Code")]
         [StringLength(50)]

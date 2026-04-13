@@ -31,5 +31,8 @@ namespace EMAP.Domain.Fyp
 
         public List<FypProject> Projects { get; set; } = new();
 
+        public int DepartmentId { get; set; }
+        public Department? Department { get; set; }
+
     }
 }

@@ -1,5 +1,8 @@
-﻿using EMAP.Domain.Users;
+﻿using EMAP.Domain.Fyp;
+using EMAP.Domain.Users;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using EMAP.Infrastructure.Data;
 
 namespace EMAP.Web.Data
 {
@@ -9,8 +12,19 @@ namespace EMAP.Web.Data
         {
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+            var db = services.GetRequiredService<EMAP.Infrastructure.Data.EmapDbContext>();
 
-            string[] roles = { "Admin", "Student", "Supervisor", "FYPCoordinator", "Reviewer", "HEDOfficial", "DOSTOfficial" };
+            // Seed roles
+            string[] roles =
+            {
+                "Admin",
+                "Student",
+                "Supervisor",
+                "FYPCoordinator",
+                "Reviewer",
+                "HEDOfficial",
+                "DOSTOfficial"
+            };
 
             foreach (var role in roles)
             {
@@ -20,9 +34,37 @@ namespace EMAP.Web.Data
                 }
             }
 
+            // Seed departments
+            if (!await db.Departments.AnyAsync())
+            {
+                var departments = new List<Department>
+                {
+                    new Department { Name = "School of Computing Sciences", Code = "SCS", IsActive = true },
+                    new Department { Name = "Electrical Engineering", Code = "EE", IsActive = true },
+                    new Department { Name = "Mechanical Engineering", Code = "ME", IsActive = true },
+                    new Department { Name = "English", Code = "ENG", IsActive = true },
+                    new Department { Name = "Pharmacy", Code = "PHARM", IsActive = true },
+                    new Department { Name = "Bio-Medical Sciences", Code = "BMS", IsActive = true },
+                    new Department { Name = "Chemical Engineering", Code = "CHE", IsActive = true },
+                    new Department { Name = "Civil Engineering", Code = "CE", IsActive = true },
+                    new Department { Name = "Management Sciences", Code = "MS", IsActive = true },
+                    new Department { Name = "Mathematics", Code = "MATH", IsActive = true },
+                    new Department { Name = "Physics", Code = "PHY", IsActive = true }
+                };
+
+                await db.Departments.AddRangeAsync(departments);
+                await db.SaveChangesAsync();
+            }
+
+            // Load departments
+            var scsDepartment = await db.Departments.FirstAsync(d => d.Code == "SCS");
+            var eeDepartment = await db.Departments.FirstAsync(d => d.Code == "EE");
+            var pharmDepartment = await db.Departments.FirstAsync(d => d.Code == "PHARM");
+
             // Admin user
             var adminEmail = "admin@emap.local";
             var admin = await userManager.FindByEmailAsync(adminEmail);
+
             if (admin == null)
             {
                 admin = new ApplicationUser
@@ -31,81 +73,135 @@ namespace EMAP.Web.Data
                     Email = adminEmail,
                     FullName = "System Admin"
                 };
-                await userManager.CreateAsync(admin, "Admin@123");
-                await userManager.AddToRoleAsync(admin, "Admin");
+
+                var result = await userManager.CreateAsync(admin, "Admin@123");
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(admin, "Admin");
+                }
+            }
+            else
+            {
+                admin.FullName = "System Admin";
+                await userManager.UpdateAsync(admin);
             }
 
-            // Demo Supervisor users
-            string[] supervisorEmails =
+            // Supervisors
+            var supervisors = new List<(string Email, string FullName, int DepartmentId)>
             {
-                "sup1@emap.local",
-                "sup2@emap.local"
+                ("sup1@emap.local", "Dr. Supervisor One", scsDepartment.Id),
+                ("sup2@emap.local", "Dr. Supervisor Two", eeDepartment.Id)
             };
 
-            foreach (var email in supervisorEmails)
+            foreach (var item in supervisors)
             {
-                var supervisor = await userManager.FindByEmailAsync(email);
+                var supervisor = await userManager.FindByEmailAsync(item.Email);
+
                 if (supervisor == null)
                 {
                     supervisor = new ApplicationUser
                     {
-                        UserName = email,
-                        Email = email,
-                        FullName = email.Replace("@emap.local", "").ToUpper(), // SUP1, SUP2
-                        Department = "Computer Science"
+                        UserName = item.Email,
+                        Email = item.Email,
+                        FullName = item.FullName,
+                        DepartmentId = item.DepartmentId
                     };
 
-                    // Password for all demo supervisors
-                    await userManager.CreateAsync(supervisor, "Supervisor@123");
-                    await userManager.AddToRoleAsync(supervisor, "Supervisor");
+                    var result = await userManager.CreateAsync(supervisor, "Supervisor@123");
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(supervisor, "Supervisor");
+                    }
+                }
+                else
+                {
+                    supervisor.FullName = item.FullName;
+                    supervisor.DepartmentId = item.DepartmentId;
+                    await userManager.UpdateAsync(supervisor);
+
+                    if (!await userManager.IsInRoleAsync(supervisor, "Supervisor"))
+                    {
+                        await userManager.AddToRoleAsync(supervisor, "Supervisor");
+                    }
                 }
             }
 
-            // FYP Coordinator user
+            // FYP Coordinator
             var coordEmail = "coordinator@emap.local";
             var coord = await userManager.FindByEmailAsync(coordEmail);
+
             if (coord == null)
             {
                 coord = new ApplicationUser
                 {
                     UserName = coordEmail,
                     Email = coordEmail,
-                    FullName = "FYP Coordinator"
+                    FullName = "FYP Coordinator",
+                    DepartmentId = scsDepartment.Id
                 };
-                await userManager.CreateAsync(coord, "Coordinator@123");
-                await userManager.AddToRoleAsync(coord, "FYPCoordinator");
+
+                var result = await userManager.CreateAsync(coord, "Coordinator@123");
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(coord, "FYPCoordinator");
+                }
+            }
+            else
+            {
+                coord.FullName = "FYP Coordinator";
+                coord.DepartmentId = scsDepartment.Id;
+                await userManager.UpdateAsync(coord);
+
+                if (!await userManager.IsInRoleAsync(coord, "FYPCoordinator"))
+                {
+                    await userManager.AddToRoleAsync(coord, "FYPCoordinator");
+                }
             }
 
-
-            // Multiple demo Student users
-            string[] studentEmails =
+            // Students
+            var students = new List<(string Email, string FullName, string RegNo, int DepartmentId)>
             {
-                "student0@emap.local",
-                "student2@emap.local",
-                "student3@emap.local",
-                "student22@emap.local",
-                "student33@emap.local",
+                ("student0@emap.local", "Student Zero", "F20-1000", scsDepartment.Id),
+                ("student2@emap.local", "Student Two", "F20-1002", scsDepartment.Id),
+                ("student3@emap.local", "Student Three", "F20-1003", eeDepartment.Id),
+                ("student22@emap.local", "Student Twenty Two", "F20-1022", pharmDepartment.Id),
+                ("student33@emap.local", "Student Thirty Three", "F20-1033", scsDepartment.Id)
             };
 
-            foreach (var email in studentEmails)
+            foreach (var item in students)
             {
-                var student = await userManager.FindByEmailAsync(email);
+                var student = await userManager.FindByEmailAsync(item.Email);
+
                 if (student == null)
                 {
                     student = new ApplicationUser
                     {
-                        UserName = email,
-                        Email = email,
-                        FullName = email.Replace("@emap.local", "").ToUpper(), // e.g. STUDENT1
-                        RegistrationNumber = "F20-" + Guid.NewGuid().ToString("N").Substring(0, 4),
-                        Department = "Computer Science"
+                        UserName = item.Email,
+                        Email = item.Email,
+                        FullName = item.FullName,
+                        RegistrationNumber = item.RegNo,
+                        DepartmentId = item.DepartmentId
                     };
 
-                    await userManager.CreateAsync(student, "Student@123");
-                    await userManager.AddToRoleAsync(student, "Student");
+                    var result = await userManager.CreateAsync(student, "Student@123");
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(student, "Student");
+                    }
+                }
+                else
+                {
+                    student.FullName = item.FullName;
+                    student.RegistrationNumber = item.RegNo;
+                    student.DepartmentId = item.DepartmentId;
+                    await userManager.UpdateAsync(student);
+
+                    if (!await userManager.IsInRoleAsync(student, "Student"))
+                    {
+                        await userManager.AddToRoleAsync(student, "Student");
+                    }
                 }
             }
         }
     }
 }
-

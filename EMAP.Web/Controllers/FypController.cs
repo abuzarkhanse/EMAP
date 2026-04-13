@@ -1,4 +1,5 @@
-﻿using EMAP.Domain.Fyp;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using EMAP.Domain.Fyp;
 using EMAP.Domain.Users;
 using EMAP.Infrastructure.Data;
 using EMAP.Web.ViewModels.Fyp;
@@ -14,6 +15,28 @@ namespace EMAP.Web.Controllers
     [Authorize(Roles = "Student")]
     public class FypController : Controller
     {
+
+        private async Task<int?> GetOrAssignDefaultDepartmentIdAsync(ApplicationUser? user)
+        {
+            if (user == null)
+                return null;
+
+            if (user.DepartmentId != null)
+                return user.DepartmentId;
+
+            var defaultDepartment = await _db.Departments
+                .FirstOrDefaultAsync(d => d.Code == "SCS");
+
+            if (defaultDepartment == null)
+                return null;
+
+            user.DepartmentId = defaultDepartment.Id;
+            await _db.SaveChangesAsync();
+
+            return user.DepartmentId;
+        }
+
+
         private readonly EmapDbContext _db;
         private readonly IWebHostEnvironment _env;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -39,10 +62,37 @@ namespace EMAP.Web.Controllers
         {
             var userId = GetCurrentUserId();
 
+            var user = await _db.Users
+                .Include(u => u.Department)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var effectiveDepartmentId = await GetOrAssignDefaultDepartmentIdAsync(user);
+            if (effectiveDepartmentId == null)
+            {
+                TempData["Error"] = "Default department not configured.";
+                return RedirectToAction("Index", "Home");
+            }
+
             var activeCalls = await _db.FypCalls
-                .Where(c => c.IsActive)
+                .Include(c => c.Department)
+                .Where(c => c.IsActive && c.DepartmentId == effectiveDepartmentId.Value)
                 .OrderByDescending(c => c.AnnouncementDate)
                 .ToListAsync();
+
+            if (!activeCalls.Any())
+            {
+                activeCalls = await _db.FypCalls
+                    .Include(c => c.Department)
+                    .Where(c => c.IsActive)
+                    .OrderByDescending(c => c.AnnouncementDate)
+                    .ToListAsync();
+            }
 
             var activeCall = activeCalls.FirstOrDefault();
 
@@ -203,7 +253,7 @@ namespace EMAP.Web.Controllers
                             EvaluationId = evaluation.Id,
                             EvaluationTitle = evaluation.Milestone?.Title ?? "Evaluation",
                             ProjectTitle = group.TentativeProjectTitle,
-                            Batch = activeCall?.Batch ?? "-",
+                            Batch = activeCall.Batch ?? "-",
                             ProgramCode = group.ProgramCode,
                             StudentName = myMember.StudentName,
                             RegistrationNo = myMember.RegistrationNo,
@@ -241,9 +291,11 @@ namespace EMAP.Web.Controllers
             }
 
             var supervisors = await _db.FypSupervisors
-                .Where(s => s.IsActive && s.CurrentSlots < s.MaxSlots)
-                .OrderBy(s => s.Department ?? "")
-                .ThenBy(s => s.Name ?? "")
+                .Where(s =>
+                    s.IsActive &&
+                    s.CurrentSlots < s.MaxSlots &&
+                    s.DepartmentId == effectiveDepartmentId.Value)
+                .OrderBy(s => s.Name)
                 .ToListAsync();
 
             var model = new FypPortalViewModel
@@ -277,10 +329,32 @@ namespace EMAP.Web.Controllers
         {
             var userId = GetCurrentUserId();
 
+            var currentUser = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (currentUser == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var effectiveDepartmentId = await GetOrAssignDefaultDepartmentIdAsync(currentUser);
+            if (effectiveDepartmentId == null)
+            {
+                TempData["Error"] = "Default department not configured.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var activeCall = await _db.FypCalls
-                .Where(c => c.IsActive)
+                .Where(c => c.IsActive && c.DepartmentId == effectiveDepartmentId.Value)
                 .OrderByDescending(c => c.AnnouncementDate)
                 .FirstOrDefaultAsync();
+
+            if (activeCall == null)
+            {
+                activeCall = await _db.FypCalls
+                    .Where(c => c.IsActive)
+                    .OrderByDescending(c => c.AnnouncementDate)
+                    .FirstOrDefaultAsync();
+            }
 
             if (activeCall == null)
             {
@@ -316,10 +390,33 @@ namespace EMAP.Web.Controllers
         {
             var userId = GetCurrentUserId();
 
+            var currentUser = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (currentUser == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var effectiveDepartmentId = await GetOrAssignDefaultDepartmentIdAsync(currentUser);
+            if (effectiveDepartmentId == null)
+            {
+                TempData["Error"] = "Default department not configured.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var activeCall = await _db.FypCalls
-                .Where(c => c.IsActive)
+                .Where(c => c.IsActive && c.DepartmentId == effectiveDepartmentId.Value)
                 .OrderByDescending(c => c.AnnouncementDate)
                 .FirstOrDefaultAsync();
+
+            if (activeCall == null)
+            {
+                activeCall = await _db.FypCalls
+                    .Where(c => c.IsActive)
+                    .OrderByDescending(c => c.AnnouncementDate)
+                    .FirstOrDefaultAsync();
+            }
 
             if (activeCall == null)
             {
@@ -403,6 +500,12 @@ namespace EMAP.Web.Controllers
                 return View(model);
             }
 
+
+            if (string.IsNullOrWhiteSpace(model.FypDescription))
+            {
+                ModelState.AddModelError(nameof(model.FypDescription), "FYP description is required.");
+            }
+
             _db.StudentGroups.Add(new StudentGroup
             {
                 FypCallId = activeCall.Id,
@@ -411,13 +514,17 @@ namespace EMAP.Web.Controllers
                 Member3Id = member3Id,
                 ProgramCode = model.ProgramCode.Trim().ToUpper(),
                 TentativeProjectTitle = model.TentativeProjectTitle.Trim(),
-                Status = GroupStatus.PendingSupervisorSelection
+                Status = GroupStatus.PendingSupervisorSelection,
+                DepartmentId = currentUser.DepartmentId.Value,
+                FypDescription = model.FypDescription.Trim()
             });
 
             await _db.SaveChangesAsync();
 
             TempData["Success"] = "Group created successfully. Now select a supervisor.";
             return RedirectToAction(nameof(Index));
+
+
         }
 
         // ===================== SELECT SUPERVISOR (POST) =====================
@@ -428,14 +535,22 @@ namespace EMAP.Web.Controllers
         {
             var userId = GetCurrentUserId();
 
+            var user = await _db.Users
+                .Include(u => u.Department)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null || user.DepartmentId == null)
+            {
+                TempData["Error"] = "Your department is not assigned.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var activeCall = await _db.FypCalls
-                .Where(c => c.IsActive)
-                .OrderByDescending(c => c.AnnouncementDate)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(c => c.IsActive && c.DepartmentId == user.DepartmentId);
 
             if (activeCall == null)
             {
-                TempData["Error"] = "No active FYP call.";
+                TempData["Error"] = "No active FYP call for your department.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -445,6 +560,12 @@ namespace EMAP.Web.Controllers
             if (group == null)
             {
                 TempData["Error"] = "Only group leader can select supervisor.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (group.DepartmentId != user.DepartmentId)
+            {
+                TempData["Error"] = "Invalid group department.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -460,6 +581,12 @@ namespace EMAP.Web.Controllers
             if (supervisor == null)
             {
                 TempData["Error"] = "Supervisor not available.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (supervisor.DepartmentId != user.DepartmentId)
+            {
+                TempData["Error"] = "You can only select a supervisor from your department.";
                 return RedirectToAction(nameof(Index));
             }
 
