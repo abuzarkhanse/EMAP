@@ -202,6 +202,61 @@ namespace EMAP.Web.Data
                     }
                 }
             }
+
+
+            // Seed default evaluation criteria
+            if (!await db.FypEvaluationCriteria.AnyAsync())
+            {
+                db.FypEvaluationCriteria.AddRange(
+                    new FypEvaluationCriterion
+                    {
+                        EvaluationType = FypMilestoneType.MidEvaluation,
+                        Title = "Problem Understanding",
+                        Description = "Understanding of the selected problem and context.",
+                        MaxMarks = 10,
+                        DisplayOrder = 1,
+                        IsActive = true
+                    },
+                    new FypEvaluationCriterion
+                    {
+                        EvaluationType = FypMilestoneType.MidEvaluation,
+                        Title = "Methodology / Approach",
+                        Description = "Clarity and suitability of proposed methodology.",
+                        MaxMarks = 10,
+                        DisplayOrder = 2,
+                        IsActive = true
+                    },
+                    new FypEvaluationCriterion
+                    {
+                        EvaluationType = FypMilestoneType.MidEvaluation,
+                        Title = "Progress / Implementation",
+                        Description = "Actual progress made in the project so far.",
+                        MaxMarks = 10,
+                        DisplayOrder = 3,
+                        IsActive = true
+                    },
+                    new FypEvaluationCriterion
+                    {
+                        EvaluationType = FypMilestoneType.MidEvaluation,
+                        Title = "Presentation / Communication",
+                        Description = "Communication quality and presentation confidence.",
+                        MaxMarks = 10,
+                        DisplayOrder = 4,
+                        IsActive = true
+                    },
+                    new FypEvaluationCriterion
+                    {
+                        EvaluationType = FypMilestoneType.MidEvaluation,
+                        Title = "Viva / Questions",
+                        Description = "Responses to questions and conceptual command.",
+                        MaxMarks = 10,
+                        DisplayOrder = 5,
+                        IsActive = true
+                    }
+                );
+
+                await db.SaveChangesAsync();
+            }
         }
     }
 }

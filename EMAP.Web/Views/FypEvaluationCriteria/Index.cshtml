@@ -1,0 +1,142 @@
+﻿@model IEnumerable<EMAP.Domain.Fyp.FypEvaluationCriterion>
+
+@{
+    ViewData["Title"] = "Evaluation Rubrics";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="mb-1">Evaluation Rubrics</h2>
+            <p class="text-muted mb-0">
+                Manage rubric titles, max marks, order, and active status for coordinator-led evaluations.
+            </p>
+        </div>
+
+        <a asp-action="Create" class="btn btn-primary">
+            + Add Rubric
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <form method="get" class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Evaluation Type</label>
+                    <select name="type" asp-items="ViewBag.TypeFilter" class="form-select">
+                        <option value="">All</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-secondary w-100">
+                        Filter
+                    </button>
+                </div>
+
+                <div class="col-md-2">
+                    <a asp-action="Index" class="btn btn-outline-dark w-100">
+                        Reset
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            @if (!Model.Any())
+            {
+                <p class="text-muted mb-0">No rubrics found.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:90px;">Order</th>
+                                <th style="width:180px;">Type</th>
+                                <th>Rubric</th>
+                                <th style="width:120px;">Max Marks</th>
+                                <th style="width:120px;">Status</th>
+                                <th class="text-end" style="width:220px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.DisplayOrder</td>
+
+                                    <td>
+                                        @switch (item.EvaluationType)
+                                        {
+                                            case EMAP.Domain.Fyp.FypMilestoneType.MidEvaluation:
+                                                <span class="badge bg-primary">Mid Evaluation</span>
+                                                break;
+                                            case EMAP.Domain.Fyp.FypMilestoneType.PreFinalEvaluation:
+                                                <span class="badge bg-info text-dark">Pre-Final</span>
+                                                break;
+                                            case EMAP.Domain.Fyp.FypMilestoneType.FinalEvaluation:
+                                                <span class="badge bg-dark">Final Evaluation</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary">@item.EvaluationType</span>
+                                                break;
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="fw-semibold">@item.Title</div>
+                                        @if (!string.IsNullOrWhiteSpace(item.Description))
+                                        {
+                                            <div class="text-muted small">@item.Description</div>
+                                        }
+                                    </td>
+
+                                    <td>@item.MaxMarks</td>
+
+                                    <td>
+                                        @if (item.IsActive)
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-end">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                            Edit
+                                        </a>
+
+                                        <form asp-action="ToggleActive" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-warning">
+                                                @(item.IsActive ? "Deactivate" : "Activate")
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-info small mt-3 mb-0">
+                    Active rubrics are used automatically in the Conduct Evaluation form.  
+                    Inactive rubrics remain in history but will not appear in new evaluations.
+                </div>
+            }
+        </div>
+    </div>
+</div>
