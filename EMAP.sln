@@ -14,6 +14,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "performance-tests", "performance-tests", "{DE05F199-228B-424E-A32F-FC5A43022018}"
+	ProjectSection(SolutionItems) = preProject
+		emap_evaluation_write_test.js = emap_evaluation_write_test.js
+		emap_high_load_test.js = emap_high_load_test.js
+		emap_load_test.js = emap_load_test.js
+		emap_login_flow_test.js = emap_login_flow_test.js
+		emap_smoke_test.js = emap_smoke_test.js
+		emap_stress_test.js = emap_stress_test.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
