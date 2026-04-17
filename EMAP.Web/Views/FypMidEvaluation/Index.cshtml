@@ -14,9 +14,15 @@
         </p>
     </div>
 
-    <a asp-action="Create" class="btn btn-primary">
-        Create Evaluation
-    </a>
+    <div class="d-flex gap-2">
+        <a asp-controller="FypEvaluationCriteria" asp-action="Index" class="btn btn-outline-secondary">
+            Manage Rubrics
+        </a>
+
+        <a asp-action="Create" class="btn btn-primary">
+            Create Evaluation
+        </a>
+    </div>
 </div>
 
 <div class="card shadow-sm border-0">
