@@ -67,26 +67,26 @@
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li>
                                             <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
-                                                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                                                Dashboard
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" asp-controller="FypCall" asp-action="Index">
-                                                <i class="bi bi-megaphone me-2"></i> FYP Calls
+                                                FYP Calls
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" asp-controller="Supervisor" asp-action="Index">
-                                                <i class="bi bi-person-badge me-2"></i> Supervisors
+                                                Supervisors
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" asp-controller="UserAdmin" asp-action="Students">
-                                                <i class="bi bi-mortarboard me-2"></i> Students
+                                                Students
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" asp-controller="FypCommittee" asp-action="Index">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="FypCommittee" asp-action="Index">
                                                 Committees
                                             </a>
                                         </li>
@@ -122,6 +122,16 @@
                                                 Chapters
                                             </a>
                                         </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="FypCoordinator" asp-action="ChapterApprovals">
+                                                Chapter Approvals
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="FypCoordinator" asp-action="FinalizationCenter">
+                                                Finalization Center
+                                            </a>
+                                        </li>
                                     </ul>
                                 </li>
                             }
@@ -149,6 +159,11 @@
                                         <li>
                                             <a class="dropdown-item" asp-controller="Supervisor" asp-action="Proposals">
                                                 <i class="bi bi-file-earmark-text me-2"></i> Proposals
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Supervisor" asp-action="ChapterReviews">
+                                                <i class="bi bi-file-earmark-text me-2"></i> Chapter Review
                                             </a>
                                         </li>
                                     </ul>
@@ -195,7 +210,7 @@
     <footer class="border-top bg-white">
         <div class="container py-3 text-center small text-muted">
             © 2025 EMAP: Editorial Management & Automation Platform
-            <div>Final Year Project | Develop by Abuzar Khan</div>
+            <div>Final Year Project</div>
         </div>
     </footer>
 

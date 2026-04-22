@@ -301,7 +301,7 @@ namespace EMAP.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("WeightagePercent")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<decimal>("WeightedMarks")
                         .HasColumnType("decimal(18,2)");
@@ -633,6 +633,280 @@ namespace EMAP.Infrastructure.Migrations
                     b.ToTable("FypEvaluationScores");
                 });
 
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminRemarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ArchivedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Batch")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CompletionRemarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CoordinatorRemarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("FinalAverageMarks")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("Fyp1AverageMarks")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("Fyp2AverageMarks")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("FypCallId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FypDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFypCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ProcessedByAdminAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProcessedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProgramCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ProjectTitle")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubmittedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SubmittedToAdminAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SupervisorName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentGroupId");
+
+                    b.ToTable("FypFinalRecords");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecordChapter", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChapterType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Feedback")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FinalRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Stage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FinalRecordId");
+
+                    b.ToTable("FypFinalRecordChapters");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecordEvaluation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EvaluationType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EvaluatorName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("FinalRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsPublishedToStudent")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ScheduledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Stage")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("TotalMarks")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Venue")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<decimal>("WeightagePercent")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("WeightedMarks")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FinalRecordId");
+
+                    b.ToTable("FypFinalRecordEvaluations");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecordEvaluationMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FinalRecordEvaluationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegistrationNo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("StudentName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("StudentUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("TotalMarks")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("WeightedMarks")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FinalRecordEvaluationId");
+
+                    b.ToTable("FypFinalRecordEvaluationMembers");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecordStudent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("FinalRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegistrationNo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("RoleInGroup")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("StudentName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("StudentUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FinalRecordId");
+
+                    b.ToTable("FypFinalRecordStudents");
+                });
+
             modelBuilder.Entity("EMAP.Domain.Fyp.FypMilestone", b =>
                 {
                     b.Property<int>("Id")
@@ -871,9 +1145,7 @@ namespace EMAP.Infrastructure.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserId1")
+                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -881,8 +1153,6 @@ namespace EMAP.Infrastructure.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("FypSupervisors");
                 });
@@ -1423,6 +1693,61 @@ namespace EMAP.Infrastructure.Migrations
                     b.Navigation("Evaluation");
                 });
 
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecord", b =>
+                {
+                    b.HasOne("EMAP.Domain.Fyp.StudentGroup", "StudentGroup")
+                        .WithMany()
+                        .HasForeignKey("StudentGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("StudentGroup");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecordChapter", b =>
+                {
+                    b.HasOne("EMAP.Domain.Fyp.FypFinalRecord", "FinalRecord")
+                        .WithMany("Chapters")
+                        .HasForeignKey("FinalRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FinalRecord");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecordEvaluation", b =>
+                {
+                    b.HasOne("EMAP.Domain.Fyp.FypFinalRecord", "FinalRecord")
+                        .WithMany("Evaluations")
+                        .HasForeignKey("FinalRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FinalRecord");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecordEvaluationMember", b =>
+                {
+                    b.HasOne("EMAP.Domain.Fyp.FypFinalRecordEvaluation", "FinalRecordEvaluation")
+                        .WithMany("Members")
+                        .HasForeignKey("FinalRecordEvaluationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FinalRecordEvaluation");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecordStudent", b =>
+                {
+                    b.HasOne("EMAP.Domain.Fyp.FypFinalRecord", "FinalRecord")
+                        .WithMany("Students")
+                        .HasForeignKey("FinalRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FinalRecord");
+                });
+
             modelBuilder.Entity("EMAP.Domain.Fyp.FypProject", b =>
                 {
                     b.HasOne("EMAP.Domain.Fyp.FypCall", "FypCall")
@@ -1436,21 +1761,19 @@ namespace EMAP.Infrastructure.Migrations
 
             modelBuilder.Entity("EMAP.Domain.Fyp.FypSupervisor", b =>
                 {
-                    b.HasOne("EMAP.Domain.Fyp.Department", null)
+                    b.HasOne("EMAP.Domain.Fyp.Department", "DepartmentRef")
                         .WithMany("Supervisors")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EMAP.Domain.Users.ApplicationUser", null)
+                    b.HasOne("EMAP.Domain.Users.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("EMAP.Domain.Users.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
+                    b.Navigation("DepartmentRef");
 
                     b.Navigation("User");
                 });
@@ -1615,6 +1938,20 @@ namespace EMAP.Infrastructure.Migrations
             modelBuilder.Entity("EMAP.Domain.Fyp.FypEvaluationMember", b =>
                 {
                     b.Navigation("Scores");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecord", b =>
+                {
+                    b.Navigation("Chapters");
+
+                    b.Navigation("Evaluations");
+
+                    b.Navigation("Students");
+                });
+
+            modelBuilder.Entity("EMAP.Domain.Fyp.FypFinalRecordEvaluation", b =>
+                {
+                    b.Navigation("Members");
                 });
 
             modelBuilder.Entity("EMAP.Domain.Fyp.FypMilestone", b =>

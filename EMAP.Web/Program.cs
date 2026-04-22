@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using EMAP.Web.Data;
 using EMAP.Web.Services.Email;
+using EMAP.Web.Services.Fyp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,9 @@ builder.Services.Configure<SmtpSettings>(
     builder.Configuration.GetSection("Smtp"));
 
 builder.Services.AddTransient<IEmailService, MailKitEmailService>();
+
+// Finalization Services
+builder.Services.AddScoped<IFypFinalRecordService, FypFinalRecordService>();
 
 builder.WebHost.UseUrls("http://0.0.0.0:5281");
 

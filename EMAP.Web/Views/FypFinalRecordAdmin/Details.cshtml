@@ -1,0 +1,180 @@
+﻿@model EMAP.Domain.Fyp.FypFinalRecord
+
+@{
+    ViewData["Title"] = "Final Record Details";
+}
+
+<div class="mb-4">
+    <div class="text-uppercase text-muted fw-semibold small">Admin Panel</div>
+    <h2 class="mb-1">Final Academic Record</h2>
+    <p class="text-muted mb-0">Detailed final dossier for administrative review and institutional processing.</p>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4"><strong>Project Title:</strong> @Model.ProjectTitle</div>
+            <div class="col-md-2"><strong>Program:</strong> @Model.ProgramCode</div>
+            <div class="col-md-2"><strong>Batch:</strong> @Model.Batch</div>
+            <div class="col-md-4"><strong>Supervisor:</strong> @Model.SupervisorName</div>
+            <div class="col-md-4"><strong>Completed At:</strong> @(Model.CompletedAt?.ToString("dd MMM yyyy") ?? "-")</div>
+            <div class="col-md-4"><strong>FYP-1 Avg:</strong> @Model.Fyp1AverageMarks</div>
+            <div class="col-md-4"><strong>FYP-2 Avg:</strong> @Model.Fyp2AverageMarks</div>
+            <div class="col-md-12"><strong>Description:</strong> @Model.FypDescription</div>
+            <div class="col-md-12"><strong>Coordinator Remarks:</strong> @Model.CoordinatorRemarks</div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h5 class="mb-3">Student Members</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Registration No</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model.Students)
+                    {
+                        <tr>
+                            <td>@s.StudentName</td>
+                            <td>@s.RegistrationNo</td>
+                            <td>@s.Email</td>
+                            <td>@s.RoleInGroup</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h5 class="mb-3">Chapter History</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Stage</th>
+                        <th>Chapter</th>
+                        <th>Title</th>
+                        <th>Submitted</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.Chapters.OrderBy(x => x.Stage).ThenBy(x => x.ChapterType))
+                    {
+                        <tr>
+                            <td>@c.Stage</td>
+                            <td>@c.ChapterType</td>
+                            <td>@c.Title</td>
+                            <td>@(c.SubmittedAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")</td>
+                            <td>@c.Status</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h5 class="mb-3">Evaluation Summary</h5>
+
+        @if (!Model.Evaluations.Any())
+        {
+            <div class="text-muted">No evaluation records found.</div>
+        }
+        else
+        {
+            @foreach (var e in Model.Evaluations.OrderBy(x => x.Stage).ThenBy(x => x.EvaluationType))
+            {
+                <div class="border rounded p-3 mb-3">
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-3"><strong>Stage:</strong> @e.Stage</div>
+                        <div class="col-md-3"><strong>Type:</strong> @e.EvaluationType</div>
+                        <div class="col-md-3"><strong>Weighted Marks:</strong> @e.WeightedMarks</div>
+                        <div class="col-md-3"><strong>Status:</strong> @(e.IsPublishedToStudent ? "Published" : "Internal")</div>
+                        <div class="col-md-6"><strong>Title:</strong> @e.Title</div>
+                        <div class="col-md-3"><strong>Venue:</strong> @e.Venue</div>
+                        <div class="col-md-3"><strong>Evaluator:</strong> @e.EvaluatorName</div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Registration No</th>
+                                    <th>Total Marks</th>
+                                    <th>Weighted Marks</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!e.Members.Any())
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No member-level evaluation details available.</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var m in e.Members)
+                                    {
+                                        <tr>
+                                            <td>@m.StudentName</td>
+                                            <td>@m.RegistrationNo</td>
+                                            <td>@m.TotalMarks</td>
+                                            <td>@m.WeightedMarks</td>
+                                            <td>@m.Remarks</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <form asp-action="MarkProcessed" method="post" class="mb-3">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <label class="form-label fw-semibold">Admin Remarks</label>
+            <textarea name="adminRemarks" rows="3" class="form-control mb-3">@Model.AdminRemarks</textarea>
+            <button type="submit" class="btn btn-success">Mark Processed</button>
+        </form>
+
+        <form asp-action="Archive" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-outline-secondary"
+                    onclick="return confirm('Archive this final academic record?');">
+                Move to Archive
+            </button>
+        </form>
+    </div>
+</div>

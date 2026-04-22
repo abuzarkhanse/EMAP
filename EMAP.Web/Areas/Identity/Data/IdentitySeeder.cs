@@ -90,7 +90,8 @@ namespace EMAP.Web.Data
             var supervisors = new List<(string Email, string FullName, int DepartmentId)>
             {
                 ("sup1@emap.local", "Dr. Supervisor One", scsDepartment.Id),
-                ("sup2@emap.local", "Dr. Supervisor Two", eeDepartment.Id)
+                ("sup2@emap.local", "Dr. Supervisor Two", eeDepartment.Id),
+                ("sup3@emap.local", "Dr. Supervisor Three", pharmDepartment.Id)
             };
 
             foreach (var item in supervisors)
@@ -162,6 +163,7 @@ namespace EMAP.Web.Data
             var students = new List<(string Email, string FullName, string RegNo, int DepartmentId)>
             {
                 ("student0@emap.local", "Student Zero", "F20-1000", scsDepartment.Id),
+                ("student1@emap.local", "Student One", "F20-1001", scsDepartment.Id),
                 ("student2@emap.local", "Student Two", "F20-1002", scsDepartment.Id),
                 ("student3@emap.local", "Student Three", "F20-1003", eeDepartment.Id),
                 ("student22@emap.local", "Student Twenty Two", "F20-1022", pharmDepartment.Id),

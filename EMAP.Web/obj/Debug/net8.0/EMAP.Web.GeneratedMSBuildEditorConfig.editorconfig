@@ -174,6 +174,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwRXZhbHVhdGlvblxfRm9ybS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/abuzarkhanse/EMAP/EMAP.Web/Views/FypFinalRecordAdmin/ArchiveList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwRmluYWxSZWNvcmRBZG1pblxBcmNoaXZlTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/abuzarkhanse/EMAP/EMAP.Web/Views/FypFinalRecordAdmin/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwRmluYWxSZWNvcmRBZG1pblxEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/abuzarkhanse/EMAP/EMAP.Web/Views/FypFinalRecordAdmin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwRmluYWxSZWNvcmRBZG1pblxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/abuzarkhanse/EMAP/EMAP.Web/Views/FypMidEvaluation/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRnlwTWlkRXZhbHVhdGlvblxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

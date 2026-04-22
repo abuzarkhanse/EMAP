@@ -28,11 +28,15 @@
                 <div class="card-body">
                     <div class="text-muted small mb-1">Pending Requests</div>
                     <div class="fs-3 fw-semibold text-warning">@Model.PendingRequests</div>
-                    <div class="small text-muted">
-                        Student groups awaiting your decision.
-                    </div>
-                    <a asp-action="PendingRequests" class="small d-inline-block mt-2">
-                        Review requests <i class="bi bi-arrow-right-short"></i>
+        
+                    <p class="small text-muted mb-2">
+                        Student groups awaiting your decision
+                    </p>
+
+                    <a asp-controller="Supervisor"
+                           asp-action="PendingRequests"
+                           class="btn btn-sm btn-outline-primary">
+                        Review Chapters →
                     </a>
                 </div>
             </div>
@@ -55,12 +59,17 @@
                 <div class="card-body">
                     <div class="text-muted small mb-1">Pending Proposals</div>
                     <div class="fs-3 fw-semibold text-info">@Model.PendingProposals</div>
-                    <div class="small text-muted">
+
+                    <p class="small text-muted mb-2">
                         Proposals requiring review or feedback.
-                    </div>
-                    <a asp-action="Proposals" class="small d-inline-block mt-2">
-                        View proposals <i class="bi bi-arrow-right-short"></i>
+                    </p>
+
+                    <a asp-controller="Supervisor"
+                           asp-action="Proposals"
+                           class="btn btn-sm btn-outline-primary">
+                        View proposals →
                     </a>
+
                 </div>
             </div>
         </div>

@@ -35,6 +35,15 @@ namespace EMAP.Infrastructure.Data
         public DbSet<FypEvaluationMember> FypEvaluationMembers { get; set; } = default!;
         public DbSet<FypEvaluationMemberScore> FypEvaluationMemberScores { get; set; } = default!;
 
+
+        // FYP Final Records for archival purposes
+        public DbSet<FypFinalRecord> FypFinalRecords => Set<FypFinalRecord>();
+        public DbSet<FypFinalRecordStudent> FypFinalRecordStudents => Set<FypFinalRecordStudent>();
+        public DbSet<FypFinalRecordChapter> FypFinalRecordChapters => Set<FypFinalRecordChapter>();
+        public DbSet<FypFinalRecordEvaluation> FypFinalRecordEvaluations => Set<FypFinalRecordEvaluation>();
+
+        public DbSet<FypFinalRecordEvaluationMember> FypFinalRecordEvaluationMembers => Set<FypFinalRecordEvaluationMember>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -74,11 +83,20 @@ namespace EMAP.Infrastructure.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             // FypSupervisor -> ApplicationUser
-            modelBuilder.Entity<FypSupervisor>()
-                .HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(s => s.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<FypSupervisor>(entity =>
+            {
+                entity.HasOne(s => s.User)
+                    .WithMany()
+                    .HasForeignKey(s => s.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(s => s.UserId)
+                    .HasMaxLength(450)
+                    .IsRequired();
+
+                entity.Property(s => s.DepartmentId)
+                    .IsRequired();
+            });
 
             // StudentGroup -> FypSupervisor
             modelBuilder.Entity<StudentGroup>(entity =>
@@ -142,6 +160,12 @@ namespace EMAP.Infrastructure.Data
 
                 entity.Property(x => x.TotalMarks)
                     .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.WeightagePercent)
+                    .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.WeightedMarks)
+                    .HasColumnType("decimal(18,2)");
 
                 entity.Property(x => x.Status)
                     .HasConversion<int>();
@@ -501,6 +525,173 @@ namespace EMAP.Infrastructure.Data
                     .WithMany()
                     .HasForeignKey(x => x.CriterionId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+
+            // FypFinalRecord
+            modelBuilder.Entity<FypFinalRecord>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.ProjectTitle)
+                    .HasMaxLength(300)
+                    .IsRequired();
+
+                entity.Property(x => x.ProgramCode)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(x => x.Batch)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(x => x.SupervisorName)
+                    .HasMaxLength(200);
+
+                entity.Property(x => x.Fyp1AverageMarks)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Fyp2AverageMarks)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.FinalAverageMarks)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Status)
+                    .HasConversion<int>();
+
+                entity.Property(x => x.SubmittedByUserId)
+                    .HasMaxLength(450)
+                    .IsRequired();
+
+                entity.Property(x => x.ProcessedByUserId)
+                    .HasMaxLength(450);
+
+                entity.HasOne(x => x.StudentGroup)
+                    .WithMany()
+                    .HasForeignKey(x => x.StudentGroupId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // FypFinalRecordStudent
+            modelBuilder.Entity<FypFinalRecordStudent>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.StudentUserId)
+                    .HasMaxLength(450)
+                    .IsRequired();
+
+                entity.Property(x => x.StudentName)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(x => x.RegistrationNo)
+                    .HasMaxLength(100);
+
+                entity.Property(x => x.Email)
+                    .HasMaxLength(200);
+
+                entity.Property(x => x.RoleInGroup)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.HasOne(x => x.FinalRecord)
+                    .WithMany(x => x.Students)
+                    .HasForeignKey(x => x.FinalRecordId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // FypFinalRecordChapter
+            modelBuilder.Entity<FypFinalRecordChapter>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Title)
+                    .HasMaxLength(300)
+                    .IsRequired();
+
+                entity.Property(x => x.Stage)
+                    .HasConversion<int>();
+
+                entity.Property(x => x.ChapterType)
+                    .HasConversion<int>();
+
+                entity.Property(x => x.Status)
+                    .HasConversion<int>();
+
+                entity.HasOne(x => x.FinalRecord)
+                    .WithMany(x => x.Chapters)
+                    .HasForeignKey(x => x.FinalRecordId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // FypFinalRecordEvaluation
+            modelBuilder.Entity<FypFinalRecordEvaluation>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Stage)
+                    .HasConversion<int>();
+
+                entity.Property(x => x.EvaluationType)
+                    .HasConversion<int>();
+
+                entity.Property(x => x.Title)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(x => x.Venue)
+                    .HasMaxLength(250);
+
+                entity.Property(x => x.EvaluatorName)
+                    .HasMaxLength(200);
+
+                entity.Property(x => x.TotalMarks)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.WeightagePercent)
+                    .HasColumnType("decimal(5,2)");
+
+                entity.Property(x => x.WeightedMarks)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.HasOne(x => x.FinalRecord)
+                    .WithMany(x => x.Evaluations)
+                    .HasForeignKey(x => x.FinalRecordId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // FypFinalRecordEvaluationMember
+
+            modelBuilder.Entity<FypFinalRecordEvaluationMember>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.StudentUserId)
+                    .HasMaxLength(450)
+                    .IsRequired();
+
+                entity.Property(x => x.StudentName)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(x => x.RegistrationNo)
+                    .HasMaxLength(100);
+
+                entity.Property(x => x.TotalMarks)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.WeightedMarks)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Remarks)
+                    .HasMaxLength(1000);
+
+                entity.HasOne(x => x.FinalRecordEvaluation)
+                    .WithMany(x => x.Members)
+                    .HasForeignKey(x => x.FinalRecordEvaluationId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

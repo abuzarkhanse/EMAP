@@ -1,0 +1,79 @@
+﻿@model IEnumerable<EMAP.Domain.Fyp.FypFinalRecord>
+
+@{
+    ViewData["Title"] = "Archived Final Records";
+}
+
+<div class="mb-4">
+    <div class="text-uppercase text-muted fw-semibold small">Admin Panel</div>
+    <h2 class="mb-1">Archived Final Records</h2>
+    <p class="text-muted mb-0">Institutional archive of completed FYP records.</p>
+</div>
+
+<form method="get" class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-10">
+                <label class="form-label fw-semibold">Search Archive</label>
+                <input type="text"
+                       name="q"
+                       value="@ViewBag.SearchText"
+                       class="form-control"
+                       placeholder="Search by project title, group ID, program, batch, supervisor, student name, registration no, or email" />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="d-flex justify-content-end mb-3">
+    <a asp-action="Index" class="btn btn-outline-primary btn-sm">Back to Active Records</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Project</th>
+                        <th>Program</th>
+                        <th>Batch</th>
+                        <th>Archived At</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No archived records found.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@item.ProjectTitle</div>
+                                    <div class="text-muted small">Group #@item.StudentGroupId</div>
+                                </td>
+                                <td>@item.ProgramCode</td>
+                                <td>@item.Batch</td>
+                                <td>@(item.ArchivedAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")</td>
+                                <td class="text-end">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary btn-sm">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,82 @@
+﻿@model IEnumerable<EMAP.Domain.Fyp.FypFinalRecord>
+
+@{
+    ViewData["Title"] = "Final Academic Records";
+}
+
+<div class="mb-4">
+    <div class="text-uppercase text-muted fw-semibold small">Admin Panel</div>
+    <h2 class="mb-1">Final Academic Records</h2>
+    <p class="text-muted mb-0">
+        Review finalized FYP records submitted by coordinators before administrative processing and archiving.
+    </p>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="d-flex justify-content-end mb-3">
+    <a asp-action="ArchiveList" class="btn btn-outline-secondary btn-sm">View Archive</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Project</th>
+                        <th>Program</th>
+                        <th>Batch</th>
+                        <th>Supervisor</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                No final academic records available.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@item.ProjectTitle</div>
+                                    <div class="text-muted small">Group #@item.StudentGroupId</div>
+                                </td>
+                                <td>@item.ProgramCode</td>
+                                <td>@item.Batch</td>
+                                <td>@item.SupervisorName</td>
+                                <td>
+                                    <span class="badge bg-@(item.Status == EMAP.Domain.Fyp.FypFinalRecordStatus.Processed ? "success" : "warning")">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td>@item.SubmittedToAdminAt.ToString("dd MMM yyyy hh:mm tt")</td>
+                                <td class="text-end">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-sm">
+                                        View Record
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

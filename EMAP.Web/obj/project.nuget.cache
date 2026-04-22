@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "89MKnYEW5Ag=",
+  "dgSpecHash": "GSaHeWgtV00=",
   "success": true,
   "projectFilePath": "C:\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
   "expectedPackageFiles": [
@@ -190,6 +190,18 @@
     "C:\\nuget\\system.windows.extensions\\7.0.0\\system.windows.extensions.7.0.0.nupkg.sha512"
   ],
   "logs": [
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MailKit' 4.14.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr",
+      "projectPath": "C:\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\abuzarkhanse\\EMAP\\EMAP.Web\\EMAP.Web.csproj",
+      "libraryId": "MailKit",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
     {
       "code": "NU1903",
       "level": "Warning",

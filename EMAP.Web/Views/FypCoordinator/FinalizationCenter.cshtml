@@ -149,16 +149,32 @@
                                         <td>@group.ProgramCode</td>
                                         <td>@group.FypCall?.Batch</td>
                                         <td class="text-end">
-                                            <form asp-action="FinalizeFyp2" method="post" class="d-inline">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="groupId" value="@group.Id" />
-                                                <input type="hidden" name="completionRemarks" value="FYP completed and finalized by coordinator." />
-                                                <button type="submit"
-                                                        class="btn btn-outline-primary btn-sm"
-                                                        onclick="return confirm('Finalize this FYP-2 group?');">
-                                                    Complete
-                                                </button>
-                                            </form>
+                                            <div class="d-flex justify-content-end gap-2">
+                                                <form asp-action="FinalizeFyp2" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="groupId" value="@group.Id" />
+                                                    <input type="hidden" name="completionRemarks" value="FYP completed and finalized by coordinator." />
+                                                    <button type="submit"
+                                                            class="btn btn-outline-primary btn-sm"
+                                                            onclick="return confirm('Finalize this FYP-2 group?');">
+                                                        Complete
+                                                    </button>
+                                                </form>
+
+                                                @if (group.IsFypCompleted)
+                                                {
+                                                    <form asp-action="SendFinalRecordToAdmin" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="groupId" value="@group.Id" />
+                                                        <input type="hidden" name="coordinatorRemarks" value="Final academic dossier submitted to admin after completion." />
+                                                        <button type="submit"
+                                                                class="btn btn-success btn-sm"
+                                                                onclick="return confirm('Send final academic record to admin?');">
+                                                            Send to Admin
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
                                         </td>
                                     </tr>
                                 }
@@ -169,4 +185,117 @@
             </div>
         </div>
     </div>
+
+    <!-- Admin Handover -->
+
+    <div class="row g-4 mt-1">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <form asp-action="SendSelectedFinalRecordsToAdmin" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <div>
+                                <h4 class="mb-1">Completed Groups Ready for Admin Handover</h4>
+                                <div class="text-muted small">
+                                    Fully completed FYP records awaiting submission to the admin office
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <input type="hidden" name="coordinatorRemarks" value="Final academic dossier submitted to admin after successful FYP completion." />
+                                <button type="submit"
+                                        class="btn btn-success btn-sm"
+                                        onclick="return confirm('Send all selected completed groups to admin?');">
+                                    Send Selected to Admin
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width:50px;">
+                                            <input type="checkbox" id="selectAllReadyToSend" />
+                                        </th>
+                                        <th>Group</th>
+                                        <th>Program</th>
+                                        <th>Batch</th>
+                                        <th>Supervisor</th>
+                                        <th>Completed At</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (!Model.ReadyForAdminHandover.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted py-4">
+                                                No completed groups are currently waiting for admin handover.
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        foreach (var group in Model.ReadyForAdminHandover)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox"
+                                                           name="selectedReadyForAdminGroupIds"
+                                                           value="@group.Id"
+                                                           class="ready-send-checkbox" />
+                                                </td>
+                                                <td>
+                                                    <div class="fw-semibold">@group.TentativeProjectTitle</div>
+                                                    <div class="text-muted small">Group #@group.Id</div>
+                                                </td>
+                                                <td>@group.ProgramCode</td>
+                                                <td>@group.FypCall?.Batch</td>
+                                                <td>@group.Supervisor?.Name</td>
+                                                <td>@(group.CompletedAt?.ToString("dd MMM yyyy hh:mm tt") ?? "-")</td>
+                                                <td class="text-end">
+                                                    <form asp-action="SendFinalRecordToAdmin" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="groupId" value="@group.Id" />
+                                                        <input type="hidden" name="coordinatorRemarks" value="Final academic dossier submitted to admin after successful FYP completion." />
+                                                        <button type="submit"
+                                                                class="btn btn-outline-success btn-sm"
+                                                                onclick="return confirm('Send this completed FYP record to admin?');">
+                                                            Send One
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="alert alert-info small mt-3 mb-0">
+                            Once sent, the final academic record becomes available to the admin panel for processing, institutional review, and archival.
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const selectAll = document.getElementById("selectAllReadyToSend");
+                    const checkboxes = document.querySelectorAll(".ready-send-checkbox");
+
+                    if (selectAll) {
+                        selectAll.addEventListener("change", function () {
+                            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                        });
+                    }
+                });
+        </script>
+    }
 </div>

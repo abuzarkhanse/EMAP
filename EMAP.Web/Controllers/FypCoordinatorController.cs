@@ -3,6 +3,7 @@ using EMAP.Domain.Fyp;
 using EMAP.Domain.Users;
 using EMAP.Infrastructure.Data;
 using EMAP.Web.Services.Email;
+using EMAP.Web.Services.Fyp;
 using EMAP.Web.ViewModels.Fyp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -24,15 +25,18 @@ namespace EMAP.Web.Controllers
         private readonly EmapDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailService _email;
+        private readonly IFypFinalRecordService _finalRecordService;
 
         public FypCoordinatorController(
             EmapDbContext db,
             UserManager<ApplicationUser> userManager,
-            IEmailService email)
+            IEmailService email,
+            IFypFinalRecordService finalRecordService)
         {
             _db = db;
             _userManager = userManager;
             _email = email;
+            _finalRecordService = finalRecordService;
         }
 
         private string CurrentUserId =>
@@ -720,6 +724,8 @@ namespace EMAP.Web.Controllers
             return RedirectToAction(nameof(ChapterApprovals));
         }
 
+        // ===================== FYP FINALIZATION =====================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FinalizeFyp1(int groupId)
@@ -987,6 +993,17 @@ namespace EMAP.Web.Controllers
 
                 if (await IsReadyForFyp2FinalizationAsync(group))
                     vm.ReadyForFyp2Finalization.Add(group);
+
+                if (group.IsFypCompleted)
+                {
+                    var alreadySentToAdmin = await _db.FypFinalRecords
+                        .AnyAsync(x => x.StudentGroupId == group.Id);
+
+                    if (!alreadySentToAdmin)
+                    {
+                        vm.ReadyForAdminHandover.Add(group);
+                    }
+                }
             }
 
             return View(vm);
@@ -1087,6 +1104,65 @@ namespace EMAP.Web.Controllers
             TempData["Success"] = $"{finalizedCount} FYP-2 group(s) finalized and marked completed.";
             return RedirectToAction(nameof(FinalizationCenter));
         }
+
+
+        // ===================== SENDING FINAL RECORD =====================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendFinalRecordToAdmin(int groupId, string? coordinatorRemarks)
+        {
+            var result = await _finalRecordService.CreateFinalRecordAsync(
+                groupId,
+                CurrentUserId,
+                coordinatorRemarks);
+
+            if (!result.Success)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(FinalizationCenter));
+            }
+
+            TempData["Success"] = result.Message;
+            return RedirectToAction(nameof(FinalizationCenter));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendSelectedFinalRecordsToAdmin(List<int> selectedReadyForAdminGroupIds, string? coordinatorRemarks)
+        {
+            if (selectedReadyForAdminGroupIds == null || !selectedReadyForAdminGroupIds.Any())
+            {
+                TempData["Error"] = "Please select at least one completed group to send to admin.";
+                return RedirectToAction(nameof(FinalizationCenter));
+            }
+
+            var successCount = 0;
+            var failMessages = new List<string>();
+
+            foreach (var groupId in selectedReadyForAdminGroupIds.Distinct())
+            {
+                var result = await _finalRecordService.CreateFinalRecordAsync(
+                    groupId,
+                    CurrentUserId,
+                    string.IsNullOrWhiteSpace(coordinatorRemarks)
+                        ? "Final academic dossier submitted to admin after successful FYP completion."
+                        : coordinatorRemarks.Trim());
+
+                if (result.Success)
+                    successCount++;
+                else
+                    failMessages.Add($"Group #{groupId}: {result.Message}");
+            }
+
+            if (successCount > 0)
+                TempData["Success"] = $"{successCount} completed group(s) successfully sent to admin.";
+
+            if (failMessages.Any())
+                TempData["Error"] = string.Join(" ", failMessages);
+
+            return RedirectToAction(nameof(FinalizationCenter));
+        }
     }
 
     public class CoordinatorChaptersVm
@@ -1114,5 +1190,8 @@ namespace EMAP.Web.Controllers
     {
         public List<StudentGroup> ReadyForFyp1Finalization { get; set; } = new();
         public List<StudentGroup> ReadyForFyp2Finalization { get; set; } = new();
+        public List<StudentGroup> ReadyForAdminHandover { get; set; } = new();
+
+        public List<int> SelectedReadyForAdminGroupIds { get; set; } = new();
     }
 }
