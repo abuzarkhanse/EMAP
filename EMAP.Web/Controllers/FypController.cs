@@ -669,6 +669,20 @@ namespace EMAP.Web.Controllers
                 return View(model);
             }
 
+            if (proposalFile == null || proposalFile.Length == 0)
+            {
+                TempData["Error"] = "Please select a PDF file.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var ext = Path.GetExtension(proposalFile.FileName).ToLowerInvariant();
+
+            if (ext != ".pdf" || proposalFile.ContentType != "application/pdf")
+            {
+                TempData["Error"] = "Only PDF files are allowed.";
+                return RedirectToAction(nameof(Index));
+            }
+
             if (string.IsNullOrWhiteSpace(model.Title))
             {
                 ModelState.AddModelError(nameof(model.Title), "Proposal title required.");
@@ -697,7 +711,6 @@ namespace EMAP.Web.Controllers
             var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "proposals");
             Directory.CreateDirectory(uploadsFolder);
 
-            var ext = Path.GetExtension(proposalFile.FileName);
             var fileName = $"group_{group.Id}_rev_{DateTime.UtcNow:yyyyMMddHHmmss}{ext}";
             var fullPath = Path.Combine(uploadsFolder, fileName);
 
@@ -817,6 +830,20 @@ namespace EMAP.Web.Controllers
             {
                 ModelState.AddModelError("", "Please select a file.");
                 return View(vm);
+            }
+
+            if (file == null || file.Length == 0)
+            {
+                TempData["Error"] = "Please select a PDF file.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (ext != ".pdf" || file.ContentType != "application/pdf")
+            {
+                TempData["Error"] = "Only PDF files are allowed.";
+                return RedirectToAction(nameof(Index));
             }
 
             var group = await _db.StudentGroups

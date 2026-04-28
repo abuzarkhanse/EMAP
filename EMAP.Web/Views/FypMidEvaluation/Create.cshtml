@@ -39,29 +39,34 @@
     <div class="card-body">
         <input type="hidden" asp-for="MilestoneId" />
 
-        <div class="row g-4 mb-4">
-            <div class="col-md-3">
-                <label asp-for="WeightagePercent" class="form-label fw-semibold"></label>
+        <div class="row g-3 align-items-end mb-4">
+            <div class="col-lg-2 col-md-4">
+                <label asp-for="WeightagePercent" class="form-label fw-semibold">Weightage (%)</label>
                 <input asp-for="WeightagePercent" type="number" step="0.01" min="0" max="100" class="form-control" />
             </div>
 
-            <div class="col-md-3">
-                <label asp-for="ScheduledAt" class="form-label fw-semibold"></label>
-                <input asp-for="ScheduledAt" type="datetime-local" class="form-control" />
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label fw-semibold">Scheduled Date</label>
+                <input name="ScheduledDate" type="date" class="form-control" required />
             </div>
 
-            <div class="col-md-3">
-                <label asp-for="Venue" class="form-label fw-semibold"></label>
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label fw-semibold">Scheduled Time</label>
+                <input name="ScheduledTime" type="time" class="form-control" required />
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <label asp-for="Venue" class="form-label fw-semibold">Venue</label>
                 <input asp-for="Venue" class="form-control" placeholder="Seminar Hall / Lab / Room No." />
             </div>
 
-            <div class="col-md-3">
-                <label asp-for="CommitteeMembers" class="form-label fw-semibold"></label>
+            <div class="col-lg-3 col-md-6">
+                <label asp-for="CommitteeMembers" class="form-label fw-semibold">Committee Members</label>
                 <input asp-for="CommitteeMembers" class="form-control" placeholder="Coordinator / Committee members list" />
             </div>
 
             <div class="col-12">
-                <label asp-for="Instructions" class="form-label fw-semibold"></label>
+                <label asp-for="Instructions" class="form-label fw-semibold">Instructions</label>
                 <textarea asp-for="Instructions" rows="3" class="form-control" placeholder="Bring slides, report, demo, or report copy if required."></textarea>
             </div>
         </div>
